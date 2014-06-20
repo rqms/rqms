@@ -1,0 +1,123 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<borderlayout width="100%" height="100%">
+		<north border="none">
+			<div width="96%">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label id="lcaption" sclass="sectionTitleLabel"
+							value="Add/Edit Feed Back" />
+					</div>
+				</span>
+				<div id="buttonsDiv"
+					style="float:right;margin-top:6px;">
+					<button label="Save" mold="trendy"
+						onClick="@command('saveThis')" tooltiptext="Save"
+						autodisable="self" sclass="mybutton button theme small">
+					</button>
+
+				</div>
+				<div style="clear: both;"></div>
+				<div sclass="sectionSeperator"></div>
+			</div>
+		</north>
+		<center border="none">
+			<vlayout vflex="1" hflex="1" sclass="vertical-scroll">
+
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<cell colspan="2">
+										<vlayout>
+											<hlayout>
+												<label
+													value="Candidate ID" sclass="flabel" />
+												<label value="*"
+													sclass="flblreq" />
+											</hlayout>
+											<textbox id="candidateid"
+												mold="rounded" hflex="2"
+												value="@bind(vm.selectedItem.candidateid)" maxlength="200" />
+										</vlayout>
+									</cell>
+								</row>
+								<row>
+									<vlayout>
+										<hlayout>
+											<label value="Job ID"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="jobid" hflex="1"
+											mold="rounded" value="@bind(vm.selectedItem.jobid)" />
+									</vlayout>
+									<vlayout>
+										<hlayout>
+											<label value="User ID"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+
+										</hlayout>
+										<textbox id="userid" hflex="1"
+											readonly="true" mold="rounded"
+											value="@bind(vm.selectedItem.userid)" />
+									</vlayout>
+								</row>
+								<row>
+									<cell colspan="2">
+										<vlayout>
+											<hlayout>
+												<label value="Comments"
+													sclass="flabel" />
+												<label value="*"
+													sclass="flblreq" />
+											</hlayout>
+											<vlayout>
+												<div
+													style="width:375px;text-align:right;padding:0px;">
+												</div>
+												<textbox rows="5"
+													mold="rounded" value="@bind(vm.selectedItem.comments)"
+													width="98.5%" style="border:2px solid #e6e6e6" />
+											</vlayout>
+										</vlayout>
+									</cell>
+								</row>
+								<row>
+									<cell colspan="2">
+										<vlayout>
+											<hlayout>
+												<label value="Status"
+													sclass="flabel" />
+												<label value="*"
+													sclass="flblreq" />
+											</hlayout>
+											<vlayout>
+												<textbox id="statusid"
+													hflex="1" mold="rounded"
+													value="@bind(vm.selectedItem.statusid)" />
+											</vlayout>
+										</vlayout>
+									</cell>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+
+			</vlayout>
+		</center>
+
+	</borderlayout>
+</zk>

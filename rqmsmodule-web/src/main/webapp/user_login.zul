@@ -1,0 +1,88 @@
+<?page automaticTimeout="false"?>
+<?root-attributes lang="en" ?>
+<?link rel="icon" type="image/x-icon" href="/resource/image/favicon2.ico"?>
+<zk xmlns:x="xhtml" xmlns:zk="zk" xmlns:a="client/attribute">
+	<window width="100%" height="100%" xmlns:w="client" xmlns:x="xhtml">
+		<style src="/resource/style/styles.css" />
+		<style src="/resource/style/global.css" />
+		<html style="color:red" if="${not empty param.login_error}">
+			<![CDATA[ Your login attempt was not successful, try
+			again.<br/><br/> Reason:
+			${SPRING_SECURITY_LAST_EXCEPTION.message} ]]>
+	    </html>
+		<div sclass="body">
+			<div sclass="wrapper">
+				<div class="content_holder">
+					<html content="AMANDA" style="display: block;"></html>
+				</div>
+				<div sclass="tab_holder">
+					<div sclass="tab_holder_tab_bg">
+						<div sclass="tabs">
+							<separator></separator>
+							<tabbox width="380px" height="100%"
+								sclass="tabs_container" >
+								<tabs>
+									<tab label="login" selected="true" />
+								</tabs>
+								<tabpanels>
+									<tabpanel></tabpanel>
+									<tabpanel>
+										<div height="420px">
+											 <cardlayout id="card"
+												width="380px" height="420px" selectedIndex="0"
+												focus="true"> 
+												<div
+													sclass="tabs_container_div">
+													<separator></separator>
+													<image
+														src="/resource/image/amanda1.png"
+														sclass="tabs_container_div_img" />
+													<div
+														sclass="for_login">
+														<textbox type="text" name="j_username"
+															placeholder="Username"  id="username">
+														</textbox>
+														<textbox type="password"
+															name="j_password" placeholder="Password" 
+															id="password" >
+														</textbox>
+													</div>
+													<div sclass="for_login">
+
+														<checkbox label="Remember my username"/>
+
+														<separator></separator>
+
+														<toolbarbutton
+															label="Forgot your password ?" />
+														<separator></separator>
+														<!-- <image
+															style="cursor: pointer;"
+															src="/resource/image/sign-in.png"
+															onClick="@command('login')" /> -->
+														<button id="btnNo"
+															label="Log in" onClick=""/>
+													</div>
+												</div>
+											 </cardlayout> 
+										</div>
+									</tabpanel>
+									<!-- <tabpanel>
+										<label
+											value="@load(vm.tabMsg)">
+										</label>
+									</tabpanel>
+									<tabpanel>
+										<label
+											value="@load(vm.tabMsg)">
+										</label>
+									</tabpanel> -->
+								</tabpanels>
+							</tabbox>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</window>
+</zk>

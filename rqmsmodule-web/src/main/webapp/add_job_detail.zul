@@ -1,0 +1,238 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<borderlayout width="100%" height="100%">
+		<north border="none">
+			<div width="96%">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label id="lcaption" sclass="sectionTitleLabel"
+							value="Add/Edit Job Details" />
+					</div>
+				</span>
+				<div id="buttonsDiv"
+					style="float:right;margin-top:6px;">
+					<button label="Save" mold="trendy"
+						onClick="@command('saveThis')" tooltiptext="Save"
+						autodisable="self" sclass="mybutton button theme small">
+					</button>
+					<button label="Reset" mold="trendy"
+						tooltiptext="Reset" autodisable="self"
+						onClick="@command('refresh')"
+						sclass="mybutton button theme small">
+					</button>
+				</div>
+				<div style="clear: both;"></div>
+				<div sclass="sectionSeperator"></div>
+			</div>
+		</north>
+		<center border="none">
+			<vlayout vflex="1" hflex="1" sclass="vertical-scroll">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label value="Job Information"
+							sclass="sectionTitleLabel" />
+						<separator />
+					</div>
+				</span>
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<cell colspan="2">
+										<vlayout>
+											<hlayout>
+												<label value="Job Title"
+													sclass="flabel" />
+												<label value="*"
+													sclass="flblreq" />
+											</hlayout>
+											<textbox id="jobtitle"
+												mold="rounded" hflex="2"
+												value="@bind(vm.selectedItem.jobtitle)" maxlength="200" />
+										</vlayout>
+									</cell>
+								</row>
+								<row>
+									<vlayout>
+										<hlayout>
+											<label value="Company Name"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="companyName"
+											hflex="1" mold="rounded"
+											value="@bind(vm.selectedItem.companyName)" />
+									</vlayout>
+									<vlayout>
+										<hlayout>
+											<label value="Company URL"
+												sclass="flabel" />
+										</hlayout>
+										<textbox id="companyUrl"
+											hflex="1" mold="rounded"
+											value="@bind(vm.selectedItem.companyUrl)" />
+									</vlayout>
+								</row>
+								<row>
+								<cell colspan="2">
+									<vlayout>
+										<hlayout>
+											<label
+												value="Job Description" sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<vlayout>
+											<div
+												style="width:375px;text-align:right;padding:0px;">
+											</div>
+											<textbox rows="5"
+												mold="rounded" value="@bind(vm.selectedItem.jobdescription)"
+												width="98.5%" style="border:2px solid #e6e6e6"/>
+										</vlayout>
+									</vlayout>
+									</cell>
+								</row>
+								<row>
+									<cell colspan="2">
+										<vlayout>
+											<label value="Skill Sets"
+												sclass="flabel" />
+											<textbox id="skillsets"
+												hflex="2" mold="rounded"
+												value="@bind(vm.selectedItem.skillsets)" />
+										</vlayout>
+									</cell>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label value="Job Address (optional)"
+							sclass="sectionTitleLabel" />
+						<separator />
+					</div>
+				</span>
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<vlayout>
+										<hlayout>
+											<label
+												value="Street Address" sclass="flabel" />
+										</hlayout>
+										<textbox id="jobstreetaddress"
+											hflex="1" mold="rounded"
+											value="@bind(vm.selectedItem.jobstreetaddress)" />
+									</vlayout>
+									<vlayout>
+										<hlayout>
+											<label value="Job ZIP Code"
+												sclass="flabel" />
+										</hlayout>
+										<textbox id="jobzipCode"
+											hflex="1" mold="rounded"
+											value="@bind(vm.selectedItem.jobzipCode)" />
+									</vlayout>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label value="Job Salary (optional)"
+							sclass="sectionTitleLabel" />
+						<separator />
+					</div>
+				</span>
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<vlayout>
+										<label value="Hourly/Yearly"
+											sclass="flabel" />
+										<textbox id="jobsalary"
+											hflex="2" mold="rounded"
+											value="@bind(vm.selectedItem.jobsalary)" />
+									</vlayout>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label value="Job Type (optional)"
+							sclass="sectionTitleLabel" />
+						<separator />
+					</div>
+				</span>
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<vlayout>
+										<label value="Job Type"
+											sclass="flabel" />
+										<textbox id="jobtype" hflex="2"
+											mold="rounded" value="@bind(vm.selectedItem.jobtype)" />
+									</vlayout>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+			</vlayout>
+		</center>
+		<south>
+			<toolbar visible="true">
+				<toolbarbutton style="font-size:12px;"
+					label="Add Candidates" tooltiptext="Add Candidates"
+					onClick="@command('addCandidates')" visible="true"
+					sclass="mybutton button theme small" />
+			</toolbar>
+		</south>
+	</borderlayout>
+</zk>

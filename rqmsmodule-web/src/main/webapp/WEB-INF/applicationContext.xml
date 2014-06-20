@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/tx
+                   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property value="jdbc:postgresql://localhost:5432/RQMS" name="url"/> 
+		<property value="postgres" name="username"/>
+		<property value="rqms" name="password"/>
+	</bean>
+
+
+	<!-- Define the datasource; define the session factory, we need specify 
+		the packagesToScan property, this property will scan all entity annotated 
+		class. define the context component-scan basepackage, this will scan all 
+		@Repository annotated Class -->	
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.rqms.domain" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.use_sql_comments">true</prop>
+				<prop key="hibernate.zeroDateTimeBehavior">convertToNull</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- Container Configuration: The IOC container configuration xml file is 
+		shown below,The container has the <context:component-scan> element and <context:annotation-config/> 
+		<context:annotation-config/> used to intimate the beans of this IOC container 
+		are annotation supported. By pass the base path of the beans as the value 
+		of the base-package attribute of context:component-scan element, we can detect 
+		the beans and registering their bean definitions automatically without lots 
+		of overhead. The value of base-package attribute is fully qualified package 
+		name of the bean classes. We can pass more than one package names by comma 
+		separated -->    
+
+
+	<context:component-scan base-package="com.rqms" />
+	<context:annotation-config />
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	
+	<bean id="CRUDService" class="com.rqms.service.CRUDServiceImpl" autowire="byType" />
+	<bean id="UserprofileService" class="com.rqms.service.UserprofileService" autowire="byType" />
+	<bean id="ApplicantfeedbackidService" class="com.rqms.service.ApplicantfeedbackidService" autowire="byType" />
+	<bean id="AttachmentService" class="com.rqms.service.AttachmentService" autowire="byType" />
+	<bean id="CandidateprofileService" class="com.rqms.service.CandidateprofileService" autowire="byType" />
+	<bean id="JobdetailsService" class="com.rqms.service.JobdetailsService" autowire="byType" />
+	<bean id="ValidroleService" class="com.rqms.service.ValidroleService" autowire="byType" />
+	<bean id="ValidstatusService" class="com.rqms.service.ValidstatusService" autowire="byType" />
+	<bean id="ValidRoleGroupService" class="com.rqms.service.ValidRoleGroupService" autowire="byType" />
+</beans>

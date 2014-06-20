@@ -1,0 +1,1770 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE modules SYSTEM "new_admin_config.dtd">
+<!-- Some important information a) Strictly adhere the dtd definition, don't 
+	try with new tag or attribute b) If you would like to add new attribute make 
+	corresponding changes in AdminConfig.java Aspire 2009/02/04 removed removed 
+	the starting "/" in url's [ie: '/admin/layout/address.gif' to 'admin/layout/address.gif'] 
+	Aspire 2009/05/26 added licence property for the following modules Asset, 
+	Folder, Health, LRProperty, Review and Tax -->
+<admin>
+	<mainOrientation>
+		<!-- <orientationPage id="FolderOrientationConcepts" name="Concepts" url="admin/MainOrientationConcept.jsp" 
+			/> <orientationPage id="SiteAndUseAdministration" name="Site and User Administration" 
+			url="admin/SiteandUser_AdminOrientation.jsp" /> <orientationPage id="CoreServices" 
+			name="Core Services" url="admin/CoreServices_Orientation.jsp" /> <orientationPage 
+			id="Module" name="Module" url="admin/ModuleOrientation.jsp" /> -->
+		<orientationPage id="FolderOrientationConcepts" name="Concepts"
+			url="concepts_orientation.zul" />
+
+		<orientationPage id="SiteAndUseAdministration" name="Site and User Administration"
+			url="site_user_admin_orientation.zul" />
+		<orientationPage id="CoreServices" name="Core Services"
+			url="core_services_orientation.zul" />
+		<orientationPage id="Module" name="Module"
+			url="module_orientation.zul" />
+
+	</mainOrientation>
+	<modules>
+		<module id="address" name="Address" icon="admin/layout/address.gif"
+			url="admin/groups/orientation.jsp" hotkey="F3" service="core">
+			<orientation id="orientation">
+				<orientationPage id="AddressOrientation" name="Orientation"
+					url="address_orientation.zul" />
+			</orientation>
+
+			<page id="ValidProvince" name="Province/State" url="valid_province.zul"
+				javaClass="ValidProvince" />
+
+
+			<page id="ValidCity" name="City" url="valid_city.zul" javaClass="ValidCity" />
+			<page id="ValidStreetType" name="Street Type" url="valid_street_type.zul"
+				javaClass="ValidStreetType" />
+			<page id="ValidStreet" name="Street Name" url="valid_street.zul"
+				javaClass="ValidStreet" />
+			<page id="ValidCommunity" name="Community" url="valid_community.zul"
+				javaClass="ValidCommunity" />
+			<page id="ValidCounty_Address" name="County" url="valid_county.zul"
+				javaClass="ValidCounty" />
+			<page id="ValidCityCommunity" name="City Community" url="valid_city_community.zul"
+				javaClass="ValidCityCommunity" />
+			<page id="ValidAddressUnitType" name="Unit Type" url="valid_address_unit_type.zul"
+				javaClass="ValidAddressUnitType" /><!-- Aspire 2010/03/01 18934 changed 
+				the label name on menu pane and tab name -->
+			<page id="ValidAddressDirection" name="Direction"
+				url="valid_address_direction.zul" javaClass="ValidAddressDirection" /><!-- 
+				Aspire 2010/02/18 18935 changed the label name on menu pane and tab name -->
+		</module>
+	<module id="attachment" name="Attachment" icon="admin/layout/attachment.gif"
+			hotkey="F4" url="admin/groups/orientation.jsp" service="core">
+			<!-- Aspire 2012/08/13 code added for the enhancement #21610 -->
+			<orientation id="orientation">
+				<orientationPage id="AttachmentOrientation" name="Orientation"
+					url="attachment_orientation.zul" />
+			</orientation>
+			<page id="ValidAttachment" name="Attachment Type" url="valid_attachment.zul" javaClass="ValidAttachment" />
+			<page id="ValidAttachmentInfo" name="Attachment Info"
+				url="valid_attachment_info.zul" javaClass="ValidAttachmentInfo"/>
+			<!-- Aspire 2012/10/17 - Added Attachment Status for #27375 -->
+			<page id="ValidAttachmentStatus" name="Attachment Status"
+				url="valid_attachment_status.zul" javaClass="ValidAttachmentStatus"/>
+			<page id="ValidAttachmentProcedure" name="Attachment Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee" >
+					
+			<param name="where"
+				value="ProcedureName = DefaultAttachment_Upd and DefaultDesc = DefaultAttachment_Upd and DefaultOrder = 6667" />
+			<param name="HidePasteSQLButtons" value="true" />
+		   </page>
+				
+		</module>
+
+
+		<module id="foi" name="Access to Information" icon="admin/layout/foi.gif"
+			hotkey="F4" url="orientation.zul" service="modules">
+
+
+			<orientation id="orientation">
+				<orientationPage id="FOIOrientation" name="Orientation"
+					url="foi_orientation.zul" />
+			</orientation>
+			<page id="ValidFOICategory" name="FOI Category" url="valid_foi_category.zul"
+				javaClass="ValidFoiCategory" />
+			<page id="ValidFOIDisposition" name="FOI Disposition" url="valid_foi_disposition.zul"
+				javaClass="ValidFoiDisposition" />
+
+			<page id="ValidFOIResult" name="FOI Result" javaClass="ValidFoiResult"
+				url="valid_foi_result.zul" />
+			<page id="ValidAct" name="Act" url="valid_act.zul" javaClass="ValidAct" />
+			<page id="ValidActExtension" name="Act Extension" url="valid_act_extension.zul"
+				javaClass="ValidActExtension" />
+			<page id="ValidCorrectionMade" name="Correction Made" url="valid_correction_made.zul"
+				javaClass="ValidCorrectionMade" />
+			<page id="ValidExemption" name="Exemption" url="valid_exemption.zul"
+				javaClass="ValidExemption" >
+				<param name="orderBy" value="ActCode|ExemptionLabel" />
+			</page>
+			<page id="ValidExemptionGroup" name="Exemption Group" url="valid_exemption_group.zul"
+				javaClass="ValidExemptionGroup" />
+			<page id="ValidExtensionGroup" name="Extension Group" url="valid_extension_group.zul"
+				javaClass="ValidExtensionGroup" />
+			<page id="ValidFinding" name="Finding" url="valid_finding.zul"
+				javaClass="ValidFinding" />
+			<page id="ValidKeyword" name="Keyword" url="valid_keyword.zul"
+				javaClass="ValidKeyword" />
+			<page id="ValidLabel" name="Label" url="valid_label.zul"
+				javaClass="ValidLabel" />
+			<page id="ValidMethodOfAccess" name="Method Of Access" url="valid_method_of_access.zul"
+				javaClass="ValidMethodOfAccess" />
+			<page id="ValidMethodOfDelivery" name="Method Of Delivery"
+				url="valid_method_of_delivery.zul" javaClass="ValidMethodOfDelivery" />
+			<page id="ValidOtherReasonsForDenial" name="Other Reasons For Denial"
+				url="valid_other_reasons_for_denial.zul" javaClass="ValidOtherReasonsForDenial" />
+			<page id="ValidReason" name="Reason" url="valid_reason.zul"
+				javaClass="ValidReason" />
+			<page id="ValidReasonForDeemedRefusal" name="Reason For Deemed Refusal"
+				url="valid_reason_for_deemed_refusal.zul" javaClass="ValidReasonForDeemedRefusal" />
+			<page id="ValidRecordGroupStatus" name="Record Group Status"
+				url="valid_record_group_status.zul" javaClass="ValidRecordGroupStatus" />
+			<page id="ValidRelPkgVersion" name="Rel Pkg Version" url="valid_rel_pkg_version.zul"
+				javaClass="ValidRelPkgVersion" />
+			<page id="ValidRetentionDisposalRule" name="Retention Disposal Rule"
+				url="valid_retention_disposal_rule.zul" javaClass="ValidRetentionDisposalRule" />
+			<page id="ValidSource" name="Source" url="valid_source.zul"
+				javaClass="ValidSource" />
+			<page id="ValidStatute" name="Statute" url="valid_statute.zul"
+				javaClass="ValidStatute" />
+			<page id="ValidTranslation" name="Translation" url="valid_translation.zul"
+				javaClass="ValidTranslation" />
+
+
+
+
+		</module>
+
+
+		<module id="assetManagement" name="Asset Management"
+			icon="admin/layout/asset_management.gif" hotkey=""
+			url="admin/groups/orientation.jsp" service="modules" license="Asset">
+			<!-- Aspire 2010/02/15 - Nodes ordered as per robb's suggestion -->
+			<page id="ValidAsset" name="Asset" url="ValidAsset.zul"
+				javaClass="ValidAsset" />
+			<page id="ValidAssetCategory" name="Category"
+				url="admin/ValidAssetCategory.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetCategorySub" name="Category Sub"
+				url="admin/ValidAssetCategorySub.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetClass" name="Class" url="admin/ValidAssetClass.jsp"
+				javaClass="ValidAsset" />
+			<page id="ValidAssetClassSub" name="Class Sub"
+				url="admin/ValidAssetClassSub.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetGroup" name="Group" url="admin/ValidAssetGroup.jsp"
+				javaClass="ValidAsset" />
+			<page id="ValidAssetGroupSub" name="Group Sub"
+				url="admin/ValidAssetGroupSub.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetWoGroup" name="WO Group" url="admin/ValidAssetWoGroup.jsp" />
+			<page id="ValidAssetWoGroupSub" name="WO Group Sub"
+				url="admin/ValidAssetWoGroupSub.jsp" />
+			<page id="ValidAssetCondition" name="Condition"
+				url="admin/ValidAssetCondition.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetContract" name="Contract"
+				url="admin/ValidAssetContract.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetAcquisitionMethod" name="Acquisition Method"
+				url="admin/ValidAssetAcquisitionMethod.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetDisposition" name="Disposition"
+				url="admin/ValidAssetDisposition.jsp" javaClass="ValidAsset" />
+			<page id="ValidAssetQualification" name="Qualification"
+				url="admin/ValidAssetQualification.jsp" javaClass="ValidAsset" />
+			<!-- Aspire 2011/09/05 - ValidAssetRate does not exist for Asset -->
+			<!-- <page id="ValidAssetRate" name="Rate" url="admin/ValidAssetRate.jsp" 
+				/> -->
+			<page id="ValidAssetStatus" name="Status" url="admin/ValidAssetStatus.jsp"
+				javaClass="ValidAsset" />
+			<page id="ValidAssetUnit" name="Asset Unit" url="admin/ValidAssetUnit.jsp"
+				javaClass="ValidAsset" />
+			<page id="ValidAssetUnitConversion" name="Asset Unit Conversion"
+				url="admin/ValidAssetUnitConversion.jsp" />
+			<page id="ValidChartOfGlAccount" name="GL Account"
+				url="ValidChartOfGlAccount.zul" javaClass="ValidChartOfGlAccount" />
+			<page id="ValidLocationBuilding" name="Location Building"
+				url="ValidLocationBuilding.zul" javaClass="ValidLocationBuilding" />
+			<page id="ValidLocationDepartment" name="Location Department"
+				url="ValidLocationDepartment.zul" javaClass="ValidLocationDepartment" />
+			<page id="ValidLocationFloor" name="Location Floor" url="ValidLocationFloor.zul"
+				javaClass="ValidLocationFloor" />
+			<page id="ValidLocationOrganization" name="Location Organization"
+				url="ValidLocationOrganization.zul" javaClass="ValidLocationOrganization" />
+			<page id="ValidLocationRegion" name="Location Region" url="ValidLocationRegion.zul"
+				javaClass="ValidLocationRegion" />
+			<page id="ValidLocationSite" name="Location Site" url="admin/ValidLocationSite.jsp" />
+			<page id="DefaultProcedure" name="Asset Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = f_FolderList_Desc and DefaultDesc = f_FolderList_Desc and DefaultOrder = 7" />
+			</page>
+			<page id="ValidFolderProcedure" name="Cost Pick Function"
+				url="admin/ValidFolderCostFunction.jsp" />
+			<page id="ValidCostProcedure" name="Cost Procedure"
+				url="admin/ValidCostProcedure.jsp" />
+			<page id="ValidFolderCostProcedure" name="Cost Update Procedure"
+				url="admin/ValidFolderCostProcedure.jsp" /><!-- Aspire 2010/04/20 - FolderCostProcedure 
+				implementation -->
+			<!-- <page id="ValidAssetAmortizationMethod" name="Amortization Method" 
+				url="admin/ValidAssetAmortizationMethod.jsp" /> -->
+			<page id="ValidAssetTransaction" name="Transaction"
+				url="admin/ValidAssetTransaction.jsp" />
+			<!-- Aspire 2009/11/20 - Start -->
+			<page id="ValidAssetTradeWage" name="Asset Trade Wage"
+				url="admin/ValidAssetTradeWage.jsp" />
+			<page id="ValidAssetTradeRate" name="Asset Trade Rate"
+				url="admin/ValidAssetTradeRate.jsp" />
+			<page id="ValidPayPeriods" name="Pay Periods" url="admin/ValidPayPeriods.jsp" />
+			<page id="ValidAssetWoCategory" name="WO Category"
+				url="admin/ValidAssetWoCategory.jsp" />
+			<page id="ValidAssetWoCategorySub" name="WO Category Sub"
+				url="admin/ValidAssetWoCategorySub.jsp" />
+			<page id="ValidAssetBudget" name="Asset Budget" url="admin/ValidAssetBudget.jsp" />
+			<page id="ValidAssetWoProgram" name="WO Program"
+				url="admin/ValidAssetWoProgram.jsp" />
+			<page id="ValidAssetWoProgramCategory" name="WO Program Category"
+				url="admin/ValidAssetWoProgramCategory.jsp" />
+			<page id="ValidAssetWoProgramCatSub" name="WO Program CategorySub"
+				url="admin/ValidAssetWoProgramCatSub.jsp" />
+			<!-- Aspire 2011/09/15 Add ValidAssetWOProgramCatSubCost node for Cost 
+				Budget(Report) data entry Start -->
+			<page id="ValidAssetWoProgramCatSubCost" name="WO Program CatSub Cost"
+				url="admin/ValidAssetWoProgramCatSubCost.jsp" />
+			<!-- Aspire 2011/09/15 End -->
+			<!-- Aspire 2011/09/19 Start -->
+			<page id="ValidAssetWoType" name="WO Type" url="admin/ValidAssetWo.jsp" />
+			<page id="ValidAssetWoRecoverable" name="WO Recoverable Type"
+				url="admin/ValidAssetWoRecoverable.jsp" />
+			<!-- Aspire 2011/09/19 End -->
+			<page id="ValidFolderAssetWoProgram" name="FolderAsset WO Program"
+				url="admin/ValidFolderAssetWoProgram.jsp" />
+			<!-- Aspire 2009/11/20 - End -->
+		</module>
+		<module id="StoryBoard" name="Auto Process Group" icon="listview.gif"
+			hotkey="" url="admin/groups/orientation.jsp" service="modules"
+			license="Jems">
+			<orientation id="orientation">
+				<orientationPage id="StoryBoardOrientation" name="Orientation"
+					url="story_board_orientation.zul" />
+			</orientation>
+			<page id="Story" name="Auto Process" url="valid_story.zul"
+				javaClass="ValidAutoProcess">
+				<detailPage id="StoryBoard" name="Auto Process Attributes"
+					url="setup_story_board_script.zul" javaClass="ValidAutoProcess">
+					<param name="where" value="AutoProcessCode" />
+				</detailPage>
+				<detailPage id="Assignment" name="Assignment"
+					url="setup_story_board_assignment.zul" javaClass="ValidAutoProcessDetail">
+					<param name="where" value="AutoProcessCode" />
+				</detailPage>
+			</page>
+			<page id="Chapter" name="Steps" url="valid_chapter.zul" javaClass="ValidAutoProcessStep">
+				<detailPage id="ValidChapterAttributes" name="Steps Attributes"
+					url="valid_chapter_attributes.zul" javaClass="ValidAutoProcessStep">
+					<param name="where" value="AutoProcessStepCode" />
+				</detailPage>
+				<detailPage id="StepDefinition" name="Step Field"
+					url="valid_auto_process_step_field.zul" javaClass="ValidAutoProcessStepField">
+					<param name="where" value="AutoProcessStepCode" />
+				</detailPage>
+				<detailPage id="StepDefault" name="Step Default"
+					url="valid_step_default_process.zul" javaClass="ValidEntityStepProcess">
+					<param name="where" value="AutoProcessStepCode" />
+				</detailPage>
+			</page>
+			<!-- <page id="Script" name="Script" url="admin/ValidScript.jsp"> <detailPage 
+				id="ValidScriptAttributes" name="Script Attributes" url="admin/ValidScriptAttributes.jsp"> 
+				<param name="where" value="PageName='{PageName}'" /> </detailPage> </page> -->
+		</module>
+		<module id="batchScheduler" name="Batch Scheduler" icon="admin/layout/batch.gif"
+			hotkey="F5" url="admin/groups/orientation.jsp" license="BatchScheduler"
+			service="modules">
+
+			<orientation id="orientation">
+				<orientationPage id="BatchSchedulerOrientation"
+					name="Orientation" url="batchscheduler_orientation.zul" />
+			</orientation>
+			
+			<page id="ReportProcedure" name="Scheduler Procedure" url="report_procedure.zul" javaClass="ReportProcedure"/>
+			<page id="ValidBatchJobType" name="Batch Job Type" url="valid_batch_job_type.zul" javaClass="ValidBatchJobType" />
+			<page id="ValidBatchJob" name="Batch Job" url="valid_batch_job.zul" javaClass="ValidBatchJob">
+				<detailPage id="ValidBatchJob_detail" name="Setup"
+					url="valid_batch_job_detail.zul" javaClass="ValidBatchJob">
+					<param name="where" value="JobRSN" />
+					<param name="JobRSN" value="{JobRSN}" />
+				
+				</detailPage>
+				<detailPage id="ValidBatchJob_output" name="Output Destinations"
+					url="valid_batch_job_output.zul" javaClass="ValidBatchJob">
+					<param name="where" value="JobRSN" />
+					<param name="JobRSN" value="{JobRSN}" />
+				</detailPage>
+				<detailPage id="ValidBatchJobParameter" name="Job Parameters" javaClass="ValidBatchJobParameter"
+					url="valid_batch_job_parameter.zul">
+					<param name="where" value="JobRSN" />
+					<param name="JobRSN" value="{JobRSN}" />
+				</detailPage>
+				<detailPage id="ValidBatchJobData" name="Data Mapping" javaClass="ValidBatchJobData"
+					url="Valid_batch_job_data.zul">
+					<param name="where" value="JobRSN" />
+					<param name="JobRSN" value="{JobRSN}" />
+				</detailPage>
+				<detailPage id="ValidBatchJobDependent" name="Dependent" javaClass="ValidBatchJobDependent"
+					url="Valid_batch_job_dependent.zul">
+					<param name="where" value="JobRSN" />
+					<param name="JobRSN" value="{JobRSN}" />
+				</detailPage>
+				<detailPage id="BatchJobInstance" name="Job Instances" javaClass="BatchJobInstance"
+					url="valid_batch_job_instance.zul">
+					<param name="where" value="BatchJobInstance.JobRSN" />
+					<param name="JobRSN" value="{BatchJobInstance.JobRSN}" />
+				</detailPage>
+			</page>
+			<page id="BatchJobInstance" name="Batch Job Instance" url="valid_batch_job_instance.zul" javaClass="BatchJobInstance" />
+			<page id="BatchSchedulerMonitor" name="Monitor"	url="valid_batch_scheduler_monitor.zul" />
+			<page id="ValidBatch" name="BatchType-FSI" url="valid_batch_fsi.zul" javaClass="ValidBatch"/>
+			<page id="ValidBatchSub" name="BatchSub-FSI" url="valid_batch_fsi_sub.zul" javaClass="ValidBatchSub" />
+			<page id="ValidProcedure" name="Procedure-FSI" url="valid_batch_procedure.zul" javaClass="ValidProcedure"/>
+			<page id="ControlBatchFSI" name="ControlBatch FSI" url="control_batch_fsi.zul" javaClass="ControlBatchFsi" />
+		</module>
+		<!-- Nalini 2011/10/25 - 23229 - Moved to the top to arrange alphabetically 
+			- Start -->
+		<module id="calendarIntegration" name="Calendar Integration"
+			icon="admin/layout/calendar-relation.png" url="admin/groups/orientation.jsp"
+			license="CalendarIntegration" service="modules"><!-- Nalini 2011/10/07 - 22775 - 
+				Changed Calendar Integration image -->
+			<!-- Nalini 2011/12/12 - 22434 - Changed to add sql editors - Start -->
+			<page id="ValidCalendarAdaptor" name="Setup" javaClass="ValidCalendarAdaptor"
+				url="valid_calendar_adaptor.zul" />
+			<page id="CalendarEventTitle" name="Customize Title" javaClass="ValidCalendarFunction"
+				url="valid_calendar_function.zul">
+				<param name="where" value="FunctionName = 'f_Get_Calendar_Title'" />
+			</page>
+			<page id="CalendarEventComments" name="Customize Comments" javaClass="ValidCalendarFunction"
+				url="valid_calendar_function.zul">
+				<param name="where" value="FunctionName = 'f_Get_Calendar_Comments'" />
+			</page>
+			<page id="CalendarEventLocation" name="Customize Location" javaClass="ValidCalendarFunction"
+				url="valid_calendar_function.zul">
+				<param name="where" value="FunctionName = 'f_Get_Calendar_Location'" />
+			</page>
+			<page id="CalendarEventEmailAddress" name="Customize EmailAddress" javaClass="ValidCalendarFunction"
+				url="valid_calendar_function.zul">
+				<param name="where" value="FunctionName = 'f_Get_Calendar_EmailAddress'" />
+			</page>
+			<!-- Nalini 2011/12/12 - 22434 - End -->
+		</module>
+		<!-- Nalini 2011/10/25 - 23229 - End -->
+		<module id="cashier" name="Cashier" icon="admin/layout/cashier.gif"
+			url="admin/groups/orientation.jsp" license="OneStopPayment" service="modules">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="CashierOrientation" name="Orientation"
+					url="cashier_orientation.zul" />
+			</orientation>
+			<page id="OneStopPaymentType" name="OneStop Payment Type" javaClass="OneStopPaymentType"
+				url="one_stop_payment_type.zul" />
+			<page id="AdditionalParameter" name="Additional Parameter" javaClass="ValidSite"
+				url="additional_parameter.zul" />
+			<page id="ValidCashDrawer" name="Cash Drawers" url="valid_cash_drawer.zul" javaClass="ValidCashDrawer" />
+			<page id="ValidTransactionGroup" name="Transaction Group" javaClass="ValidTransactionGroup"
+				url="valid_transaction_group_cashier.zul" />
+			<page id="ValidTransaction" name="Transaction" url="valid_transaction_cashier.zul" javaClass="ValidTransaction" />
+			<page id="CashierTaxParameter" name="Tax Parameter" javaClass="ValidSiteTax"
+				url="cashier_tax_parameter.zul" />
+		</module>
+		<module id="certification" name="Certification"
+			icon="admin/layout/certification.gif" hotkey=""
+			url="admin/groups/orientation.jsp" license="Course" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="CertificationOrientation" name="Orientation"
+					url="certification_orientation.zul" />
+			</orientation>
+			<!-- Aspire 2010/10/14 - #20282 - To show the old Certification set-up 
+				Pages -->
+			<page id="ValidCourseGroup" name="Group" url="valid_course_group.zul"
+				license="CertificationOld" javaClass="ValidCourseGroup" />
+			<page id="ValidCourse" name="Type" url="valid_course.zul"
+				license="CertificationOld" javaClass="ValidCourse" />
+			<page id="ValidInstructor" name="Instructor" url="valid_instructor.zul"
+				license="CertificationOld" javaClass="ValidInstructor" />
+			<page id="DefaultCourseInfo" name="Default Info" url="default_course_info.zul"
+				license="CertificationOld" javaClass="DefaultCourseInfo" />
+			<page id="CeritificateInsertProcedure" name="Insert Procedure"
+				url="default_procedure.zul" license="CertificationNew" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = Course_Insert and DefaultDesc = Course_Insert and DefaultOrder = 11" />
+			</page>
+			<page id="CeritificateDeleteProcedure" name="Delete Procedure"
+				url="default_procedure.zul" license="CertificationNew" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = Course_Delete and DefaultDesc = Course_Delete and DefaultOrder = 12" />
+			</page>
+			<page id="CeritificateResultUpdateProcedure" name="Result Update Procedure"
+				url="default_procedure.zul" license="CertificationNew" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = CourseResult_Update and DefaultDesc = CourseResult_Update and DefaultOrder = 13" />
+			</page>
+			
+			<!-- <page id="ValidCourseForm" name="Valid Course Form" url="valid_course_form.zul"
+				license="CertificationOld" javaClass="ValidCourseForm" /> -->
+			<page id="ValidCertificationInfoGroup" name="Valid Certification Info Group"
+				url="valid_certification_info_group.zul" license="CertificationNew"  javaClass="ValidCertificationInfoGroup"/>
+			<page id="ValidCertificationInfo" name="Valid Certification Info"
+				url="valid_certification_info.zul" license="CertificationNew" javaClass="ValidCertificationInfo" />
+			<page id="ValidCertificationResult" name="Valid Certification Result"
+				url="valid_certification_result.zul" license="CertificationNew"  javaClass="ValidCertificationResult"/>
+			<page id="ValidCertificationStatus" name="Valid Certification Status"
+				url="valid_certification_status.zul" license="CertificationNew" javaClass="ValidCertificationStatus" />
+			<page id="ValidCertificationGroup" name="Valid Certification Group"
+				url="valid_certification_group.zul" license="CertificationNew" javaClass="ValidCertificationGroup" />
+			<page id="ValidCertification" name="Valid Certification"
+				url="valid_certification.zul" license="CertificationNew"  javaClass="ValidCertification"/>
+			<!-- <page id="ValidCertificationForm" name="Valid Certification Form"
+				url="valid_certification_form.zul" license="CertificationNew" javaClass="ValidCertificationForm" /> -->
+			<page id="ValidCourseSessionInfoGroup" name="Valid Course Session Info Group"
+				url="valid_course_session_info_group.zul" license="CertificationNew"  javaClass="ValidCourseSessionInfoGroup"/>
+			<page id="ValidCourseSessionInfo" name="Valid Course Session Info"
+				url="valid_course_session_info.zul" license="CertificationNew" javaClass="ValidCourseSessionInfo" />
+			<page id="ValidCourseSessionStatus" name="Valid Course Session Status"
+				url="valid_course_session_status.zul" license="CertificationNew" javaClass="ValidCourseSessionStatus" />
+			<page id="ValidExaminer" name="Valid Examiner" url="valid_examiner.zul" javaClass="ValidExaminer"
+				license="CertificationNew" />
+			<!-- Aspire 20/03/02 - Issue #20977 Adding Screen for the following procedures 
+				-start- -->
+			<page id="CourseSessionProcedure" name="Course Session Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCourseSession_Val and DefaultDesc = DefaultCourseSession_Val and DefaultOrder = 616" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+		 	<page id="CourseSessionExaminerProcedure" name="Course Session Examiner Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCourseExaminer_UPD and DefaultDesc = DefaultCourseExaminer_UPD and DefaultOrder = 617" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<page id="CourseSessionInfoProcedure" name="Course Session Info Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCourseSessionInfo_UPD and DefaultDesc = DefaultCourseSessionInfo_UPD and DefaultOrder = 618" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<page id="CertificationProcedure" name="Certification Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCertification_Val and DefaultDesc = DefaultCertification_Val and DefaultOrder = 619" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<page id="CertificationInfoProcedure" name="Certification Info Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCertificationInfo_UPD and DefaultDesc = DefaultCertificationInfo_UPD and DefaultOrder = 717" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<page id="CertificationResultProcedure" name="Certification Result Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultCertificationResult_UPD and DefaultDesc = DefaultCertificationResult_UPD and DefaultOrder = 711" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<!-- Aspire 20/03/02 Issue #20977 end -->
+		</module>
+		
+		<module id="condition" name="Condition" icon="admin/layout/condition.gif"
+			url="admin/groups/orientation.jsp" license="FolderCondition" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="ConditionOrientation" name="Orientation"
+					url="condition_orientation.zul" />
+			</orientation>
+			<page id="ValidConditionGroup" name="Group"
+				url="valid_condition_group.zul" javaClass="ValidConditionGroup"/>
+			<page id="ValidCondition" name="Valid Condition"
+				url="valid_condition.zul" javaClass="ValidCondition"/>
+			<page id="ValidConditionStatus" name="Status"
+				url="valid_condition_status.zul" javaClass="ValidConditionStatus" />
+			<!-- Aspire 2011/04/15 (#21613)-Add Enforcement option -->
+			<page id="ValidEnforcement" name="Enforcement" url="valid_enforcement.zul" 
+			javaClass="ValidEnforcement"/>
+			<page id="ValidConditionWorkflow" name="Workflow" url="valid_condition_workflow.zul"
+				javaClass="ValidConditionWorkflow" />
+			<page id="ConditionWorkflowFunction" name="Workflow Function" url="condition_workflow_function.zul" 
+				javaClass="DefaultAccountBillFee"/>
+		</module>
+		
+		<module id="controlassessment_module" name="Control Assessment"
+			icon="admin/layout/controlassessment.gif" url="admin/groups/orientation.jsp"
+			service="modules">
+			<orientation id="orientation">
+				<orientationPage id="ControlAssessment_Orientation"
+					name="Orientation" url="control_assessment_orientation.zul" />
+			</orientation>
+			<page id="ControlAssessment" name="Control Assessment" url="control_assessment.zul" javaClass="ControlAssessment" />
+		</module>
+		<!-- Aspire 2011/11/11 - #23456 - Custom report, Report and My Office moved 
+			to core service list -->
+		<module id="customReport" name="Custom Report" icon="admin/layout/custom_report.gif"
+			url="admin/groups/orientation.jsp" service="core">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="CustomReportOrientation" name="Orientation"
+					url="custom_report_orientation.zul" />
+			</orientation>
+			<page id="ValidCustomReport" name="Custom Report" url="valid_custom_report.zul"
+				javaClass="ValidCustomReport">
+				<detailPage id="CustomReportFields" name="Fields"
+					url="valid_custom_report_detail.zul" javaClass="ValidCustomReport">
+					<param name="where" value="ReportCode" />
+					<param name="ReportCode" value="{ReportCode}" />
+				</detailPage>
+				<!-- Aspire 2009/04/25 - Start -->
+				<detailPage id="CustomReportParamters" name="Parameters"
+					url="valid_custom_report_parameters.zul" javaClass="ValidCustomReportParameter">
+					<param name="where" value="REPORTCODE" />
+					<param name="REPORTCODE" value="{ReportCode}" />
+				</detailPage>
+				<!-- Aspire 2009/04/25 - End -->
+				<!-- Aspire 2009/08/26 - Start CustomReport-Introducing Before and After 
+					Procedure tabs -->
+				<detailPage id="CustomReportBeforeProcedure" name="Before Procedure"
+					url="valid_custom_report_before_procedure.zul" javaClass="ValidCustomReport">
+					<param name="where" value="ReportCode" />
+					<param name="ReportCode" value="{ReportCode}" />
+				</detailPage>
+				<detailPage id="CustomReportAfterProcedure" name="After Procedure"
+					url="valid_custom_report_after_procedure.zul" javaClass="ValidCustomReport">
+					<param name="where" value="ReportCode" />
+					<param name="ReportCode" value="{ReportCode}" />
+				</detailPage>
+				<!-- Aspire 2009/08/26 - end -->
+			</page>
+			<!-- Aspire 2009/04/25 - Issue# 17788 -->
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<!-- Aspire 2012/09/12 licence removed for the enhancement #27012 -->
+			<page id="ValidDeficiencyReport" name="Deficiency Report"
+				url="valid_deficiency_report.zul" javaClass="ValidDeficiencyReport" />
+			<page id="ValidFolderReport" name="Folder Report" url="valid_folder_report.zul"
+				javaClass="ValidFolderReport" />
+			<page id="ValidMenuReportGroup" name="Menu Group" url="valid_menu_report_group.zul"
+				javaClass="ValidMenuReportGroup" />
+			<page id="ValidMenuReport" name="Menu Report" url="valid_menu_report.zul"
+				javaClass="ValidMenuReport" />
+			<page id="ValidProcessReport" name="Process Report"	url="valid_process_report.zul"
+				javaClass="ValidProcessReport" />
+			<page id="ValidPeopleReport" name="People Report" url="valid_people_report.zul"
+				javaClass="ValidPeopleReport" />
+			<page id="ValidPropertyReport" name="Property Report" url="valid_property_report.zul"
+				javaClass="ValidPropertyReport" />
+			<page id="ValidSiteReport" name="Site Report" url="valid_site_report.zul" 
+				javaClass="ValidSiteReport" />
+			<page id="ValidStandardReport" name="Standard Report" url="valid_standard_report.zul"
+				javaClass="ValidStandardReport" /> <!-- ESS: Sangramk 2011/03/14 added (Issue id :20758 Require ability to override 
+				Standard Reports ) -->
+		</module>
+		<module id="dispatch" name="Dispatch" icon="dispatch.gif"
+			hotkey="" url="admin/groups/orientation.jsp" service="modules"
+			license="Dispatch">
+			<page id="DispatchList" name="Dispatch List" url="admin/ValidDispatch.jsp" />
+			<page id="DispatchFolders" name="Dispatch Folders" url="admin/ValidDispatchFolder.jsp" />
+			<page id="DispatchUserStatus" name="Dispatch Status"
+				url="admin/ValidDispatchStatus.jsp" />
+			<page id="ValidDispatchUserList" name="User List"
+				url="admin/ValidDispatchUser.jsp" />
+			<page id="DispatchInfoMapping" name="Info Mapping"
+				url="admin/ValidDispatchInfo.jsp" />
+		</module>
+		<module id="docket" name="Docket" icon="Docket.gif" hotkey=""
+			url="admin/groups/orientation.jsp" service="modules" license="Jems">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<!-- <orientation id="orientation">
+				<orientationPage id="DocketOrientation" name="Orientation"
+					url="admin/groups/DocketOrientation.jsp" />
+			</orientation> -->
+			<orientation id="orientation">
+				<orientationPage id="DocketOrientation" name="Orientation"
+					url="docket_orientation.zul" />
+			</orientation>
+			<!-- <page id="ValidCourt" name="Valid Court" url="admin/ValidCourt.jsp" /> -->
+			<page id="ValidCourt" name="Valid Court" url="valid_court.zul" 
+		javaClass="ValidCourt" />
+		<!-- 	<page id="ValidCourtRoom" name="ValidCourtRoom" url="admin/ValidCourtRoom.jsp" /> -->
+		<page id="ValidCourtRoom" name="Valid Court Room" url="valid_courtroom.zul" 
+		javaClass="ValidCourtRoom" />
+			<page id="ValidDocket" name="ValidDocket" url="valid_docket.zul" javaClass="ValidDocket" />
+			<page id="ValidCourtUserType" name="Valid Court User Type" url="valid_court_user_type.zul" 
+		javaClass="ValidCourtUserType" />
+			<!-- <page id="ValidCourtUserType" name="ValidCourtUserType"
+				url="admin/ValidCourtUserType.jsp" /> -->
+			<!-- <page id="ValidCourtUser" name="ValidCourtUser" url="admin/ValidCourtUser.jsp" /> -->
+			<page id="ValidCourtUser" name="Valid Court User" url="valid_court_user.zul" 
+		javaClass="ValidCourtUser" />
+			<!-- <page id="ValidUserHoliday" name="ValidUserHoliday" url="admin/ValidCourtHoliday.jsp" /> -->
+				<page id="ValidUserHoliday" name="Valid User Holiday" url="valid_court_holiday.zul" 
+		javaClass="ValidCourtHoliday" /> 
+			<page id="ValidFolderDocketNames" name="Folder Docket Names"
+				url="admin/ValidFolderDocketNames.jsp" />
+		</module>
+
+		<module id="document_clause" name="Document and Clause" icon="admin/layout/document.gif"
+			hotkey="" url="admin/groups/orientation.jsp" service="core">
+			<!-- Aspire 2012/08/13 code added for the enhancement #21610 -->
+			<orientation id="orientation">
+				<orientationPage id="DocumentOrientation" name="Orientation"
+					url="documentandclause_orientation.zul" />
+			</orientation>
+			<page id="ValidDocument" name="Document" url="valid_document.zul" javaClass="ValidDocument"/>
+
+			<page id="ValidDocumentText" name="Document Text" url="Valid_document_text.zul" javaClass="ValidDocumentText">
+				<detailPage id="ValidDocumentTextDetail" name="Valid Document"
+					url="valid_document_text_detail.zul" javaClass="ValidDocumentText">
+					<param name="where"
+						value="DocumentCode='{DocumentCode}' and TextOrder='{TextOrder}'" />
+				</detailPage>
+			</page>
+			<page id="ValidDocumentGroup" name="Valid Document Group"
+				url="valid_document_group.zul" javaClass="ValidDocumentGroup" />
+			<page id="ValidClause" name="Clause" url="valid_clause.zul" javaClass="ValidClause" />
+			<page id="ValidDocumentField" name="ValidDocumentField" url="valid_document_field.zul" javaClass="ValidDocumentField" />
+			<page id="DefaultPlaceHolders" name="DefaultPlaceHolders" url="default_placeholders.zul" javaClass="" />
+			
+		</module>
+		<module id="eai" name="EAI" icon="admin/layout/eai.gif" hotkey=""
+			url="admin/groups/orientation.jsp" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="EaiOrientationConcepts" name="Concepts"
+					url="admin/groups/EaiOrientationConcepts.jsp" />
+				<orientationPage id="EaiOrientationConfig" name="Configuration"
+					url="admin/groups/EaiOrientationConfig.jsp" />
+			</orientation>
+			<page id="EaiParameter" name="EAI Parameter" url="admin/EaiParameter.jsp" />
+			<page id="ValidEaiTrigger" name="Valid EAI Trigger" url="admin/ValidEaiTrigger.jsp"
+				license="EAI" />
+			<page id="ValidEaiInclude" name="Valid EAI Include" url="admin/ValidEaiInclude.jsp"
+				license="EAI" />
+			<page id="EaiHeartbeat" name="Heartbeat" url="admin/EaiHeartbeat.jsp" />
+			<page id="EaiGetFifoQueue" name="GetFifoQueue" url="admin/EaiGetFifoQueue.jsp" />
+			<page id="EaiPutFifoQueue" name="PutFifoQueue" url="admin/EaiPutFifoQueue.jsp" />
+			<!-- Aspire 2010/10/28 Support Issue #: 110875 - Add the FifoEai Admin 
+				Screen -->
+			<page id="FifoEai" name="FifoEai" url="admin/FifoEai.jsp" />
+			<page id="EaiLog" name="Show Log" url="admin/EaiLog.jsp" />
+			<page id="EaiDequeue" name="Dequeue" url="admin/EaiDeQueue.jsp" />
+			<!-- Aspire 2010/10/28 - Add the EaiWizard Admin Screen -->
+			<page id="EaiWizard" name="EaiWizard" url="admin/EaiWizard.jsp" />
+		</module>
+		<!--Aspire - 27663 - Added for Dynamic Meta data implementation for EDMS-Alfresco -->
+		<module id="edms" name="EDMS" icon="admin/layout/EDMS.gif"
+			url="admin/groups/orientation.jsp" license="edms" service="modules">
+			<page id="EDMSMetaData" name="Customize Meta Data" url="admin/DefaultFunction.jsp">
+				<param name="where"
+					value="ProcedureName = 'f_edms_ProfileFields' and DefaultDesc = 'f_edms_ProfileFields' and DefaultOrder = 90000" />
+			</page>
+		</module>
+
+		<module id="enterpriseSecurity" name="Enterprise Security"
+			icon="admin/layout/enterprise-security.gif" hotkey=""
+			url="admin/groups/orientation.jsp" license="RowLevelSecurity"
+			service="modules">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="EnterpriseSecurityOrientation"
+					name="Orientation" url="enterprice_security_orientation.zul" />
+			</orientation>
+			<page id="RowLevelSecurity" name="Row Level Security (RLS)" url="row_level_security.zul" />
+			<page id="DefaultRLSFunction" name="Default RLS Function" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<!-- Aspire (QA-#26965) Added the ProcedureName in the where condition 
+					to avoid multiple rows error msg -->
+				<param name="where"
+					value=" FolderType = '  ' AND LOWER(ProcedureName) = f_amanda_rls_default" /><!-- 
+					Aspire 2011/08/11 Issue #22588, #22587 - ProcedureName and ProcedureDesc 
+					removed like EXE behaviour -->
+			</page>
+		</module>
+		<module id="executiveMonitor" name="Executive Monitor"
+			icon="admin/layout/executive_monitor.gif" hotkey=""
+			url="admin/groups/orientation.jsp" license="ExecutiveMonitor"
+			service="modules">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="ExecutiveMonitorOrientation"
+					name="Orientation" url="admin/groups/ExecutiveMonitorOrientation.jsp" />
+			</orientation>
+			<page id="ValidMonitor" name="Valid Monitors" url="admin/ValidMonitor.jsp" />
+			<page id="ValidMonitorAlertPriority" name="Alert Priority"
+				url="admin/ValidMonitorAlertPriority.jsp" />
+		</module>
+		<module id="fee" name="Fee" icon="admin/layout/fees.gif" url="admin/groups/orientation.jsp"
+			service="core">
+			<!-- Aspire 2011/04/18 code added for the enhancement #21619 -->
+			<orientation id="orientation">
+				<orientationPage id="FeeOrientation" name="Orientation"
+					url="fee_orientation.zul" />
+			</orientation>
+			<page id="ValidAccountFee" name="Fee Type" url="valid_account_fee.zul"
+				javaClass="ValidAccountFee" />
+			<page id="ValidAccountPayment" name="Payment Type" url="valid_account_payment.zul"
+				javaClass="ValidAccountPayment" />
+			<page id="validAccountFeeGroup" name="Fee Group Type" url="valid_account_fee_group.zul"
+				javaClass="ValidAccountFeeGroup" />
+		</module>
+		<!-- Aspire 2011/05/03 #21688-Valid FMS screen is displaying based on EDMS 
+			license. -->
+		<module id="fileManagementSystem" name="File Management System"
+			icon="admin/layout/EDMS.gif" url="admin/groups/orientation.jsp"
+			hotkey="" service="modules" license="edms">
+			<page id="ValidFMS" name="Valid FMS" url="admin/ValidFMS.jsp" />
+		</module>
+
+		<module id="folder" name="Folder" icon="admin/layout/folder.gif"
+			url="admin/groups/orientation.jsp" service="core">
+
+			<orientation id="orientation">
+				<orientationPage id="FolderOrientationConcepts"
+					name="Concepts" url="folder_orientation_concepts.zul" />
+				<orientationPage id="FolderOrientationSetup" name="Default Setup"
+					url="folder_orientation_setup.zul" />
+			</orientation>
+
+
+			<page id="ValidFolder" name="Folder and Defaults" url="valid_folder.zul"
+				javaClass="ValidFolder">
+				<detailPage id="FolderAttributes" name="Folder Attributes"
+					url="folder_attributes.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+				</detailPage>
+				<!-- <detailPage id="FolderTabMask" name="Tab Order" url="folder_tab_mask.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+				</detailPage> -->
+				<detailPage id="FolderFinancialDefaults" name="Financial Defaults"
+					url="folder_financial_defaults.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+				</detailPage>
+				<detailPage id="FolderDisclaimer" name="Disclaimer"
+					url="disclaimer_folder_form.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+					<param name="FolderType" value="{FolderType}" />
+				</detailPage>
+				<detailPage id="FolderButtonPermission" name="Button Permission"
+					url="folder_button_permission.zul" javaClass="ValidUserButton">
+					<param name="where" value="FolderType" />
+					<param name="FolderType" value="{FolderType}" />
+				</detailPage>
+				<detailPage id="Foi" name="FOI"
+					url="valid_folder_foi.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+					<param name="FolderType" value="{FolderType}" />
+				</detailPage>
+				<detailPage id="FolderReport" name="Report"
+					url="folder_report.zul" javaClass="ValidFolder">
+					<param name="where" value="FolderType" />
+					<param name="FolderType" value="{FolderType}" />
+				</detailPage>
+			</page>
+			<page id="ValidFolderNameSetup" name="Folder Name Setup"
+				url="admin/ValidFolderNumberSetup.jsp" isNodeRequired="false">
+				<detailPage id="ValidFolderNameSetup" name="Folder Name Wizard"
+					url="valid_folder_name.zul">
+					<param name="AgencyType" value="{AgencyType}" />
+					<param name="FolderType" value="document.FolderType" />
+				</detailPage>
+			</page>
+			<!-- <page id="ValidFolderForm" name="Valid Folder Form" url="not_yet_implemented.zul" /> -->
+			<!-- <page id="ValidFolderFormComputed" name="Valid Computed Form" url="admin/ValidFolderFormComputed.jsp" 
+				/> -->
+			<page id="ValidFolderGroup" name="Valid Folder Group" url="valid_folder_group.zul"
+				javaClass="ValidFolderGroup" />
+				<page id="ValidFolderNumberSetup" name="Folder Number Setup"
+				url="valid_folder_number_pattern_setup.zul" javaClass="ValidFolderNumberPattern">
+			 	
+			 	<detailPage id="FolderNumberPatternAttributes" name="Folder Number Pattern Attributes"
+					url="folder_number_pattern_attributes.zul" javaClass="ValidFolderNumberPattern">
+					<param name="where" value="PatternType" />
+				</detailPage>
+				 
+			</page>
+			<!-- <page id="ValidFolderRule" name="Valid Folder Rule" url="admin/ValidFolderRule.jsp" 
+				/> -->
+
+
+			<page id="ValidStatus" name="Valid Status" url="valid_status.zul"
+				javaClass="ValidStatus" />
+			<page id="ValidSub" name="Valid Sub" url="valid_sub.zul"
+				javaClass="ValidSub" />
+			<page id="ValidWork" name="Valid Work" url="valid_work.zul"
+				javaClass="ValidWork" />
+			<page id="ValidInfoGroup" name="Valid Info Group" url="valid_info_group.zul"
+				javaClass="ValidInfoGroup" />
+			<page id="ValidInfo" name="Valid Info" url="valid_info.zul"
+				javaClass="ValidInfo" />
+			<page id="ValidPickSelect" name="Valid Pick Select" url="valid_pick_select.zul"
+				javaClass="ValidPickSelect" />
+			<page id="ValidFixture" name="Valid Fixture" url="valid_fixture.zul"
+				javaClass="ValidFixture" />
+			<page id="ValidUsageGenUse" name="Usage General Use" url="valid_usage_gen_use.zul"
+				javaClass="ValidUsageGenUse" />
+			<page id="ValidUsageOccClass" name="Usage Occupancy Class" url="valid_usage_occ_class.zul"
+				javaClass="ValidUsageOccClass" />
+			<!-- <page id="ValidCustomize" name="Valid Customize" url="valid_customize.zul"
+				javaClass="ValidCustomize" /> -->
+			<page id="ValidFreeForm" name="Valid Free Form" url="valid_freeform.zul"
+				javaClass="ValidFreeform">
+				<detailPage id="ValidFreeform_detail" name="Detail"
+					url="valid_freeform_detail.zul" javaClass="ValidFreeform">
+					<param name="where" value="FreeFormCode" />
+					<param name="FreeFormCode" value="{FreeFormCode}" />
+				</detailPage>
+				<detailPage id="ValidFreeformColumn" name="Column"
+					url="valid_freeform_column.zul" javaClass="ValidFreeformColumn">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidFreeformDefault" name="Default"
+					url="valid_freeform_default.zul" javaClass="ValidFreeformDefault">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="FreeformCode" />
+					<!-- <param name="where" value="FreeFormCode = '{FreeFormCode}'" /> 
+						<param name="TableName" value="TableName = '{TableName}'" /> -->
+				</detailPage>
+				<detailPage id="ValidFreeformButton" name="Button"
+					url="valid_freeform_button.zul" javaClass="ValidFreeformButton">
+					<param name="where" value="FreeformCode" />
+				</detailPage>
+				<detailPage id="ValidFreeformTab" name="Tab"
+					url="valid_freeform_tab.zul" javaClass="ValidFreeformTab">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="FreeformCode" />
+				</detailPage>
+				<detailPage id="FolderProcedure" name="Folder Procedure"
+					url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+					<param name="where" value="FreeFormCode"/>
+					<param name="type" value="FolderProcedure"/>
+					<param name="HidePasteSQLButtons" value="true" />
+					<param name="HidePasteSQLFunctionButtons" value="true" />
+				</detailPage>
+				<detailPage id="ProcessProcedure" name="ProcessProcedure"
+					url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+					<param name="where" value="FreeFormCode"/>
+					<param name="type" value="ProcessProcedure"/>
+					<param name="HidePasteSQLButtons" value="true" />
+					<param name="HidePasteSQLFunctionButtons" value="true" />
+				</detailPage>
+			</page>
+			<page id="FolderMigrate" name="Folder Migrate" url="not_yet_implemented.zul" />
+			<page id="ValidFolderHeader" name=" Folder Header Label" url="default_function.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = F_Folder_Header_Label and DefaultDesc = F_Folder_Header_Label and DefaultOrder = 831" />
+				<param name="HidePasteSQLButtons" value="true" />
+				<param name="HidePasteSQLFunctionButtons" value="true" />
+			</page>
+			<page id="ValidCommentGroup" name=" Folder Comment Group" url="valid_comment_group.zul"
+				javaClass="ValidCommentGroup" /><!-- Issue Id:-22092 -->
+
+			<folder id="mapping" name="Statistics Canada Mapping">
+				<page id="ValidBuildingStatCan" name="Stats Can Sub" url="valid_building_stat_can.zul"
+					javaClass="ValidBuildingStatCan" />
+				<page id="ValidWorkStatCan" name="Stats Can Work" url="valid_work_stat_can.zul"
+					javaClass="ValidWorkStatCan" />
+				<page id="ValidStatCan" name="Stats Can Code" url="valid_stat_can.zul"
+					javaClass="ValidStatCan" />
+				<page id="ValidStatcanIdentification" name="Statcan Identification"
+					url="valid_stat_can_identification.zul" javaClass="ValidStatCanIdentification" />
+				<page id="ValidPropertySAS" name="Property SAS" url="valid_property_sas.zul"
+					javaClass="ValidPropertySas" />
+			</folder>
+		</module>
+
+		<module id="gis" name="GIS Adaptor" icon="admin/layout/gis.gif"
+			url="admin/groups/orientation.jsp" license="GIS" service="modules">
+			<!-- Aspire 2012/09/18 code added for the enhancement #27037 -->
+			<orientation id="orientation">
+				<orientationPage id="GISAdaptorOrientation" name="Orientation"
+					url="admin/groups/GISAdaptorOrientation.jsp" />
+			</orientation>
+			<page id="ValidGIS" name="Valid GIS Adaptor" url="admin/ValidGISAdaptor.jsp" />
+		</module>
+		<!-- Aspire 2012/09/03 code added for the enhancement #26922 -->
+		<module id="health" name="Health" icon="admin/layout/health.gif"
+			url="admin/groups/orientation.jsp" service="modules" license="Health">
+			<!-- Aspire 2012/09/03 code added for the enhancement -->
+			<orientation id="orientation">
+				<orientationPage id="HealthOrientation" name="Orientation"
+					url="health_orientation.zul" />
+			</orientation>
+			<page id="ValidHealthParm" name="Health Parms" url="valid_health_parms.zul"
+			javaClass="ValidHealthParm">
+				<param name="where" value="SystemID = 'IBMS'" />
+			</page>
+		</module>
+		<module id="insurance" name="Insurance" icon="admin/layout/insurance.gif"
+			url="admin/groups/orientation.jsp" service="modules">
+			<!-- Aspire 2012/08/14 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="InsuranceOrientation" name="Orientation"
+					url="insurance_orientation.zul" />
+			</orientation>
+			<page id="ValidInsuranceCompany" name="Insurance Company"
+				url="valid_insurance_company.zul"  javaClass="ValidInsuranceCompany"/>
+			<page id="ValidInsuranceAgent" name="Insurance Agent"
+				url="valid_insurance_agent.zul"  javaClass="ValidInsuranceAgent" />
+		</module>
+		
+		
+		<!--  <module id="user" name="User" icon="admin/layout/user.gif" url="orientation.zul"
+			service="administration">
+			<orientation id="orientation">
+				<orientationPage id="UserOrientation" name="Orientation"
+					url="user_orientation_tab.zul" />
+			</orientation>  -->
+			
+		
+		<module id="judgment" name="Judgment, Claims, Charges and Bonds"
+			icon="jems.gif" url="orientation.zul" license="Jems"
+			service="modules">
+			<!-- Aspire 2012/09/03 code added for the enhancement -->
+			<orientation id="orientation">
+				<orientationPage id="HealthOrientation" name="Orientation"
+					url="judgment_and_claim_orientation.zul" />
+			</orientation>
+			<folder id="judgement" name="Judgment">
+				<page id="ValidClaims" name="Claims" url="valid_claim.zul"
+					 javaClass="ValidClaim"/>
+				
+				<page id="ValidJudgments" name="Judgments" url="valid_judgment.zul" 
+					 javaClass="ValidJudgment"/>
+			</folder>
+
+			<folder id="charge" name="Charge">
+				<page id="ValidCharge" name="Charges" url="valid_charge.zul"
+				      javaClass="ValidCharge" />
+				<page id="ValidChargeType" name="Charge Type" url="valid_charge_type.zul"
+				      javaClass="ValidChargeType" />
+				<page id="ValidFolderCharge" name="Folder Charges" url="valid_folder_charge.zul"
+				      javaClass="ValidFolderCharge" />
+				<page id="ValidChargeInfo" name="Charge Info" url="valid_charge_info.zul"
+					javaClass="ValidChargeInfo" />
+				<page id="ValidChargeChangeReason" name="Change Reason"	url="valid_charge_change_reason.zul"
+					javaClass="ValidChargeChangeReason" />
+			</folder>
+
+			<folder id="disposition" name="Disposition">
+				<page id="ValidDisposition" name="Disposition" url="valid_disposition.zul"
+					javaClass="ValidDisposition" />
+				<page id="ValidFolderChargeDisposition" name="Charge Disposition" url="valid_folder_charge_disposition.zul"
+					javaClass="ValidFolderChargeDisposition" />
+				<page id="ValidPlea" name="Plea" url="valid_plea_type.zul"
+					javaClass="ValidPleaType" />
+				<page id="ValidDeferral" name="Deferral" url="valid_deferral_type.zul"
+					javaClass="ValidDeferralType" />
+			</folder>
+
+			<folder id="sentence" name="Sentence">
+				<page id="ValidSentence" name="Sentence" url="valid_sentence.zul"
+					javaClass="ValidSentence" />
+				<page id="ValidChargeSentence" name="Charge Sentence" url="valid_charge_sentence.zul"
+					javaClass="ValidChargeSentence" />
+				<page id="ValidSentenceStatus" name="Sentence Status" url="valid_sentence_status.zul"
+					javaClass="ValidSentenceStatus" />
+				<!-- vivek 2013/02/12 Severity and Units are part of Sentence, not Bond. 
+					Move them to under ‘Sentence’ tree in Admin #28289 -->
+				<page id="ValidChargeSeverity" name="Severity" url="valid_charge_severity.zul"
+					javaClass="ValidChargeSeverity" />
+				<page id="ValidChargeUnit" name="Units" url="valid_charge_units.zul"
+					javaClass="ValidChargeUnits" />
+			</folder>
+
+			<folder id="bond" name="Bond">
+				<page id="ValidBondDisbursementType" name="Bond Disbursement Type" url="valid_bond_disbursement_type.zul"
+					javaClass="ValidBondDisbursementType" />
+				<page id="ValidBondPaymentType" name="Bond Payment Type" url="valid_bond_payment_type.zul"
+					javaClass="ValidBondPaymentType" />
+				<page id="ValidBondPostLocation" name="Bond Post Location" url="valid_bond_post_location.zul"
+					javaClass="ValidBondPostLocation" />
+				<page id="ValidBondType" name="Bond Type" url="valid_bond_type.zul"
+					javaClass="ValidBondType" />
+			</folder>
+
+
+
+
+		</module>
+		<module id="licenseParamter" name="Licence Parameter" icon="admin/layout/license_parameter.gif" hotkey=""
+	        url="admin/groups/orientation.jsp" license="LocationLicense or PeopleLicese" service="modules">
+	         <!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+	         <orientation id="orientation">
+		           <orientationPage id="LicenseParameter_Orientation"
+			             name="Orientation" url="license_parameter_orientation.zul" />
+	          </orientation>
+	          <page id="ValidGeneralLicParm" name="Licence Parm" url="valid_general_lic_parm.zul"
+		          javaClass="ValidGeneralLicParm" />
+	          <page id="ValidRenewal" name="Renewal Type" url="valid_renewal.zul" javaClass="ValidRenewal" />
+        </module>
+		<module id="lookup" name="Lookup" icon="admin/layout/lookup.gif"
+			url="admin/groups/orientation.jsp" service="core">
+			<!-- Aspire 2012/09/04 code added for the enhancement #26920 -->
+			<orientation id="orientation">
+				<orientationPage id="LookupOrientation" name="Orientation"
+					url="lookup_orientation.zul" />
+			</orientation>
+			<page id="ValidLookupGroup" name="Lookup Table" url="valid_lookupgroup.zul" javaClass="ValidLookupGroup" />
+		</module>
+		<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+		<module id="lotteryParameter" name="Lottery &amp; Gaming Parameters"
+			icon="lotterylicense.gif" url="admin/groups/orientation.jsp" license="LotteyLicense"
+			service="modules">
+			<orientation id="orientation">
+				<orientationPage id="Lottery&amp;GamingParameters_Orientation"
+					name="Orientation" url="admin/groups/Lottery&amp;GamingParameters_Orientation.jsp" />
+			</orientation>
+			<page id="ValidLotteryParm" name="Lottery Parm" url="admin/ValidLotteryParm.jsp" />
+			<page id="ValidDrawType" name="Draw Type" url="admin/ValidDrawType.jsp" />
+			<page id="ValidWheelType" name="Wheel Type" url="admin/ValidWheelType.jsp" />
+			<page id="LateReportProcedure" name="Late Report Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = LateReportDays and DefaultDesc = LateReportDays and DefaultOrder = 5" />
+			</page>
+		</module>
+		<module id="letterOfCredit" name="Letter Of Credit"
+			icon="admin/layout/letter_of_credit.gif" url="admin/groups/orientation.jsp"
+			license="LetterOfCredit" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="LOCOrientation" name="Orientation"
+					url="loc_orientation.zul" />
+			</orientation>
+			<page id="LOCParameter" name="LOC Parameter" url="loc_parameter.zul" javaClass="ValidSite" />
+		</module>
+		<module id="lrProperty" name="LR Property" icon="LRProperty.gif"
+			url="admin/groups/orientation.jsp" service="modules" license="LRProperty">
+			<page id="ValidLRProperty" name="LR Property Type" url="admin/ValidLRProperty.jsp" />
+			<page id="ValidLRType" name="LR Method" url="admin/ValidLRType.jsp" />
+			<page id="ValidOwnership" name="Ownership Type" url="admin/ValidOwnership.jsp" />
+			<page id="ValidTRSSubDivision" name="TRS Subdivision"
+				url="admin/ValidTRSSubdivision.jsp" />
+			<page id="ValidLRFieldDefinition" name="LR Field Definition"
+				url="admin/ValidLRFieldDefinition.jsp" />
+			<page id="ValidCounty" name="County" url="valid_county.zul" />
+			<page id="ValidDistrict" name="District" url="admin/ValidDistrict.jsp" />
+			<page id="ValidRouteType" name="Route Type" url="admin/ValidRouteType.jsp" />
+			<page id="ValidRoute" name="Route Name" url="admin/ValidRoute.jsp" />
+			<page id="ValidUnit" name="Unit" url="admin/ValidUnit.jsp" />
+		</module>
+
+		<module id="mapTab" name="Map Tab" icon="admin/layout/map_tab.gif"
+			url="admin/groups/orientation.jsp" service="core">
+			<orientation id="orientation">
+				<orientationPage id="MapTabOrientation" name="Orientation"
+					url="admin/groups/MapTabOrientation.jsp" />
+			</orientation>
+			<page id="ValidMap" name="Valid Map" url="admin/ValidMap.jsp" />
+			<page id="ValidLayer" name="Valid Layer" url="admin/ValidLayer.jsp" />
+			<page id="ValidMapLayer" name="Valid Map Layer" url="admin/ValidMapLayer.jsp" />
+			<page id="ValidPropertyMap" name="Valid Property Map" url="admin/ValidPropertyMap.jsp" />
+			<page id="ValidFolderMap" name="Valid Folder Map" url="admin/ValidFolderMap.jsp" />
+		</module>
+		<module id="MarkupMgnt" name="Markup Management" icon="admin/layout/markup.png"
+			url="admin/groups/orientation.jsp" service="modules" license="PdfMarkup">
+			<page id="MarkupParameter" name="Markup Parameter"
+				url="admin/ValidMarkupParameters.jsp" />
+			<page id="ValidMarkup" name="Valid Markup" url="admin/ValidEplan.jsp" />
+			<page id="ValidImprint" name="Valid Imprint(e.g. Stamps)" url="admin/ValidImprint.jsp" />
+			<page id="ValidPDFBundle" name="Valid PDFBundle(e.g.Package)"
+				url="admin/ValidPdfBundle.jsp" />
+			<page id="ValidMarkupNoteCategory" name="Valid Markup Note Category"
+				url="admin/ValidMarkupNoteCategory.jsp" />
+			<page id="ValidMarkupNoteGroup" name="Valid Markup Note Group"
+				url="admin/ValidMarkupNoteGroup.jsp" />
+			<page id="ValidMarkupNote" name="Valid Markup Note" url="admin/ValidMarkupNote.jsp" />
+			<page id="ValidMimeMarkup" name="Valid Mime" url="admin/ValidMime.jsp" />
+		</module>
+
+		<module id="Mobile" name="Mobile" icon="admin/layout/mobile.gif"
+			url="admin/groups/orientation.jsp" license="Mobile" service="modules">
+			<page id="PAL4" name="PAL4" url="admin/ValidMobileGroup.jsp" />
+			<page id="PAL5" name="PAL5" url="admin/ValidMobileDepartment.jsp" />
+			<page id="MOBILE6" name="MOBILE6" url="admin/ValidMobileDepartment.jsp" />
+		</module>
+		<module id="myElement" name="My Office" icon="admin/layout/myoffice.gif"
+			url="admin/groups/orientation.jsp" service="core">
+			<orientation id="orientation">
+				<orientationPage id="MyOfficeOrientation" name="Orientation"
+					url="admin/groups/MyOfficeOrientation.jsp" />
+			</orientation>
+			<page id="ValidMyElementGroup" name="My Element Group"
+				url="admin/ValidMyElementGroup.jsp" />
+			<page id="ValidMyElement" name="My Element" url="admin/ValidMyElement.jsp" />
+			<page id="ValidBulletin_2" name="Admin Notices" url="admin/ValidBulletin.jsp">
+				<param name="where" value="BulletinRSN=2" />
+			</page>
+		</module>
+		<module id="people" name="People" icon="people.gif"
+			url="admin/groups/orientation.jsp" service="core">
+			<!-- Aspire 2011/04/19 code added for the enhancement #21620 -->
+			<orientation id="orientation">
+				<orientationPage id="PeopleOrientation" name="Orientation"
+					url="people_orientation.zul" />
+			</orientation>
+			<page id="ValidPeople" name="People Type" url="valid_people.zul"
+				javaClass="ValidPeople" />
+			<page id="ValidPeopleStatus" name="People Status" url="valid_people_status.zul"
+				javaClass="ValidPeopleStatus" />
+			<page id="DefaultPeopleInfo" name="Default People Info" url="default_people_info.zul"
+				javaClass="DefaultPeopleInfo" />
+			<page id="ValidAddress" name="Address Type" url="valid_address.zul"
+				javaClass="ValidAddress" />
+			<page id="ValidPeopleMember" name="Member Type" url="valid_people_member.zul"
+				javaClass="ValidPeopleMember" />
+			<page id="ValidAlias" name="Alias" url="valid_alias.zul"
+				javaClass="ValidAlias" />
+			<page id="PeopleProcedure" name="People Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultPeople_Upd and DefaultDesc = DefaultPeople_Upd and DefaultOrder = 6" />
+				<param name="HidePasteSQLButtons" value="true" />
+			</page>
+			<!-- Aspire 2010/10/29 Enhancement #:19919 - Added f_insert_before_people 
+				and f_insert_before_property has been added into Admin -->
+			<page id="PeopleFunction" name="People Function" url="default_function.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = f_People_Insert_Before and DefaultDesc = f_People_Insert_Before and DefaultOrder = 89999" />
+			</page>
+			<!-- Aspire 2011/06/27 - iTrack(#21370) added People Info Procedure admin 
+				screen -->
+			<page id="PeopleInfoProcedure" name="People Info Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultPeopleInfo_Upd and DefaultDesc = DefaultPeopleInfo_Upd and DefaultOrder = 89997" />
+			</page>
+			<page id="ValidStreetPostal" name="Postal Code" url="valid_street_postal.zul"
+				javaClass="ValidStreetPostal" license="RegisteredTo eq 'CSDC'" />
+			<!-- Aspire 2011/07/13 Enhancement: #21375 People&Property Migration -->
+			<page id="PeopleMigrate" name="People Migrate" url="not_yet_implemented.zul" />
+			<page id="ValidPeopleFreeform" name="Valid People Free Form"
+				url="valid_people_freeform.zul" javaClass="ValidPeopleFreeform">
+				<detailPage id="ValidPeopleFreeform_detail" name="Detail"
+					url="valid_people_freeform_detail.zul" javaClass="ValidPeopleFreeform">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformColumn" name="Column"
+					url="valid_people_freeform_column.zul"  javaClass="ValidPeopleFreeformColumn">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformDefault" name="Default"
+					url="valid_people_freeform_default.zul"  javaClass="ValidPeopleFreeformDefault">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+					<!-- <param name="TableName" value="TableName = '{TableName}'" /> -->
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformButton" name="Button"
+					url="valid_people_freeform_button.zul"  javaClass="ValidPeopleFreeformButton">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformTab" name="Tab"
+					url="valid_people_freeform_tab.zul"  javaClass="ValidPeopleFreeformTab">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="DefaultProcedure" name="Procedure"
+					url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+					<param name="where" value="FreeFormCode"/>
+					<param name="type" value="People"/>
+					<param name="HidePasteSQLButtons" value="true" />
+					<param name="HidePasteSQLFunctionButtons" value="true" />
+				</detailPage>
+			</page>
+		</module>
+		<module id="Personalization" name="Personalization" icon="admin/Freeform.gif"
+			url="admin/groups/orientation.jsp" service="modules">
+			<page id="ValidCustomJsp_Personalization" name="Custom Jsp"
+				url="not_yet_implemented.zul" />
+			<page id="ValidResourceBundle_Personalization" name="Resource Bundle"
+				url="not_yet_implemented.zul" />
+			<page id="ValidFreeForm_Personalization" name="Valid Free Form"
+				url="valid_freeform.zul">
+				<detailPage id="ValidFreeform_detail" name="Detail"
+					url="valid_freeform_detail.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidFreeformColumn" name="Column"
+					url="valid_freeform_column.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidFreeformDefault" name="Default"
+					url="valid_freeform_default.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+					<param name="TableName" value="TableName = '{TableName}'" />
+				</detailPage>
+				<detailPage id="ValidFreeformButton" name="Button"
+					url="valid_freeform_button.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidFreeformTab" name="Tab"
+					url="valid_freeform_tab.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="FolderProcedure" name="FolderProcedure"
+					url="default_procedure.zul?type=FolderProcedure">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="Process Procedure" name="Process Procedure"
+					url="default_procedure.zul">
+					<param name="where" value="FreeFormCode"/>
+					<param name="type" value="ProcessProcedure"/>
+					<param name="HidePasteSQLButtons" value="true" />
+					<param name="HidePasteSQLFunctionButtons" value="true" />
+				</detailPage>
+			</page>
+			<page id="ValidPeopleFreeform_Personalization" name="Valid People Free Form"
+				url="not_yet_implemented.zul">
+				<detailPage id="ValidPeopleFreeform_detail" name="Detail"
+					url="valid_people_freeform_detail.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformColumn" name="Column"
+					url="valid_people_freeform_column.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformDefault" name="Default"
+					url="valid_people_freeform_default.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+					<param name="TableName" value="TableName = '{TableName}'" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformButton" name="Button"
+					url="valid_people_freeform_button.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPeopleFreeformTab" name="Tab"
+					url="valid_people_freeform_tab.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="DefaultProcedure" name="Procedure"
+					url="default_procedure.zul?type=People">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+			</page>
+			<page id="ValidPropertyFreeform_Personalization" name="Valid Property Free Form"
+				url="not_yet_implemented.zul">
+				<detailPage id="ValidPropertyFreeform_detail" name="Detail"
+					url="not_yet_implemented.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformColumn" name="Column"
+					url="not_yet_implemented.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformDefault" name="Default"
+					url="not_yet_implemented.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+					<param name="TableName" value="TableName = '{TableName}'" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformButton" name="Button"
+					url="not_yet_implemented.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformTab" name="Tab"
+					url="not_yet_implemented.zul">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+				<detailPage id="DefaultProcedure" name="Procedure"
+					url="default_procedure.zul?type=Property">
+					<param name="where" value="FreeFormCode = '{FreeFormCode}'" />
+				</detailPage>
+			</page>
+			<page id="ValidFolderForm_Personalization" name="Valid Folder Form"
+				url="not_yet_implemented.zul" />
+			<page id="ValidProcessForm_Personalization" name="Valid Process Form"
+				url="valid_process_form.zul" />
+			<page id="ValidSiteForm_Personalization" name="Valid Site Form"
+				url="not_yet_implemented.zul" />
+			<page id="ValidSiteFormInclude_Personalization" name="Valid Site Form Include"
+				url="not_yet_implemented.zul" />
+		</module>
+		<module id="process" name="Process" icon="admin/layout/process.gif"
+			url="not_yet_implemented.zul" service="core">
+			<!-- Aspire 2011/04/16 code added for the enhancement #21610 -->
+			<orientation id="orientation">
+				<orientationPage id="ProcessOrientationConcepts"
+					name="Concepts" url="process_orientation_concepts.zul" />
+				<orientationPage id="ProcessOrientationSetup" name="Default Setup"
+					url="process_orientation_setup.zul" />
+			</orientation>
+
+			<page id="ValidProcess" name="Process and Defaults" url="valid_process.zul"
+				javaClass="ValidProcess" />
+			<page id="ValidProcessGroup" name="Valid Process Group" url="valid_process_group.zul"
+				javaClass="ValidProcessGroup" />
+			<page id="ValidProcessStatus" name="Valid Process Status" url="valid_process_status.zul"
+				javaClass="ValidProcessStatus" />
+			<page id="ValidProcessDiscipline" name="Valid Process Discipline"
+				url="valid_process_discipline.zul" javaClass="ValidProcessDiscipline" />
+			<page id="ValidProcessAttemptResult" name="Valid Attempt Result"
+				icon="" url="valid_process_attempt_result.zul" javaClass="ValidProcessAttemptResult" />
+			<page id="ValidChecklist" name="Valid Process Checklist" url="valid_checklist.zul"
+				javaClass="ValidChecklist" />
+			<page id="ValidChecklistGroup" name="Valid Checklist Group" url="valid_checklist_group.zul"
+				javaClass="ValidChecklistGroup" />
+			<page id="ValidProcessInfo" name="Valid Process Info" url="valid_process_info.zul"
+				javaClass="ValidProcessInfo" />
+			<page id="ValidProcessSql" name="Valid Process Select" url="valid_process_sql.zul"
+				javaClass="ValidProcessSql" />
+			<page id="ValidMilestone" name="Valid Milestone" url="valid_milestone.zul"
+				javaClass="ValidMilestone" />
+			<page id="ValidConsentOutcome" name="Valid Consent Outcome" url="valid_consent_outcome.zul"
+				javaClass="ValidConsentOutcome" /> <!-- Aspire 2010/03/17 -->
+
+			<page id="ValidDeficiencyCategory" name="Deficiency Category"
+				url="valid_deficiency_category.zul" javaClass="ValidDeficiencyCategory"
+				license="Deficiency" />
+			<page id="ValidDeficiencySubCategory" name="Deficiency Sub Category"
+				url="valid_deficiency_sub_category.zul" javaClass="ValidDeficiencySubCategory"
+				license="Deficiency" />
+			<page id="ValidDeficiency" name="Deficiency" url="valid_deficiency.zul"
+				javaClass="ValidDeficiency" license="Deficiency" />
+			<page id="ValidDeficiencyStatus" name="Deficiency Status"
+				url="valid_deficiency_status.zul" javaClass="ValidDeficiencyStatus"
+				license="Deficiency" />
+			<page id="ValidDeficiencyAction" name="Deficiency Action"
+				url="valid_deficiency_action.zul" javaClass="ValidDeficiencyAction"
+				license="Deficiency" />
+			<page id="ValidProcessSeverity" name="Deficiency Severity" url="valid_process_severity.zul"
+				javaClass="ValidProcessSeverity" license="Deficiency" />
+
+			<page id="ValidProcessForm" name="Valid Process Form" url="valid_process_form.zul"
+				javaClass="ValidProcessForm" />
+		</module>
+		<module id="property" name="Property" icon="admin/layout/property.gif"
+			url="not_yet_implemented.zul" service="core">
+			<orientation id="orientation">
+				<orientationPage id="PropertyOrientation" name="Orientation"
+					url="property_orientation.zul" />
+			</orientation>
+			<page id="ValidProperty" name="Property Type" url="valid_property.zul" 
+			 javaClass="ValidProperty"/>
+			<page id="ValidPropertyStatus" name="Property Status"
+				url="valid_property_status.zul" javaClass="ValidPropertyStatus"/>
+			<page id="ValidPropertyInfoGroup" name="Valid Info Group"
+				url="valid_info_group.zul" javaClass="ValidInfoGroup"/> 
+			<page id="ValidPropertyInfo" name="Property Info" url="valid_property_info.zul"
+			  javaClass="ValidPropertyInfo" />
+			<page id="ValidParcelType" name="Parcel Type" url="valid_parcel_type.zul"  javaClass="ValidParcelType"/>
+			<page id="ValidParcelLotBlockType" name="Lot/Block Type"
+				url="valid_parcel_lot_block_type.zul" javaClass="ValidParcelLotBlockType"/>
+			<page id="ValidArea" name="Area Type" url="valid_area_type.zul" javaClass="ValidArea"/>
+			<page id="ValidZone" name="Zone Type" url="valid_zone_type.zul" javaClass="ValidZone"/>
+			<page id="PropertyProcedure" name="Property Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultProperty_Upd and DefaultDesc = DefaultProperty_Upd and DefaultOrder = 1" />
+			</page>
+			<!-- Aspire 2010/10/29 Enhancement #:19919 - Added f_insert_before_people 
+				and f_insert_before_property has been added into Admin -->
+			<page id="PropertyFunction" name="Property Function" url="default_function.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = f_Property_Insert_Before and DefaultDesc = f_Property_Insert_Before and DefaultOrder = 89998" />
+			</page>
+			<page id="PropertyInfoProcedure" name="Property Info Procedure"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultPropertyInfo_Upd and DefaultDesc = DefaultPropertyInfo_Upd and DefaultOrder = 2" />
+			</page>
+			<page id="PropertyPeopleProcedure" name="Property-People Proc"
+				url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultPropertyPeople_Upd and DefaultDesc = DefaultPropertyPeople_Upd and DefaultOrder = 3" />
+			</page>
+			<page id="ValidPropertyRelation" name="Relation Type"
+				url="valid_property_relation.zul" javaClass="ValidPropertyRelation" />
+			<!-- Aspire 2011/07/13 Enhancement: #21375 People&Property Migration -->
+			<page id="PropertyMigrate" name="Property Migrate" url="not_yet_implemented.zul" />
+			<!-- ESS: Abhisek: 21-Nov-2011: PropertyFreeform: Issue Id- 20983 -->
+			<page id="ValidPropertyFreeform" name="Valid Property Free Form"
+				url="valid_property_freeform.zul"  javaClass="ValidPropertyFreeform">				
+				
+				<detailPage id="validPropertyFreeform_detail" name="Detail"
+					url="valid_property_freeform_detail.zul" javaClass="ValidPropertyFreeform">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformColumn" name="Column"
+					url="valid_property_freeform_column.zul" javaClass="ValidPropertyFreeformColumn">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformDefault" name="Default"
+					url="valid_property_freeform_default.zul" javaClass="ValidPropertyFreeformDefault">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformButton" name="Button"
+					url="valid_property_freeform_button.zul"  javaClass="ValidPropertyFreeformButton" >
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				<detailPage id="ValidPropertyFreeformTab" name="Tab"
+					url="valid_property_freeform_tab.zul" javaClass="ValidPropertyFreeformTab">
+					<param name="where" value="FreeformCode" />
+					<param name="FreeformCode" value="{FreeformCode}" />
+				</detailPage>
+				
+				
+				<detailPage id="DefaultProcedure" name="Procedure"
+					url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+					<param name="where" value="FreeFormCode"/>
+					<param name="type" value="Property"/>
+					<param name="HidePasteSQLButtons" value="true" />
+					<param name="HidePasteSQLFunctionButtons" value="true" />
+				</detailPage>
+			</page>
+		</module>
+		<module id="entraprise" name="Public Portal" icon="admin/layout/publicportal.gif"
+			hotkey="" url="not_yet_implemented.zul" license="PublicPortal"
+			service="modules">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="PublicPortalOrientation" name="Orientation"
+					url="not_yet_implemented.zul" />
+			</orientation>
+			<page id="WebValidFolder" name="Web Folder" url="not_yet_implemented.zul" />
+			<page id="Web_Payment_After" name="Web Payment After" url="not_yet_implemented.zul" />
+			<!-- Aspire 2011/01/28 Issue # 20893 Adding screens to Public Portal -->
+			<page id="ValidProcessDisplay" name="Process Display"
+				url="not_yet_implemented.zul" />
+			<page id="ValidDocumentDisplay" name="Document Display"
+				url="not_yet_implemented.zul" />
+			<page id="ValidAttachmentDisplay" name="Attachment Display"
+				url="not_yet_implemented.zul" />
+			<page id="ValidWebMenu" name="Web Menu" url="not_yet_implemented.zul" />
+			<page id="ValidWebPeopleDisplay" name="People Column Display"
+				url="not_yet_implemented.zul" />
+		</module>
+		<!-- Report Wizard disabled in AMANDA5 -->
+		<module id="reportWizard" name="Report" icon="reportwizard.gif"
+			hotkey="" url="not_yet_implemented.zul" license="true" service="core"> <!-- Aspire 2009/12/09 - For 'Reports' menu no need to check for any licence -->
+			<!-- Aspire 2012/09/18 code added for the enhancement #27035 -->
+			<orientation id="orientation">
+				<orientationPage id="ReportOrientation" name="Orientation"
+					url="not_yet_implemented.zul" />
+			</orientation>
+			<page id="ValidAdhocGroup" name="Adhoc Group" url="not_yet_implemented.zul" />
+			<page id="ValidAdhoc" name="Valid Adhoc" url="not_yet_implemented.zul" />
+			<!-- Aspire 2009/12/08 - Issue 18361 <page id="ValidAdhocReport" name="Adhoc 
+				Report" url="admin/ValidAdhocReport.jsp" /> <page id="ValidRelationship" 
+				name="Relationship" url="admin/ValidRelationship.jsp" /> -->
+			<!-- Aspire 2010/09/27 (19822) Added license="ReportWizard" -->
+			<folder id="reportWizard" name="Report Wizard" license="ReportWizard">
+				<page id="ValidReportWizardColumnGroup" name="Rpt Wizard Column Group"
+					url="not_yet_implemented.zul" />
+				<page id="ValidReportWizardColumn" name="Report Wizard Column"
+					url="not_yet_implemented.zul" />
+				<page id="ValidReportWizardGroup" name="Report Wizard Group"
+					url="not_yet_implemented.zul" />
+				<page id="ValidReportWizard" name="Report Wizard Template" url="not_yet_implemented.zul" />
+			</folder>
+		</module>
+		<module id="requestForSerivce" name="Request For Service" icon="callcenter.gif"
+			hotkey="" url="not_yet_implemented.zul" license="CallCentre"
+			service="modules">
+			<!-- Aspire 2012/08/13 code added for the enhancement #21610 -->
+			<orientation id="orientation">
+				<orientationPage id="RFSOrientation" name="Orientation"
+					url="rfs_orientation.zul" />
+			</orientation>
+			<page id="RFSParameter" name="RFS Parameter" url="rfs_parameter.zul" javaClass="ValidSite"/>
+			<page id="ValidBrochure" name="Info Library" url="valid_brochure.zul" javaClass="ValidBrochure"/>
+			<page id="ValidBulletin_1" name="Bulletin" url="valid_bulletin.zul" javaClass="ValidBulletin">
+				<param name="where" value="BulletinRSN=1" />
+			</page>
+			<page id="ValidInfoRefCategory" name="Info Reference Category"
+				url="valid_info_ref_category.zul" javaClass="ValidInfoRefCategory"/>
+			<page id="ValidInfoRefGroup" name="Info Reference Group" url="valid_info_ref_group.zul" javaClass="ValidInfoRefGroup" />
+		</module>
+		<module id="review" name="Review" icon="admin/layout/review.gif"
+			url="not_yet_implemented.zul" service="modules" license="Review">
+			<!-- Aspire 2012/09/12 code added for the enhancement #27010 -->
+			<orientation id="orientation">
+				<orientationPage id="ReviewOrientation" name="Orientation"
+					url="not_yet_implemented.zul" />
+			</orientation>
+			<page id="ReviewParameter" name="Review Parameter" url="admin/EaiParameter.jsp" /> <!-- Aspire 2012/05/03 (#25630) Enabled Review Parameter -->
+			<page id="ValidEmailMsgReview" name="Email Message" url="valid_email_msg.zul" /> <!-- Aspire 2012-03-07 (#23063) re enabled Email node -->
+			<!-- <page id="ReviewWizard" name="Review Wizard" url="admin/ReviewWizard.jsp" 
+				/> --><!-- Aspire 2011/10/12 (#20485) Implement the Review Wizard -->
+		</module>
+		<module id="site" name="Site" icon="admin/layout/site.gif"
+			url="admin/groups/orientation.jsp" service="administration">
+			<!-- Aspire 2012/09/03 code added for the enhancement #21621 -->
+			<orientation id="orientation">
+				<orientationPage id="siteorientation" name="Orientation"
+					url="site_orientation.zul" />
+			</orientation>
+			<page id="ValidSite" name="Site" url="valid_site.zul" javaClass="ValidSite"/>
+			<page id="ValidSiteConfig" name="Site Config" url="valid_site_config.zul"  javaClass="ValidSiteOption"/>
+			<!-- <page id="ValidSiteSchedule" name="Schedule" url="admin/ValidSiteSchedule.jsp" /> -->
+			
+			<page id="ValidPrinter" name="Printer" url="valid_printer.zul"
+				javaClass="ValidPrinter" />
+			<page id="ValidHoliday" name="Holiday" url="valid_holiday.zul"
+				javaClass="ValidHoliday" />
+			<page id="ValidTab" name="Valid Tab" url="valid_tab.zul"
+				javaClass="ValidTab" />
+			<!-- <page id="All_Sequences" name="All Sequences" url="admin/All_Sequences.jsp"
+				RDBMS="Oracle" /> -->
+			<!-- <page id="InvalidOracleObjects" name="Invalid Oracle Objects"
+				url="admin/InvalidOracleObjects.jsp" RDBMS="Oracle" /> -->
+			<!-- Aspire 2012/09/03 code modified for the enhancement #21621 -->
+			<!-- <page id="ValidCustomJsp" name="Configure Page" url="admin/ValidCustomJsp.jsp" 
+				/> -->
+			<!--<page id="ValidPageText" name="Customize Page" url="admin/ValidPageText.jsp" 
+				/> --><!-- Aspire 2012/05/02 - #25613 Removed Customize Page since it is obsolete 
+				and it has been replaced by Custom Jsp and Resource Bundle -->
+			<page id="ValidMime" name="Valid Mime" url="valid_mime.zul" javaClass="ValidMime"/>
+			<!-- <page id="ValidSiteForm" name="Valid Site Form" url="admin/ValidSiteForm.jsp" 
+				/> <page id="ValidSiteFormInclude" name="Valid Site Form Include" url="admin/ValidSiteFormInclude.jsp" 
+				/> -->
+			<page id="LogonProcedure" name="Logon Procedure" url="default_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where"
+					value="ProcedureName = DefaultLogon and DefaultDesc = DefaultLogon and DefaultOrder = 4" />
+			</page>
+			<page id="ValidPath" name="Path Synonym" url="valid_path.zul"
+				javaClass="ValidPath" />
+			<page id="ValidTask" name="Valid Task" url="valid_task.zul"
+				javaClass="ValidTask" />
+			<!-- <page id="ValidTaskStep" name="Valid Task Step" url="admin/ValidTaskStep.jsp" 
+				/> -->
+			<!-- Not required anymore as we use Log4j for logging; also it is commented 
+				for security reason -->
+			<!-- <page id="ShowLog" name="Show Log" url="admin/ShowLog.jsp" /> -->
+			<page id="ValidEmailMsg" name="Email Message" url="valid_email_msg.zul"
+				javaClass="ValidEmailMsg" />
+			<page id="ValidResourceBundle" name="Resource Bundle" url="valid_resource_bundle.zul"
+				javaClass="ValidResourceBundle" />
+			<!-- Aspire 2010/02/02 Added -->
+			<page id="ValidMessage" name="Valid Message" url="valid_message.zul"
+				javaClass="ValidMessage" />
+			<page id="EmailLog" name="EmailLog" url="email_log.zul"
+				javaClass="EmailLog" />
+			<folder id="tools" name="Tools" icon="admin/images/folder.gif">
+				<!-- Aspire 211/10/14 (#21372) maintenance spell mistake -->
+				<page id="PathMaintenance" name="Path Maintenance" url="path_maintenance.zul" javaClass="FolderDocument"/>
+				
+				<!-- These features has been integrated with batch scheduler hence it 
+					is no longer required. <page id="ValidBatch" name="Batch" url="admin/ValidBatch.jsp" 
+					/> <page id="ValidBatchSub" name="Batch Sub" url="admin/ValidBatchSub.jsp" 
+					/> <page id="ValidProcedure" name="Procedure" url="admin/ValidProcedure.jsp" 
+					/> <page id="ControlBatchFSI" name="External System Interface" url="admin/ControlBatchFSI.jsp" 
+					/> -->
+			</folder>
+
+			<!-- Aspire 2011/10/28 - Issue #23277 -Agency folder node is Jems item -->
+			<!-- <folder id="agency" name="Agency" icon="admin/images/folder.gif"
+				license="Jems" bolRootNode="true">
+				<page id="ValidAgency" name="Valid Agency" url="ValidAgency.zul"
+					javaClass="ValidAgency" />
+				<page id="ValidAgencyFolder" name="Valid Agency Folder" url="ValidAgencyFolder.zul"
+					javaClass="ValidAgencyFolder" />
+				<page id="ValidAgencyUser" name="Valid Agency User" url="ValidAgencyUser.zul"
+					javaClass="ValidAgencyUser" />
+				<page id="ValidAgencyResource" name="Valid Agency Resource"
+					url="ValidAgencyResource.zul" javaClass="ValidAgencyResource" />
+				<page id="ValidAgencyLocationDevice" name="Valid Agency Location Device"
+					url="ValidAgencyLocationDevice.zul" javaClass="ValidAgencyLocationDevice" />
+				<page id="ValidEmail" name="Valid Email" url="valid_email.zul"
+					javaClass="ValidEmail" />
+				<page id="ValidPaymentProvider" name="Valid Payment Provider"
+					url="ValidPaymentProvider.zul" javaClass="ValidPaymentProvider" />
+			</folder> -->
+			<!-- Aspire 2011/10/28 - Issue #23277 -Resource folder node is Jems item -->
+			<folder id="resource" name="Resource" icon="admin/images/folder.gif"
+				license="Jems" bolRootNode="true">
+				<page id="ValidResource" name="Resource" url="valid_resource.zul"
+					javaClass="ValidResource" />
+				<page id="ValidResourceType" name="Resource Type" url="valid_resource_type.zul"
+					javaClass="ValidResourceType" />
+				<page id="ValidResourceGroup" name="Resource Group" url="valid_resource_group.zul"
+					javaClass="ValidResourceGroup" />
+				<page id="ValidResourceGroupUser" name="Resource Group User"
+					url="valid_resource_group_user.zul" javaClass="ValidResourceGroupUser" />
+			</folder>
+		</module>
+		<!-- Aspire 2011/07/07 code added for the enhancement #22328 - Starts -->
+		<module id="smartphone" name="Smart Phone" icon="admin/layout/smart_phone.png"
+			url="admin/groups/orientation.jsp" service="modules" license="SmartPhone">
+			<page id="ValidMobileForm" name="Mobile Form" url="admin/ValidMobileForm.jsp" />
+			<page id="ValidMobileOption" name="Mobile Options" url="admin/ValidMobileOption.jsp" />
+		</module>
+		<!-- Aspire 2011/07/07 code added for the enhancement #22328 - Ends -->
+		<module id="tax" name="Tax" icon="admin/layout/tax.gif" url="orientation.zul"
+			service="modules" license="Tax">
+			<orientation id="orientation">
+				<orientationPage id="TaxOrientation" name="Orientation"
+					url="tax_orientation.zul" />
+			</orientation>
+			<page id="ValidAssessment" name="Valid Assessment" url="valid_assessment.zul" javaClass="ValidAssessment" />
+			<page id="ValidAssessmentInfo" name="Valid Assessment Info" url="valid_assessment_info.zul" javaClass="ValidAssessmentInfo" />
+			<page id="ValidAssessmentRate" name="Valid Assessment Rate" url="valid_assessment_rate.zul" javaClass="ValidAssessmentRate" />
+			<page id="ValidRate" name="Rate" url="valid_rate.zul" javaClass="ValidRate" />
+			<page id="ValidTransactionGroup_Tax" name="Transaction Group" url="valid_transaction_group.zul" javaClass="ValidTransactionGroup"/>
+			<page id="ValidTransaction_Tax" name="Transaction" url="valid_transaction.zul" javaClass="ValidTransaction"/>
+			<page id="ValidBatch_Tax" name="Batch" url="valid_batch.zul" javaClass="ValidBatch"/>
+			<page id="ValidBatchSub_Tax" name="Batch Sub" url="valid_batch_sub.zul" javaClass="ValidBatchSub"/>
+			<page id="ValidProcedure_Tax" name="Procedure" url="valid_procedure.zul" javaClass="ValidProcedure"/>
+			<page id="ControlLog_Tax" name="Control Log" url="control_log.zul" javaClass="ControlLog"/>
+			<page id="Code_Tax" name="Code" url="valid_code.zul" javaClass="ValidCode"/> 
+			<page id="Colour_Tax" name="Colour" url="valid_colour.zul" javaClass="ValidColour"/>
+			<page id="ValidSiteTax" name="Tax Parameters" url="valid_site_tax.zul" javaClass="ValidSiteTax"/>
+			<page id="ValidLookupTaxGroup_Tax" name="Tax Lookup" url="valid_lookup_tax_group.zul" javaClass="ValidLookupTaxGroup"/>
+			<page id="ValidTaxFolder_Tax" name="Tax Folder" url="valid_tax_folder.zul" javaClass="ValidColumn"/>
+			<!-- <page id="ValidProcedureUserObject" name="Tools" url="valid_procedure_user_object.zul" javaClass="ValidProcedureUserObject"/> -->
+			<folder id="ValidProcedureUserObject" name="Tools">
+				<page id="ProcedureUserObject" name="Procedure UserObject" url="valid_procedure_user_object.zul"
+					javaClass="ValidProcedureUserObject" />
+				<!-- <page id="InvalidOracleObjects" name="Invalid Oracle Objects" url="invalid_oracle_objects.zul"
+					javaClass="ValidProcedureUserObject" RDBMS="SqlServer"/> -->
+			</folder>
+		</module>
+		<module id="troubleshoot" name="Troubleshoot" icon="admin/layout/wrench.png"
+			url="orientation.zul" service="administration">
+			<!-- <page id="CSDCDebugLog" name="Server Logging" url="admin/CSDCDebugLog.jsp" />
+			<page id="ValidConnectionPool" name="Connection"
+				url="admin/ValidConnectionPool.jsp" /> -->
+			<page id="MessagingMonitor" name="Messaging Monitor" url="messaging_monitor.zul" />
+			<page id="Message" name="Messaging" url="message.zul" javaClass="Message" />
+			<page id="MessageAdd" name="Add a Message" url="message_add.zul" javaClass="Message" />
+			<!-- <page id="IndexComparator" name="Find Missing Indexes" url="admin/IndexComparator.jsp" />
+			<page id="CustomLocation" name="Server Directories &amp; Files"
+				url="admin/CustomLocation.jsp" /> -->
+		</module>
+		<module id="trustAccount" name="Trust Account" icon="trustaccount.gif"
+			url="admin/groups/orientation.jsp" license="TrustAccount" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="TrustAccountOrientation" name="Orientation"
+					url="trustaccount_orientation.zul" />
+			</orientation>
+			<page id="ValidTrustParm" name="Trust Account Parameter" url="valid_trust_param.zul" javaClass="ValidTrustParm" />
+		</module>
+		<module id="timeandactivity" name="Time and Activity"
+			icon="admin/layout/timeandactivity.gif" hotkey=""
+			url="admin/groups/orientation.jsp" license="TimeAndActivity" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="TATOrientation" name="Orientation"
+					url="tat_orientation.zul" />
+			</orientation>
+			<page id="ValidTatParm" name="TAT Parameter" url="valid_tat_parm.zul" javaClass="ValidTatParm"/>
+		</module>
+		<module id="user" name="User" icon="admin/layout/user.gif" url="orientation.zul" service="administration">
+			<orientation id="orientation">
+				<orientationPage id="UserOrientation" name="Orientation" url="user_orientation_tab.zul" />
+			</orientation>
+			<page id="ValidAccess" name="Access" url="valid_access.zul" javaClass="ValidAccess" />
+			<page id="ValidDepartment" name="Department" url="valid_department.zul" javaClass="ValidDepartment" />
+			<page id="ValidLocation" name="Location" url="valid_location.zul" javaClass="ValidLocation" />
+			<page id="ValidUser" name="Users" url="manage_user.zul" javaClass="ValidUser">
+				<detailPage id="UserDetail" name="User" url="valid_user_detail.zul" javaClass="ValidUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="UserFolderPermission" name="Folder Permission" url="valid_user_button.zul" javaClass="ValidUserButton">
+					<param name="where" value="UserId" />
+					<param name="UserID" value="{UserID}" />
+				</detailPage>
+				<detailPage id="UserSitePermission" name="Site Permission" url="valid_user_permission.zul" javaClass="ValidUserPermission">
+					<param name="where" value="UserId" />
+					<param name="UserID" value="{UserID}" />
+				</detailPage>
+				<detailPage id="Password" name="Password" url="change_password.zul" javaClass="ValidUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="TrustedUser" name="Trusted User" url="valid_user_trusted.zul" javaClass="ValidUserTrusted">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="EnhancedSecurity" name="Enhanced Security" url="enhanced_security.zul" javaClass="ValidUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<!-- <detailPage id="UserRLS" name="Data Security" url="valid_program_security_user.zul" javaClass="ValidProgramSecurityUser">
+					<param name="where" value="UserId" />
+					<param name="dstColumnName" value="USERID" />
+				</detailPage> -->
+				<detailPage id="Audit" name="Login History" url="valid_audit.zul" javaClass="LogCsdcLogon"   >
+					<param name="where" value="UserId" />
+					<param name="dstColumnName" value="LogonUserId" />
+				</detailPage>
+				<detailPage id="UserAccess" name="Access" url="valid_user_access.zul" javaClass="ValidUserAccess">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="UserTeam" name="Team" url="valid_user_team.zul" javaClass="ValidTeamUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="UserReport" name="Report" url="valid_user_report.zul" javaClass="ValidMenuReportUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="UserGroup" name="Group" url="valid_user_privilege_group.zul" javaClass="ValidPrivilegeUser">
+					<param name="where" value="UserId" />
+				</detailPage>
+				<detailPage id="UserMenuOptions" name="Menu Options" url="valid_user_menu_options.zul" javaClass="ValidUserMainMenu">
+					<param name="where" value="UserId" />
+				</detailPage>
+			</page>
+			<page id="SecurityGroup" name="Security Group" url="valid_privilege.zul" javaClass="ValidPrivilege">
+				<detailPage id="Security" name="Security" url="valid_privilege_detail.zul" javaClass="ValidPrivilege">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="User" name="User" url="valid_privilege_user.zul" javaClass="ValidPrivilegeUser">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="UserFolderPermission" name="Folder Permission" url="valid_privilege_button.zul" javaClass="ValidPrivilegeButton">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="UserSitePermission" name="Site Permission" url="valid_privilege_permission.zul" javaClass="ValidPrivilegePermission">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="MenuOptions" name="Menu Options" url="valid_privilege_main_menu.zul" javaClass="ValidPrivilegeMainMenu">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="Report" name="Report" url="valid_privilege_menu_report.zul" javaClass="ValidPrivilegeMenuReport">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+				<detailPage id="GroupRLS" name="Group RLS" url="valid_privilege_group_rls.zul" javaClass="ValidRowLevelSecurityPrivilege">
+					<param name="where" value="PrivilegeCode" />
+				</detailPage>
+			</page>
+			<page id="ValidTeam" name="Team" url="valid_team.zul" javaClass="ValidTeam" >
+				<detailPage id="TeamUserDetail" name="Team User" url="valid_team_user.zul" javaClass="ValidTeamUser">
+					<param name="where" value="TeamCode" />
+				</detailPage>
+			</page>
+			<page id="UserValidationProcedure" name="User Validation Procedure" url="user_validation_procedure.zul" javaClass="DefaultAccountBillFee">
+				<param name="where" value="ProcedureName = ValidUser_Validation and DefaultDesc = User Validation Procedure and DefaultOrder = 6666" />
+				<param name="HidePasteSQLButtons" value="true" />
+				<param name="HidePasteSQLFunctionButtons" value="true" />
+			</page>
+			<page id="ValidUserDictionary" name="User Dictionary" url="valid_user_dictionary.zul" javaClass="ValidUserDictionary" />
+			<page id="ValidSignature" name="Signature" url="valid_signature.zul" javaClass="ValidSignature" />
+			<page id="CsdcLogon" name="Who's On" url="csdc_logon.zul" javaClass="CsdcLogon" DBOwner="true" />
+			<!-- <page id="ValidUserGroup" name="User Group" url="valid_user_group.zul" javaClass="ValidUserGroup" /> -->
+		</module>
+		<module id="vehicle" name="Vehicle" icon="vehicle.gif"
+			url="admin/groups/orientation.jsp" license="Vehicle" service="modules">
+			<orientation id="orientation">
+				<orientationPage id="VehicleOrientation" name="Orientation"
+					url="vehicle_orientation.zul" />
+			</orientation>
+			<page id="ValidMake" name="Make" url="valid_vehicle_make.zul"  javaClass="ValidMake"/>
+			<page id="ValidModel" name="Model" url="valid_vehicle_model.zul"  javaClass="ValidModel"/>
+			<page id="ValidBodyType" name="Body Type" url="valid_vehicle_body_type.zul" javaClass="ValidBodyType" />
+			<page id="ValidVehicleColour" name="Color"
+				url="valid_vehicle_colour.zul" javaClass="ValidVehicleColour"/>
+			<page id="ValidVehicleStatus" name="Vehicle Status"
+				url="valid_vehicle_status.zul" javaClass="ValidVehicleStatus" />
+			<page id="ValidVehicleInfo" name="Vehicle Info" url="valid_vehicle_info.zul" javaClass="ValidVehicleInfo" />
+		</module>
+		<!-- Nalini 2012/01/31 - 24353 - Added - Start -->
+		<module id="webService" name="Web Service" icon="admin/layout/service-icon.png"
+			url="admin/groups/orientation.jsp" license="WebService" service="modules">
+			<!-- Aspire 2012/09/18 code added for the enhancement #27038 -->
+			<orientation id="orientation">
+				<orientationPage id="WebServiceOrientation" name="Orientation"
+					url="webservice_orientation.zul" />
+			</orientation>
+			<page id="ValidWebServiceSQL" name="Web Service SQL"
+				url="valid_webservice_sql.zul" javaClass="ValidWebServiceSql"/>
+		</module>
+		<!-- Nalini 2012/01/31 - 24353 - End -->
+	</modules>
+</admin>

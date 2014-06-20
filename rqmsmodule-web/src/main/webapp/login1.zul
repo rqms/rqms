@@ -1,0 +1,130 @@
+
+
+<?root-attributes lang="en" ?>
+<?link rel="icon" type="image/x-icon" href="/resource/image/favicon2.ico"?>
+<zk xmlns:x="xhtml" xmlns:zk="zk" xmlns:a="client/attribute">
+	<window width="100%" height="100%" xmlns:w="client" xmlns:x="xhtml"
+		apply="org.zkoss.bind.BindComposer"	>
+		<style src="/resource/style/styles.css" />
+		<style src="/css/global.css" />
+<!-- this form-login-page form is also used as the
+			form-error-page to ask for a login again. -->
+		<html style="color:red" if="${not empty param.login_error}">
+
+
+
+
+			
+			<![CDATA[ Your login attempt was not successful, try
+			again.<br/><br/> Reason:
+			${SPRING_SECURITY_LAST_EXCEPTION.message} ]]>
+			
+			
+			
+			
+			
+    </html>
+<h:form id="f" name="f" action="j_spring_security_check"
+			method="POST" xmlns:h="http://www.w3.org/1999/xhtml">
+		<div sclass="body">
+
+			<div sclass="wrapper">
+
+				<div class="content_holder">
+					<html  style="display: block;">
+					<h1>RQMS</h1>
+<br>
+An abundance opportunity lies in this business which shall assist the Human Resource teams and employers in Resourcing and staffing through various stages such as searching candidates, shortlisting them, screening, background verification, offering the roles, implying that, the application shall bridge the gap between employers, candidates and vendors entirely.
+</br>
+<br></br>
+<br></br>
+<h3>Our goal is to create a highly automated Web-Portal for employers which shall support staffing solutions. </h3>
+
+					</html>
+				</div>
+				<div sclass="tab_holder">
+					<div sclass="tab_holder_tab_bg">
+						<div sclass="tabs">
+							<separator></separator>
+							
+								
+										<div height="350px">
+											
+												<div
+													sclass="tabs_container_div">
+													<separator></separator>
+													<separator></separator>
+													<separator></separator>
+													<!-- <image
+														src="/resource/image/amanda1.png"
+														sclass="tabs_container_div_img" /> -->
+													<div
+														sclass="for_login">
+														<textbox
+															width="248px" sclass="login_box_user"
+															name="j_username"
+															placeholder="User Name"
+															tooltiptext="@load(vm.lblUserName)"
+															focus="@load(empty vm.username)"
+															 >
+														</textbox>
+														<textbox
+															width="248px" type="password"
+															name="j_password"
+															placeholder="Password"
+															sclass="login_box_pass"
+															tooltiptext="Password"
+															focus="@load(not empty vm.username)"
+															>
+														</textbox>
+
+
+														
+													</div>
+													<div
+														sclass="for_login">
+
+														<checkbox
+															label="Remember Password"
+															checked="false">
+														</checkbox>
+
+														<separator></separator>
+                                                    <h:input type="submit"  value="Login" sclass="button"/>
+                                                    
+                                                    
+														  <!-- <image 
+															style="cursor: pointer;"
+															src="/images/sign-in.png"
+															/>  -->
+													</div> 
+												</div>
+												<div visible="@load(!vm.fieldDisable)"
+													sclass="tabs_container_div">
+													<separator></separator>
+													<separator></separator>
+													<!-- <image
+														src="/resource/image/amanda1.png"
+														sclass="tabs_container_div_img" /> -->
+													
+												</div>
+
+											
+										</div>
+									
+							
+
+
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+
+		</div>
+		</h:form>
+
+	</window>
+</zk>

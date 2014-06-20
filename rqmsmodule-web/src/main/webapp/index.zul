@@ -1,0 +1,5 @@
+<zk>
+	<window apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm')@init('com.rqms.viewmodel.IndexVM')">
+	</window>
+</zk>

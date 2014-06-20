@@ -1,0 +1,234 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<borderlayout width="100%" height="100%">
+			<north border="none">
+				<div width="96%">
+					<span width="100%">
+						<div sclass="sectionTitle">
+							<separator />
+							<label id="lcaption"
+								sclass="sectionTitleLabel" value="Add/Edit User Details" />
+							<image
+								src="@load(fxStatus.dirty?'images/unsaved32x32.png':'')" />
+
+						</div>
+					</span>
+					<div id="buttonsDiv"
+						style="float:right;margin-top:6px;">
+						<button label="Save" mold="trendy"
+							onClick="@command('saveThis')" tooltiptext="Save"
+							autodisable="self" sclass="mybutton button theme small">
+						</button>
+						<button label="Reset" mold="trendy"
+							tooltiptext="Reset" autodisable="self"
+							onClick="@command('refreshList')"
+							sclass="mybutton button theme small">
+						</button>
+					</div>
+					<div style="clear: both;"></div>
+					<div sclass="sectionSeperator"></div>
+				</div>
+			</north>
+			<center border="none">
+
+				<vlayout vflex="1" hflex="1" sclass="vertical-scroll">
+					<groupbox mold="3d" width="100%" closable="false">
+						<x:table border="0" width="100%"
+							height="100%">
+							<x:tr>
+								<x:td width="100%" valign="top">
+									<separator />
+										<label value="Profesional Information" sclass="sectionTitleLabel" />
+									<separator />
+								</x:td>
+							</x:tr>
+							<x:tr>
+								<x:td>
+									<x:table border="0" width="100%">
+										<x:tr>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Last Name"
+													value="Last Name:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.lastName)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Frist Name"
+													value="Frist Name:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.firstName)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Middle Name"
+													value="Middle Name:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.middleName)" maxlength="128"/>
+											</x:td>
+										</x:tr>
+										<x:tr>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="User Id"
+													value="User Id:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.userLoginID)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Password"
+													value="Password:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox type="password"  hflex="1" value="@bind(vm.selectedItem.password)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Confirm Password"
+													value="Confirm Password:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox type="password" hflex="1" value="@bind(vm.selectedItem.confirmPassword)" maxlength="128"/>
+											</x:td>
+										</x:tr>
+										<x:tr>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Role Id"
+													value="Role Id:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<combobox readonly="true" hflex="1" autodrop="true"
+													model="@load(vm.getComboBoxList())"
+													selectedItem="@load(vm.getSelectOption(vm.selectedItem.roleid))"
+													itemRenderer="com.rqms.common.SelectOptionRenderer" onSelect="@command('valueChangedListnerForCombo',BeanData = vm.selectedItem, Code = self)" />
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="SSN"
+													value="SSN:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.SSN)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label tooltiptext="Website" value="Website:" sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.website)" maxlength="128"/>
+											</x:td>
+										</x:tr>
+										<x:tr>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Email ID"
+													value="Email ID:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.email)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="DOB"
+													value="DOB:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<datebox hflex="1" format="yyyy-MM-dd" value="@bind(vm.selectedItem.DOB)" readonly="true" />
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Phone Number"
+													value="Phone Number:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox hflex="1" value="@bind(vm.selectedItem.phoneNumber)" />
+											</x:td>
+										</x:tr>
+										</x:table>
+										</x:td>
+									</x:tr>
+									<x:tr>
+										<x:td width="100%" valign="top">
+											<separator />
+												<label value="Personel Information" sclass="sectionTitleLabel" />
+											<separator />
+										</x:td>
+									</x:tr>
+									<x:tr>
+									<x:td>
+										<x:table border="0" width="100%">
+											<x:tr>
+												<x:td width="13%" align="right">
+													<label
+														tooltiptext="Current Address"
+														value="Current Address:"
+														sclass="flabel" />
+												</x:td>
+											<x:td width="20%" colspan="1">
+												<textbox hflex="1" rows="3" value="@bind(vm.selectedItem.address1)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="City"
+													value="City:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.city)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="State"
+													value="State:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.state)" maxlength="128"/>
+											</x:td>
+										</x:tr>
+										<x:tr>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="Permanent Address"
+													value="Permanent Address:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%" colspan="1">
+												<textbox  hflex="1" rows="3" value="@bind(vm.selectedItem.address2)" maxlength="128"/>
+											</x:td>
+											<x:td width="13%" align="right">
+												<label
+													tooltiptext="ZipCode"
+													value="ZipCode:"
+													sclass="flabel" />
+											</x:td>
+											<x:td width="20%">
+												<textbox  hflex="1" value="@bind(vm.selectedItem.zipCode)" maxlength="128"/>
+											</x:td>
+										</x:tr>
+									</x:table>
+								</x:td>
+							</x:tr>
+							</x:table>
+					</groupbox>
+				</vlayout>
+			</center>
+		</borderlayout>
+	<!-- </window> -->
+</zk>

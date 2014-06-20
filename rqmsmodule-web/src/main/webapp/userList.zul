@@ -1,0 +1,98 @@
+<?page title="Users List" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window id="userList" border="none" height="80%" width="96%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.UserListVM')">
+		<separator />
+		<separator />
+		<div width="100%">
+			<div sclass="sectionTitle">
+				<separator />
+				<label value="Users" sclass="sectionTitleLabel" />
+				<separator />
+			</div>
+			<div style="float:right">
+				<button label="Add New" onClick="@command('onAddNew')"
+					mold="trendy" sclass="mybutton button theme small" />
+				<button label="Logout" mold="trendy" id="btnlogout"
+					sclass="mybutton button theme small" onClick="@command('Logout')" />
+			</div>
+			<div style="clear: both;"></div>
+			<div sclass="sectionSeperator"></div>
+		</div>
+		<separator />
+		<listbox id="" mold="paging" pageSize="11" pagingPosition="top"
+			sclass="mylist" selectedItem="@bind(vm.selectedItem)"
+			model="@load(vm.dataSet)">
+			<auxhead>
+				<auxheader colspan="1">
+					<image sclass="fImageFilter" />
+					<textbox cols="20" mold="rounded"
+						value="@bind(vm.dataFilter.firstName)"
+						onChange="@command('doFilter')" instant="true" />
+				</auxheader>
+				<auxheader colspan="1">
+					<image sclass="fImageFilter" />
+					<textbox cols="20" mold="rounded"
+						value="@bind(vm.dataFilter.lastName)"
+						onChange="@command('doFilter')" instant="true" />
+				</auxheader>
+				<auxheader colspan="1">
+					<image sclass="fImageFilter" />
+					<textbox cols="20" mold="rounded"
+						value="@bind(vm.dataFilter.email)" onChange="@command('doFilter')"
+						instant="true" />
+				</auxheader>
+				<auxheader colspan="1">
+					<image sclass="fImageFilter" />
+					<textbox cols="20" mold="rounded"
+						value="@bind(vm.dataFilter.loginID)"
+						onChange="@command('doFilter')" instant="true" />
+				</auxheader>
+
+			</auxhead>
+			<listhead sizable="true">
+				<listheader label="First Name" sortDirection="ascending"
+					sort="auto(firstName)" />
+				<listheader label="Last Name" sort="auto(lastName)" />
+				<listheader label="Email" sort="auto(email)" />
+				<listheader label="Login ID" sort="auto(userLoginID)" />
+				<listheader label="Action" />
+			</listhead>
+			<template name="model" var="p1">
+				<listitem onSelect="@command('SelectedRecord',BeanData = p1 )">
+					<listcell label="@load(p1.firstName)" />
+					<listcell label="@load(p1.lastName)" />
+					<listcell label="@load(p1.email)" />
+					<listcell label="@load(p1.userLoginID)" />
+					<listcell>
+						<hbox spacing="20px">
+							<image
+								onClick="@command('onEdit',userRecord=p1)" sclass="fimageedit"
+								visible="@load(p1.system eq 0)"
+								tooltiptext="To Edit the user details">
+							</image>
+							<image
+								onClick="@command('openAsReadOnly',userRecord=p1)"
+								sclass="fimageView" tooltiptext="To view the user details">
+							</image>
+							<image
+								tooltip="msgPopup, position=before_start, delay=500"
+								sclass="fImageSystem" visible="@load(p1.system eq 1)" />
+							<image
+								onClick="@command('onDelete',userRecord=p1)"
+								visible="@load(p1.system eq 0)" sclass="fimageDelete"
+								tooltiptext="To Delete the user ">
+							</image>
+						</hbox>
+					</listcell>
+				</listitem>
+			</template>
+		</listbox>
+		<popup id="msgPopup">
+			<label id="msg"
+				value="Sytem defined user. Edit and Delete are not allowed.">
+			</label>
+		</popup>
+	</window>
+</zk>

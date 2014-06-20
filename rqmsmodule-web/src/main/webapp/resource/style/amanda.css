@@ -1,0 +1,153 @@
+.upper-textbox {
+	text-transform: uppercase;
+	
+}
+
+.textbox-color{
+	background-color : #FFE1EC;
+	 
+}
+.textbox-non-mandatory-color{
+	background-color : #FFFFFF;
+	 
+}
+.field-label {
+	font-weight: bold;
+	color: gray;
+}
+
+.field-data {
+	font-size: 13px;
+}
+
+.group-header {
+	font-weight: bold;
+}
+
+.label-header{
+	display:block; 
+	margin-top:5px; 
+	margin-left:5px; 
+	font-weight: bold;
+}
+
+.grp-header{
+	border-width: 1px;
+	border-left-style: solid; 
+	border-right-style: solid; 
+	border-bottom-style: solid; 
+	border-color: #9AB7D7; 
+}
+.grid-cell{
+	 
+	
+}
+
+.tab-header {  
+  font-size: 18px;
+  font-weight: bold;
+  align:center;
+}
+
+.vertical-scroll {
+	overflow-y: auto !important;
+}
+
+.z-panel-children {
+	background: none;
+}
+
+.error-message {
+	font-weight: bold;
+	font-size: 14px;
+	color: red;
+}
+
+.new-info-msg {
+	font-weight: bold;
+	font-size: 14px;
+	color: green;
+	 
+}
+
+.status-message {
+	background-color: #FFF7B2;
+}
+
+.new-info {
+	background-color:#E6E6FA;
+}
+
+.listbox-header{
+	font-weight: bold;
+	font-size: 15px;
+}
+div.connectionCache {
+	position: fixed;
+	background-color: yellow;
+	padding-left: 10px;
+	padding-right: 10px;
+	top: 0px;
+	right: 150px;
+	z-index: 100000;
+	line-height: 30px;
+	text-align: center;
+	color: black;
+	font-style: normal;
+	border-bottom:2px solid black;
+	border-left:2px solid black;
+	border-right:2px solid black;
+	opacity:0.8;
+}
+div.currentAgency {
+	position: fixed;
+	background-color: transparent;
+	padding-right: 10px;
+	top: 0px;
+	right: 50px;
+	z-index: 100001;
+	line-height: 30px;
+	text-align: center;
+	color: #003471;
+	font-style: normal;
+	font-weight:bolder;
+	opacity:0.8;
+}
+
+div.amandaLogo {
+	position: fixed;
+	background-color: transparent;
+	top: 7.5px;
+	right: 1px;
+	z-index: 100002;
+	opacity:0.9;
+}
+
+.CustomScript {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 14px;
+}
+
+.z-tabpanel {
+	padding: 0px;
+}
+.intBoxRightAlign.z-intbox{
+	text-align:right;
+}
+.textBoxCenterAlign.z-textbox{
+	text-align:center;
+}
+
+/* Regular Desktop */
+@media (max-width: 1024px) {
+	.home-header {
+		height: 45px;
+	}
+}
+
+/* for iPad */
+@media (min-width: 1025px) {
+	.home-header {
+		height: 70px;
+	}
+}

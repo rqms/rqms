@@ -1,0 +1,306 @@
+<?page title="" contentType="text/html;charset=UTF-8"?>
+<zk>
+
+	<window id="userCRUD" border="none"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.UserCRUDVM')">
+		<div
+			form="@id('fx') @load(vm.selectedRecord) @save(vm.selectedRecord, before='saveThis')">
+
+			<div width="96%">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label id="lcaption" sclass="sectionTitleLabel"
+							value="Add/Edit Users" />
+						<label id="readonly" sclass="sectionTitleLabel"
+							value="(ReadOnly)" visible="@load(vm.makeAsReadOnly)" />
+						<image
+							src="@load(fxStatus.dirty?'images/unsaved32x32.png':'')" />
+
+					</div>
+				</span>
+				<div id="buttonsDiv"
+					style="float:right;margin-top:6px;">
+					<button label="Save and Close" mold="trendy"
+						visible="@load(not vm.makeAsReadOnly)"
+						onClick="@command('saveThis', action=0)"
+						sclass="mybutton button theme small">
+					</button>
+					<button label="Save and Add" mold="trendy"
+						visible="@load(not vm.makeAsReadOnly)"
+						onClick="@command('saveThis', action=1)"
+						sclass="mybutton button theme small">
+					</button>
+					<button
+						label="@load(vm.makeAsReadOnly ?'Close':'Cancel')" mold="trendy"
+						onClick="@command('cancel')"
+						sclass="mybutton button theme small">
+					</button>
+				</div>
+				<div style="clear: both;"></div>
+				<div sclass="sectionSeperator"></div>
+			</div>
+
+			<span width="100%">
+				<div sclass="sectionTitle">
+					<separator />
+					<label value="Personel Information"
+						sclass="sectionTitleLabel" />
+					<separator />
+				</div>
+			</span>
+			<div>
+				<image content="@bind(vm.myImage)" width="150px"
+					style="overflow:auto;z-index:999;position:absolute;right:30px;top:56px;width:150px;height:140px;background-color:#ff99cc;" />
+				<button Label="Add" sclass="mybutton button theme small"
+					width="40px" upload="true,maxsize=300"
+					visible="@load(not vm.makeAsReadOnly)"
+					style="position:absolute;right:115px;top:200px;"
+					onUpload="@command('upload', upEvent=event)" mold="trendy" />
+				<button Label="Del" sclass="mybutton button theme small"
+					visible="@load(not vm.makeAsReadOnly)" width="40px"
+					style="position:absolute;right:30px;top:200px;"
+					onClick="@command('removeImage')" mold="trendy" />
+			</div>
+			<panel width="95%" sclass="sectionPanel">
+				<panelchildren>
+					<separator />
+					<grid sclass="vgrid">
+						<columns>
+							<column hflex="10%"></column>
+							<column hflex="10%"></column>
+							<column hflex="10%"></column>
+							<column hflex="10%"></column>
+						</columns>
+						<rows>
+							<row>
+								
+								<vlayout>
+									<hlayout>
+										<label value="Last Name"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="lastname"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded" hflex="1"
+										value="@bind(fx.lastName)" />
+								</vlayout>
+								<vlayout>
+									<hlayout>
+										<label value="First Name"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="firstname"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded" hflex="1"
+										value="@bind(fx.firstName)" />
+								</vlayout>
+								<vlayout>
+									<label value="Middle Name"
+										sclass="flabel" />
+									<textbox id="middleName"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+										value="@bind(fx.middleName)" />
+								</vlayout>
+
+							</row>
+							<row>
+
+								<vlayout>
+									<hlayout>
+										<label value="Email"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="email" hflex="1"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+										value="@bind(fx.email)" />
+								</vlayout>
+								<cell colspan="2">
+									<hbox>
+										<vlayout>
+											<label value="SSN"
+												sclass="flabel" />
+											<MaskedBox
+												format="999-99-9999" width="115%"
+												readonly="@load(vm.makeAsReadOnly)"
+												value="@bind(fx.SSN) @converter('com.rqms.utilities.MaskConverter')">
+											</MaskedBox>
+										</vlayout>
+										<vlayout>
+											<label value="DOB"
+												sclass="flabel" />
+											<MaskedBox
+												waterMark="mm/dd/yyyy" format="99/99/9999"
+												readonly="@load(vm.makeAsReadOnly)" width="100%"
+												value="@bind(fx.DOB) @converter('com.rqms.utilities.MyDateFormatConverter')">
+											</MaskedBox>
+										</vlayout>
+									</hbox>
+								</cell>
+							</row>
+						</rows>
+					</grid>
+				</panelchildren>
+			</panel>
+			<separator />
+
+			<separator />
+			<span width="100%">
+				<div sclass="sectionTitle">
+					<separator />
+					<label value="Address Information"
+						sclass="sectionTitleLabel" />
+					<separator />
+				</div>
+			</span>
+			<panel width="95%" sclass="sectionPanel">
+				<panelchildren>
+					<grid sclass="vgrid">
+						<columns>
+							<column hflex="1"></column>
+							<column hflex="1"></column>
+							<column hflex="1"></column>
+						</columns>
+						<rows>
+							<row>
+								<cell colspan="2">
+									<vlayout>
+										<hlayout>
+											<label value="Address"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="address1" hflex="2"
+											readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+											value="@bind(fx.address1)" />
+									</vlayout>
+								</cell>
+							</row>
+							<row>
+								<cell colspan="2">
+									<vlayout>
+										<textbox id="address2" hflex="2"
+											readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+											value="@bind(fx.address2)" />
+									</vlayout>
+								</cell>
+							</row>
+							<row>
+								<vlayout>
+									<hlayout>
+										<label value="City"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="City" hflex="1"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+										value="@bind(fx.city)" />
+								</vlayout>
+								<vlayout>
+									<grid>
+										<columns>
+											<column width="60%"></column>
+											<column></column>
+										</columns>
+										<rows>
+											<row>
+												<vlayout>
+													<hlayout>
+														<label
+															value="State" sclass="flabel" />
+														<label value="*"
+															sclass="flblreq" />
+													</hlayout>
+													<textbox id="State"
+														readonly="@load(vm.makeAsReadOnly)" hflex="1"
+														mold="rounded" value="@bind(fx.state)" />
+												</vlayout>
+												<vlayout>
+													<hlayout>
+														<label
+															value="ZipCode" sclass="flabel" />
+														<label value="*"
+															sclass="flblreq" />
+													</hlayout>
+													<MaskedBox
+														format="99999-9999" hflex="1"
+														readonly="@load(vm.makeAsReadOnly)"
+														value="@bind(fx.zipCode) @converter('com.rqms.utilities.MaskConverter')">
+													</MaskedBox>
+
+												</vlayout>
+											</row>
+										</rows>
+									</grid>
+								</vlayout>
+							</row>
+						</rows>
+					</grid>
+				</panelchildren>
+			</panel>
+			<separator />
+			<span width="100%">
+				<div sclass="sectionTitle">
+					<separator />
+					<label value="Login information"
+						sclass="sectionTitleLabel" />
+				</div>
+			</span>
+			<panel width="95%" sclass="sectionPanel">
+				<panelchildren>
+					<separator />
+					<grid sclass="vgrid">
+						<columns>
+							<column width="20%"></column>
+							<column width="26%"></column>
+						</columns>
+						<rows>
+							<row>
+								<vlayout>
+									<hlayout>
+										<label value="Login ID"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="loginid" hflex="1"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+										value="@bind(fx.userLoginID)" />
+								</vlayout>
+								<vlayout>
+									<hlayout>
+										<label value="Password"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<textbox id="password" width="80%"
+										readonly="@load(vm.makeAsReadOnly)" mold="rounded"
+										value="@bind(fx.password)" />
+								</vlayout>
+								<vlayout>
+									<hlayout>
+										<label value="Theme"
+											sclass="flabel" />
+										<label value="*"
+											sclass="flblreq" />
+									</hlayout>
+									<combobox model="@load(vm.themes)"
+										width="30%" mold="rounded" readonly="@load(vm.makeAsReadOnly)"
+										selectedItem="@bind(fx.theme)" value="@bind(fx.theme)" />
+								</vlayout>
+							</row>
+						</rows>
+					</grid>
+				</panelchildren>
+			</panel>
+		</div>
+	</window>
+</zk>

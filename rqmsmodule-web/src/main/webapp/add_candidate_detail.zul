@@ -1,0 +1,159 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<borderlayout width="100%" height="100%">
+		<north border="none">
+			<div width="96%">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label id="lcaption" sclass="sectionTitleLabel"
+							value="Add/Edit Candidates" />
+					</div>
+				</span>
+				<div id="buttonsDiv"
+					style="float:right;margin-top:6px;">
+					<button label="Save" mold="trendy"
+						onClick="@command('saveThis')" tooltiptext="Save"
+						autodisable="self" sclass="mybutton button theme small">
+					</button>
+					<button label="Reset" mold="trendy"
+						tooltiptext="Reset" autodisable="self"
+						onClick="@command('refresh')"
+						sclass="mybutton button theme small">
+					</button>
+				</div>
+				<div style="clear: both;"></div>
+				<div sclass="sectionSeperator"></div>
+			</div>
+		</north>
+		<center border="none">
+			<vlayout vflex="1" hflex="1" sclass="vertical-scroll">
+				<span width="100%">
+					<div sclass="sectionTitle">
+						<separator />
+						<label value="Candidate Information"
+							sclass="sectionTitleLabel" />
+						<separator />
+					</div>
+				</span>
+				<panel width="95%" sclass="sectionPanel">
+					<panelchildren>
+						<separator />
+						<grid sclass="vgrid">
+							<columns>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+								<column hflex="10%"></column>
+							</columns>
+							<rows>
+								<row>
+									<vlayout>
+										<hlayout>
+											<label
+												value="Candidate Name" sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="candidatename"
+											mold="rounded" hflex="1"
+											value="@bind(vm.selectedItem.candidatename)" maxlength="200" />
+									</vlayout>
+
+									<vlayout>
+										<hlayout>
+											<label value="DOB"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<datebox id="dob" hflex="1"
+											mold="rounded" value="@bind(vm.selectedItem.dob)" />
+									</vlayout>
+									<vlayout>
+										<hlayout>
+											<label value="Email"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="email" hflex="1"
+											mold="rounded" value="@bind(vm.selectedItem.email)" />
+									</vlayout>
+									<vlayout>
+										<hlayout>
+											<label value="Phone Number"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<textbox id="companyUrl"
+											hflex="1" mold="rounded" 
+											value="@bind(vm.selectedItem.phonenumber)" />
+									</vlayout>
+								</row>
+								
+								<row>
+									<vlayout>
+										<hlayout>
+											<label value="Address"
+												sclass="flabel" />
+											<label value="*"
+												sclass="flblreq" />
+										</hlayout>
+										<vlayout>
+											<textbox id="address"
+												hflex="2" value="@bind(vm.selectedItem.address)" />
+										</vlayout>
+									</vlayout>
+									<vlayout>
+										<label value="Zip Code"
+											sclass="flabel" />
+										<textbox id="zipcode" hflex="1"
+											mold="rounded" value="@bind(vm.selectedItem.zipcode)" />
+									</vlayout>
+									<cell colspan="2">
+										<vlayout>
+											<label value="Skill Sets"
+												sclass="flabel" />
+											<textbox
+												id="candidateskillsets" hflex="4" mold="rounded"
+												value="@bind(vm.selectedItem.candidateskillsets)"
+												maxlength="128" />
+										</vlayout>
+									</cell>
+								</row>
+								
+								<row>
+								<cell colspan="2">
+									<vlayout>
+										<hlayout>
+											<label value="Experience Detail"
+											sclass="flabel" />
+										</hlayout>
+										<vlayout>
+											<div
+												style="width:375px;text-align:right;padding:0;">
+											</div> 
+											<textbox rows="5" id="candidateexperiencedetail"
+												mold="rounded" value="@bind(vm.selectedItem.candidateexperiencedetail)"
+												width="98.5%" style="border:2px solid #e6e6e6"/>
+										</vlayout>
+									</vlayout>
+									</cell>
+								
+									<vlayout>
+										<label value="Exp In Years"
+											sclass="flabel" />
+										<textbox id="expInYears"
+											hflex="2" mold="rounded"
+											value="@bind(vm.selectedItem.expInYears)" maxlength="128" />
+									</vlayout>
+								</row>
+							</rows>
+						</grid>
+					</panelchildren>
+				</panel>
+			</vlayout>
+		</center>
+	</borderlayout>
+</zk>

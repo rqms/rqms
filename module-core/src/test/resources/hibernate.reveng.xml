@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+  <table-filter match-name="applicantfeedback"/>
+  <table-filter match-name="attachment"/>
+  <table-filter match-name="candidateprofile"/>
+  <table-filter match-name="jobcandidatemap"/>
+  <table-filter match-name="jobdetails"/>
+  <table-filter match-name="userprofile"/>
+  <table-filter match-name="validrole"/>
+  <table-filter match-name="validstatus"/>
+</hibernate-reverse-engineering>

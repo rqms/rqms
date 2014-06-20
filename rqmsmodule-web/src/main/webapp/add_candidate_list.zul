@@ -1,0 +1,68 @@
+<?page title="" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window id="add_candidate_list" width="100%" height="100%"
+		border="none" contentStyle="overflow:auto;"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.CandidateDetailListVM')">
+		<vbox height="100%" heights="50%, 50%" width="100%">
+			<borderlayout width="100%" height="100%">
+				<north border="none">
+					<menubar width="100%">
+						<menuitem label="Add" tooltiptext="Add"
+							image="/resource/image/insert.gif"
+							onClick="@command('addNewCandidateDetail')" />
+						<menuitem label="Refresh" tooltiptext="Refresh"
+							image="/resource/image/refresh.gif" autodisable="self"
+							onClick="@command('refresh')" />
+					</menubar>
+				</north>
+				<center id="_center" border="none">
+					<listbox id="candidateDetailListboxViewModelId"
+						vflex="1" emptyMessage="No Record"
+						model="@load(vm.listBoxViewModel.model)"
+						selectedItems="@bind(vm.listBoxViewModel.selectedListItem)"
+						span="true" sclass="mylist"
+						onSelect="@command('loadDetailPageTab')">
+						<listhead sizable="true">
+							<listheader label="Candidate Id"
+								sortDirection="ascending" sort="auto(candidateid)" />
+							<listheader label="Candidate Name"
+								sort="auto(candidatename)" />
+							<listheader label="DOB" sort="auto(dob)" />
+							<listheader label="Email"
+								sort="auto(email)" />
+								<listheader label="Add Feed Back" />
+						</listhead>
+						<template name="model" var="p1">
+							<listitem>
+								<listcell label="@load(p1.candidateid)" />
+								<listcell
+									label="@load(p1.candidatename)" />
+								<listcell label="@load(p1.dob)" />
+								<listcell label="@load(p1.email)" />
+								<listcell>
+									<hbox spacing="20px">
+										<image
+											onClick="@command('addFeedBack',candidateRecord=p1)"
+											sclass="fimageedit" visible="true"
+											tooltiptext="To Add/Edit the feed back details">
+										</image>
+									</hbox>
+								</listcell>
+							</listitem>
+						</template>
+					</listbox>
+				</center>
+			</borderlayout>
+			<splitter></splitter>
+			<tabbox width="100%" height="100%" id="usertabs">
+				<tabs width="100%">
+					<tab />
+				</tabs>
+				<tabpanels>
+					<tabpanel></tabpanel>
+				</tabpanels>
+			</tabbox>
+		</vbox>
+	</window>
+</zk>

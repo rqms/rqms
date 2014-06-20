@@ -1,0 +1,49 @@
+<?page title="Main" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window id="main" border="none" width="100%" height="100%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.MainVM')">
+		<borderlayout id="mainlayout" height="100%">
+			<north sclass="home-header" height="27px">
+				<borderlayout>
+					<center border="none">
+						<panel border="none">
+							<panelchildren>
+								<menubar
+									children="@bind(vm.menuNodes) @template(empty each.children?'menuitem':'menu')">
+									<template name="menu" var="node">
+										<menu
+											label="@bind(node.label)">
+											<menupopup
+												children="@bind(node.children) @template(empty each.children?'menuitem':'menu')" />
+										</menu>
+									</template>
+									<template name="menuitem"
+										var="node">
+										<menuitem
+											label="@bind(node.label)"
+											onClick="@command('menuClicked',node=node)"
+											checked="@load(node.checked)" image="@load(node.iconImage)"
+											disabled="@load(node.disable)" />
+									</template>
+								</menubar>
+							</panelchildren>
+						</panel>
+					</center>
+				</borderlayout>
+			</north>
+			<center id="center" border="0">
+				<tabbox width="100%" height="100%" id="mainTab">
+					<tabs>
+						<tab label="Orientation" visible="true" />
+					</tabs>
+					<tabpanels>
+						<tabpanel style="color:#333399;">
+							<include src="orientation.zul" visible="true" />
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+			</center>
+		</borderlayout>
+	</window>
+</zk>

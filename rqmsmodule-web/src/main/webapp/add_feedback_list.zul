@@ -1,0 +1,60 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<window width="100%" height="100%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.AppFeedbackListVM')">
+		<vbox height="100%" width="100%" widths="40%,55%">
+			<borderlayout width="100%" height="100%">
+				<north border="none">
+					<menubar width="100%">
+						<menuitem label="Add"
+							tooltiptext="Add" image="/resource/image/insert.gif"  onClick="@command('add')"/>						
+						<menuitem
+							label="Refresh" onClick="@command('refreshList')"
+							tooltiptext="Refresh" image="/resource/image/refresh.gif" autodisable="self" />
+						</menubar>
+				</north>
+				<center id="_center" border="none">
+					<listbox id="listBoxViewModelId" vflex="1"
+							emptyMessage="No Record" model="@load(vm.listBoxViewModel.model)"  sclass="mylist" 
+							selectedItems="@bind(vm.listBoxViewModel.selectedListItem)"  span="true" multiple="true" checkmark="true">
+							<listhead sizable="true">
+								<listheader hflex="min"/>
+								<listheader label="Job Id"
+									sortDirection="ascending" sort="auto(jobid)" />
+								<listheader label="Candidate Id"
+									sort="auto(candidateid)" />
+								<listheader label="User Id"
+									sort="auto(userid)" />
+								<listheader label="Status Id"
+									sort="auto(statusid)" />
+								<!-- <listheader label="Action" /> -->
+							</listhead>
+							<template name="model" var="p1">
+							<custom-attributes
+								 userdetail="${p1}" />
+								<listitem  >
+									<listcell />
+									<listcell label="@load(p1.jobid)" />
+									<listcell label="@load(p1.candidateid)" />
+									<listcell label="@load(p1.userid)" />
+									<listcell label="@load(p1.statusid)" />
+								</listitem>
+							</template>
+						</listbox>
+				</center>
+			</borderlayout>
+			<splitter></splitter>
+			<tabbox width="100%" height="100%"  id="usertabs">
+			<tabs width="100%">
+				<tab />
+			</tabs>
+			<tabpanels>
+				<tabpanel>
+				 <!-- <include src="/user_profile_detail.zul" 
+							  /> -->
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+		</vbox>
+	</window>
+</zk>

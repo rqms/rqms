@@ -1,0 +1,60 @@
+<?page title="" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window id="add_new_job" width="100%" height="100%" border="none" contentStyle="overflow:auto;"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.JobDetailListVM')">
+		<vbox height="100%" width="100%" widths="40%,55%">
+			<borderlayout width="100%" height="100%">
+				<north border="none">
+					<menubar width="100%">
+						<menuitem label="Add" tooltiptext="Add"
+							image="/resource/image/insert.gif"
+							onClick="@command('addNewJobDetail')" />
+						<menuitem label="Refresh" tooltiptext="Refresh"
+							image="/resource/image/refresh.gif" autodisable="self"
+							onClick="@command('refresh')" />
+					</menubar>
+				</north>
+				<center id="_center" border="none">
+					<listbox id="jobDetailListboxViewModelId" vflex="1"
+						emptyMessage="No Record" model="@load(vm.listBoxViewModel.model)"
+						selectedItems="@bind(vm.listBoxViewModel.selectedListItem)"
+						span="true" sclass="mylist"
+						onSelect="@command('loadDetailPageTab')">
+						<listhead sizable="true">
+							<listheader label="Job ID"
+								sortDirection="ascending" sort="auto(jobid)" />
+							<listheader label="Job Title"
+								sort="auto(jobtitle)" />
+							<listheader label="Job Description"
+								sort="auto(jobdescription)" />
+							<listheader label="Job Type"
+								sort="auto(jobtype)" />
+						</listhead>
+						<template name="model" var="p1">
+							<listitem>
+								<listcell label="@load(p1.jobid)" />
+								<listcell label="@load(p1.jobtitle)" />
+								<listcell
+									label="@load(p1.jobdescription)" />
+								<listcell label="@load(p1.jobtype)" />
+							</listitem>
+						</template>
+					</listbox>
+				</center>
+			</borderlayout>
+			<splitter></splitter>
+			<tabbox width="100%" height="100%" id="usertabs">
+				<tabs width="100%">
+					<tab />
+				</tabs>
+				<tabpanels>
+					<tabpanel>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</vbox>
+
+	</window>
+
+</zk>

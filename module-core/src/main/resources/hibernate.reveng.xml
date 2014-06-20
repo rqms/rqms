@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+	<type-mapping>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="INTEGER" hibernate-type="int"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="INTEGER" hibernate-type="int"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			length="15" not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="INTEGER" hibernate-type="int"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="TIMESTAMP" hibernate-type="timestamp"
+			length="29" not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="BIGINT" hibernate-type="long"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="DATE" hibernate-type="date" length="13"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			length="50" not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			length="50" not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="INTEGER" hibernate-type="java.lang.Integer"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="TIMESTAMP" hibernate-type="timestamp"
+			length="29" not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="INTEGER" hibernate-type="java.lang.Integer"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="BIGINT" hibernate-type="java.lang.Long"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="false">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"></sql-type>
+	</type-mapping>
+	<table-filter match-name="applicantfeedback"></table-filter>
+	<table-filter match-name="attachment"></table-filter>
+	<table-filter match-name="candidateprofile"></table-filter>
+	<table-filter match-name="jobcandidatemap"></table-filter>
+	<table-filter match-name="jobdetails"></table-filter>
+	<table-filter match-name="userprofile"></table-filter>
+	<table-filter match-name="validrole"></table-filter>
+	<table-filter match-name="validstatus"></table-filter>
+	<table name="userprofile">
+		<column name="id"></column>
+		<column name="dob"></column>
+		<column name="ssn"></column>
+		<column name="state"></column>
+		<column name="address1"></column>
+		<column name="address2"></column>
+		<column name="city"></column>
+		<column name="email"></column>
+		<column name="firstname"></column>
+		<column name="lastname"></column>
+		<column name="middlename"></column>
+		<column name="password"></column>
+		<column name="roleid"></column>
+		<column name="stampdate"></column>
+		<column name="system"></column>
+		<column name="theme"></column>
+		<column name="userloginid"></column>
+		<column name="userphoto"></column>
+		<column name="website"></column>
+		<column name="zipcode"></column>
+	</table>
+	<table name="applicantfeedback">
+		<column name="candidateid"></column>
+		<column name="jobid"></column>
+		<column name="stampuser"></column>
+		<column name="statusid"></column>
+		<column name="comments"></column>
+		<column name="stampdate"></column>
+		<column name="userid"></column>
+	</table>
+	<table name="validrole">
+		<column name="roleid"></column>
+		<column name="roletype"></column>
+		<column name="roledescription"></column>
+		<column name="stampuser"></column>
+		<column name="stampdate"></column>
+	</table>
+	<table name="validstatus">
+		<column name="statusid"></column>
+		<column name="statustype"></column>
+		<column name="statusdescription"></column>
+		<column name="stampuser"></column>
+		<column name="stampdate"></column>
+	</table>
+	<table name="attachment">
+		<column name="attachmentid"></column>
+		<column name="jobid"></column>
+		<column name="candidateid"></column>
+		<column name="attachmentpath"></column>
+		<column name="attachmentdescription"></column>
+		<column name="attachmentdata"></column>
+		<column name="stampdate"></column>
+	</table>
+	<table name="jobdetails">
+		<column name="jobid"></column>
+		<column name="jobrequesteduserid"></column>
+		<column name="jobtitle"></column>
+		<column name="jobdescription"></column>
+		<column name="skillsets"></column>
+		<column name="companyname"></column>
+		<column name="joblocation"></column>
+		<column name="jobtype"></column>
+		<column name="statusid"></column>
+		<column name="stampdate"></column>
+	</table>
+	<table name="jobcandidatemap">
+		<column name="mappingkey"></column>
+		<column name="candidateid"></column>
+		<column name="jobid"></column>
+		<column name="stampdate"></column>
+	</table>
+	<table name="candidateprofile">
+		<column name="candidateid"></column>
+		<column name="candidatename"></column>
+		<column name="dob"></column>
+		<column name="phonenumber"></column>
+		<column name="address"></column>
+		<column name="zipcode"></column>
+		<column name="email"></column>
+		<column name="candidateskillsets"></column>
+		<column name="candidateexperiencedetail"></column>
+		<column name="exp_in_years"></column>
+		<column name="isfake"></column>
+		<column name="stampdate"></column>
+	</table>
+</hibernate-reverse-engineering>

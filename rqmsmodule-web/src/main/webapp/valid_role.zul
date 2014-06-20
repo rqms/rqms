@@ -1,0 +1,45 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<window width="100%" height="100%"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.ValidRoleVM')">
+		<borderlayout width="100%" height="100%">
+				<north border="none">
+					<menubar width="100%">
+						<menuitem label="Add"
+							tooltiptext="Add" image="/resource/image/insert.gif"  onClick="@command('add')"/>
+						<menuitem label="Save"
+							tooltiptext="Save" image="/resource/image/save.gif"  onClick="@command('save')"/>							
+						<menuitem
+							label="Refresh" onClick="@command('refreshList')"
+							tooltiptext="Refresh" image="/resource/image/refresh.gif" autodisable="self" />
+						</menubar>
+				</north>
+				<center id="_center" border="none">
+					<listbox id="listBoxViewModelId" vflex="1"
+							emptyMessage="No Record" model="@load(vm.listBoxViewModel.model)"  sclass="mylist" 
+							selectedItems="@bind(vm.listBoxViewModel.selectedListItem)"  span="true" multiple="false" checkmark="false">
+							<listhead sizable="true">
+								<!-- <listheader hflex="min"/> -->
+								<listheader hflex="min" label="Role Type"
+									sortDirection="ascending" sort="auto(roletype)" />
+								<listheader hflex="min" label="Description"
+									sort="auto(roledescription)" />
+							</listhead>
+							<template name="model" var="p1">
+							<listitem>
+									<!-- <listcell /> -->
+									<listcell tooltiptext="@load(p1.roletype)">
+										<textbox width="95%" hflex="1"
+											value="@bind(p1.roletype)" onChange="@command('changedRoleType',BeanData = p1)"/>
+									</listcell>
+									<listcell tooltiptext="@load(p1.roledescription)">
+										<textbox width="95%" hflex="1"
+											value="@bind(p1.roledescription)" onChange="@command('changedRoleDesc',BeanData = p1)"/>
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+				</center>
+			</borderlayout>
+	</window>
+</zk>

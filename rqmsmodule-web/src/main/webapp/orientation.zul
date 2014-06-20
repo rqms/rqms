@@ -1,0 +1,161 @@
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<window height="100%" width="100%" vflex="1" hflex="1"
+		apply="org.zkoss.bind.BindComposer"
+		>
+		<borderlayout height="100%" width="100%">
+			<!-- <north border="none">
+				<toolbar id="listTool" sclass="vista" 
+					align="start">
+					<toolbarbutton label="Expand All" id="expandall"
+						onClick="@command('expandAll')"
+						image="/resource/image/arrow_expand_all.gif"
+						tooltiptext="Expand All" />
+					<toolbarbutton label="Collapse All" id="collapseall"
+						onClick="@command('collapseAll')"
+						image="/resource/image/arrow_collapse_all.gif"
+						tooltiptext="Collapse All" />
+				</toolbar> 
+			</north> -->
+			<center border="none">
+				<vlayout spacing="5px" vflex="1" hflex="1"
+					sclass="vertical-scroll" height="100%" width="100%">
+					<vbox />
+					<groupbox id="gb" mold="3d" width="100%">
+						<caption sclass="sectionTitleLabel"
+							image="/resource/image/Arrow_Expanded.gif"
+							style="font-family:Arial;font-size:12px;"
+							label="Business Objectives" />
+						<hbox>
+							<x:table border="0" width="100%">
+								<x:tr>
+									<x:td width="10%" style="align:left;font-family:Arial;font-size:12px;"/>
+									<x:td width="90%"
+										style="align:left;font-family:Arial;font-size:12px;">
+										<label sclass="flabel" value="BO-1 – Reduce Hiring process efforts for employers by 25 % - 30 % within 6 months of the initial release." />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Scale: Duration consumed for a skilled candidate for onboarding." />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Meter: Screening details as provided by employers. " />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:left;font-family:Arial;font-size:12px;">
+										<label sclass="flabel" value="BO-2 – Reduce Hiring process cost involved by 15 – 20 % within 12 months of the initial release." />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Scale: (Current) Operational Cost details to hire a skilled candidate." />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Meter: Hiring simultaneously and demonstrating at employers end." />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:left;font-family:Arial;font-size:12px;">
+										<label sclass="flabel" value="BO-3 – Increase in Screening and Assignment genuineness by 40 % - 50 % on every employees - This can be achieved when employers opt for following" />
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Background verification, Skill Testing." />
+									</x:td>
+								</x:tr>
+								<!-- <x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Skill Testing." />
+									</x:td>
+								</x:tr> -->
+								<x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Drug Screening, Personal Interviews." />
+									</x:td>
+								</x:tr>
+								<!-- <x:tr>
+									<x:td style="align:right;font-family:Arial;font-size:10px;"/>
+									<x:td style="align:right;font-family:Arial;font-size:10px;">
+										<label value="Personal Interviews." />
+									</x:td>
+								</x:tr> -->
+								<x:tr>
+									<x:td align="center" colspan="2">
+									<image src="/resource/image/nimbus-home1.png" />
+									</x:td>
+									
+								</x:tr>
+							</x:table>
+						</hbox>
+					</groupbox>
+					<!-- <groupbox id="gxeb" mold="3d" width="100%">
+						<caption
+							image="/admin/images/Arrow_Expanded.gif"
+							label="@load(vm.getText('AdminOrientationConcepts:LABEL_ADMIN_CERTIFICATION'))" />
+						<hbox>
+							<x:table border="0" width="100%">
+								<x:tr>
+									<x:td width="70%"
+										style="align:left;font-family:Arial;font-size:12px;">
+										<label
+											value="@bind(vm.getText('AdminOrientationConcepts:DESC_ADMIN_CERTIFICATION_1'))">
+										</label>
+									</x:td>
+									<x:td width="50%"
+										style="align:left;">
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td width="20px" colspan="2">
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td width="70%"
+										style="align:left;font-family:Arial;font-size:12px;">
+										<label
+											value="@bind(vm.getText('AdminOrientationConcepts:DESC_ADMIN_CERTIFICATION_2'))">
+										</label>
+									</x:td>
+									<x:td width="30%"
+										style="align:right;">
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td width="20px" colspan="2">
+									</x:td>
+								</x:tr>
+								<x:tr>
+									<x:td width="70%"
+										style="align:left;font-family:Arial;font-size:12px;">
+										<label
+											value="@bind(vm.getText('AdminOrientationConcepts:DESC_ADMIN_CERTIFICATION_3'))">
+										</label>
+
+									</x:td>
+									<x:td width="30%"
+										style="align:right;">
+									</x:td>
+								</x:tr>
+							</x:table>
+						</hbox>
+					</groupbox> -->
+				</vlayout>
+			</center>
+		</borderlayout>
+	</window>
+</zk>

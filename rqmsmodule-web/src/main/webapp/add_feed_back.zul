@@ -1,0 +1,21 @@
+<?page title="Feed Back Details" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:x="xhtml" xmlns:zk="zk">
+	<window title="Feed Back Details" border="normal"
+		onClose="@command('close')" closable="true" width="950px"
+		height="500px" mode="modal" popup="true"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.rqms.viewmodel.ApplicantFeedBackDetail')">
+
+		<tabbox id="usertabs" width="100%" height="100%">
+			<tabs width="100%">
+				<tab />
+			</tabs>
+			<tabpanels>
+				<tabpanel>
+
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+
+	</window>
+</zk>

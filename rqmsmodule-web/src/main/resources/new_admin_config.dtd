@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT admin (modules|mainOrientation)+>
+<!ELEMENT mainOrientation (orientationPage+)>
+<!ELEMENT modules (module+)>
+<!ELEMENT module (folder|page|orientation)*>
+<!ELEMENT folder (page+)>
+<!ELEMENT page (param*|detailPage*)>
+<!ELEMENT param EMPTY>
+<!ELEMENT detailPage (param*)>
+<!ELEMENT orientation (orientationPage+)>
+<!ELEMENT orientationPage EMPTY>
+
+
+<!ATTLIST module       id CDATA #REQUIRED>
+<!ATTLIST module       name CDATA #REQUIRED>
+<!ATTLIST module       icon CDATA #REQUIRED>
+<!ATTLIST module       url CDATA #REQUIRED>
+<!ATTLIST module       hotkey CDATA #IMPLIED>
+<!ATTLIST module       license CDATA #IMPLIED>
+<!ATTLIST module       service CDATA #IMPLIED>
+
+<!ATTLIST folder       id CDATA #REQUIRED>
+<!ATTLIST folder       name CDATA #REQUIRED>
+<!ATTLIST folder       icon CDATA #IMPLIED>
+<!ATTLIST folder       license CDATA #IMPLIED>
+<!ATTLIST folder       bolRootNode CDATA #IMPLIED>
+
+<!ATTLIST page         id CDATA #REQUIRED>
+<!ATTLIST page         name CDATA #REQUIRED>
+<!ATTLIST page         icon CDATA #IMPLIED>
+<!ATTLIST page         url CDATA #REQUIRED>
+<!ATTLIST page         license CDATA #IMPLIED>
+<!ATTLIST page         DBOwner CDATA #IMPLIED>
+<!ATTLIST page         RDBMS CDATA #IMPLIED>
+<!ATTLIST page         isNodeRequired CDATA #IMPLIED>
+<!ATTLIST page         javaClass CDATA #IMPLIED>
+
+
+
+<!ATTLIST param        name CDATA #REQUIRED>
+<!ATTLIST param        value CDATA #REQUIRED>
+
+<!ATTLIST detailPage         id CDATA #REQUIRED>
+<!ATTLIST detailPage         name CDATA #REQUIRED>
+<!ATTLIST detailPage         icon CDATA #IMPLIED>
+<!ATTLIST detailPage         url CDATA #REQUIRED>
+<!ATTLIST detailPage         license CDATA #IMPLIED>
+<!ATTLIST detailPage         DBOwner CDATA #IMPLIED>
+<!ATTLIST detailPage         RDBMS CDATA #IMPLIED>
+<!ATTLIST detailPage         javaClass CDATA #IMPLIED>
+
+<!ATTLIST orientation		id CDATA #REQUIRED>
+
+<!ATTLIST orientationPage	id CDATA #REQUIRED>
+<!ATTLIST orientationPage	name CDATA #REQUIRED>
+<!ATTLIST orientationPage	url CDATA #REQUIRED>
+
+
+
