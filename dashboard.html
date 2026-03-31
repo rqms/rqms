@@ -1,207 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iPad Dashboard - GPS Debugged</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; pointer-events: none; }
-        .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
-        .big-btn:active { background-color: #000 !important; opacity: 0.7; transform: scale(0.95); }
-    </style>
-</head>
-<body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
+<script>
+    // ... (ส่วนอื่นๆ เหมือนเดิม) ...
 
-    <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
-        <div class="flex items-center gap-4">
-            <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
-            <div>
-                <p class="text-[8px] uppercase text-slate-500 font-bold">Status</p>
-                <h2 id="status-text" class="text-lg font-black text-white uppercase leading-none">Offline</h2>
-            </div>
-        </div>
-        <div class="border-l border-slate-800 pl-4">
-            <p class="text-[8px] uppercase text-slate-500 font-bold">Artist</p>
-            <h2 id="display-artist-name" class="text-lg font-black text-emerald-500 leading-none">---</h2>
-        </div>
-        <div class="text-right ml-auto">
-            <h2 id="display-time" class="text-2xl font-mono font-black text-emerald-500 leading-none">00:00:00</h2>
-        </div>
-    </div>
+    function getLocation() {
+        var listContainer = document.getElementById('venue-list');
+        var input = document.getElementById('venue-input');
+        listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังค้นหาพิกัด...</p>";
 
-    <div class="grid grid-cols-1 gap-2 mb-8">
-        <div class="flex gap-2">
-            <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold text-lg outline-none focus:border-emerald-500">
-            <button onclick="getLocation()" class="bg-slate-800 px-6 rounded-xl border border-slate-600 text-2xl big-btn">📍</button>
-        </div>
-        <div id="venue-list" class="flex flex-wrap gap-2 min-h-[10px]"></div>
-        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white py-4 rounded-xl font-black uppercase shadow-lg big-btn text-xl">เปิดระบบ</button>
-    </div>
+        if (!navigator.geolocation) {
+            alert("iPad ไม่รองรับ GPS");
+            return;
+        }
 
-    <div class="mb-10">
-        <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em]">🔥 LIVE REQUESTS</h3>
-        <div id="queue-container"></div>
-    </div>
-
-    <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em]">💾 HISTORY (STATS)</h3>
-        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <script>
-        var SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
-        var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        var sb = supabase.createClient(SB_URL, SB_KEY);
-        var artistId = new URLSearchParams(window.location.search).get('id');
-        var isSystemOpen = false;
-
-        setInterval(function() {
-            document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
-        }, 1000);
-
-        // --- ฟังก์ชัน GPS แบบเน้นความชัวร์ ---
-        function getLocation() {
-            var listContainer = document.getElementById('venue-list');
-            listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
-
-            if (!navigator.geolocation) {
-                alert("iPad ของพี่ไม่รองรับ GPS บน Browser นี้ครับ");
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                var lat = pos.coords.latitude;
-                var lon = pos.coords.longitude;
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            var lat = pos.coords.latitude;
+            var lon = pos.coords.longitude;
+            
+            // ดึงข้อมูลแบบละเอียดขึ้น
+            var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+            
+            fetch(url)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                var addr = data.address;
+                // 1. ลองหาชื่อร้าน/สถานที่ก่อน
+                var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar].filter(Boolean);
                 
-                // ใช้ API แผนที่ (ระบุ Zoom และ Address Details)
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                // 2. ถ้าไม่เจอชื่อร้าน ให้เอาชื่อ ถนน หรือ ตำบล มาสำรองไว้ (พี่จะได้ไม่ต้องพิมพ์ยาว)
+                var backup = [addr.road, addr.suburb, addr.village].filter(Boolean);
                 
-                fetch(url)
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    var addr = data.address;
-                    // รวมชื่อสถานที่ที่เป็นไปได้ทั้งหมด
-                    var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
-                    
-                    listContainer.innerHTML = ""; // ล้างตัวโหลดออก
-                    
-                    if (names.length === 0) {
-                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้านในพิกัดนี้ ลองพิมพ์ชื่อเองนะครับ</p>";
-                        return;
-                    }
+                listContainer.innerHTML = ""; 
 
+                if (names.length > 0) {
+                    // ถ้าเจอชื่อร้าน ให้สร้างปุ่มให้เลือก
                     names.forEach(function(name) {
                         var pill = document.createElement('button');
                         pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold";
                         pill.innerText = name;
-                        pill.onclick = function() {
-                            document.getElementById('venue-input').value = name;
-                            listContainer.innerHTML = "";
-                        };
+                        pill.onclick = function() { input.value = name; listContainer.innerHTML = ""; };
                         listContainer.appendChild(pill);
                     });
-                })
-                .catch(function(err) {
-                    alert("ไม่สามารถดึงข้อมูลแผนที่ได้: " + err);
-                    listContainer.innerHTML = "";
-                });
-            }, function(error) {
-                // แจ้งเตือนถ้า iPad ปฏิเสธ GPS
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert("พี่ต้องกด 'อนุญาต' (Allow) ให้เข้าถึงตำแหน่งใน Safari/Chrome ก่อนครับ");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert("ไม่พบข้อมูลตำแหน่ง (ลองขยับไปใกล้หน้าต่างดูครับ)");
-                        break;
-                    case error.TIMEOUT:
-                        alert("ขอข้อมูลตำแหน่งนานเกินไป ลองกดใหม่อีกครั้งครับ");
-                        break;
+                } else if (backup.length > 0) {
+                    // ถ้าไม่เจอชื่อร้านเลย เอาชื่อถนน/พื้นที่มาใส่ในช่องพิมพ์ให้เลย
+                    input.value = backup[0]; 
+                    listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>หาชื่อร้านไม่เจอ ดึงชื่อถนน/พื้นที่มาให้แทนแล้วครับ</p>";
+                } else {
+                    listContainer.innerHTML = "<p class='text-[10px] text-red-400'>ไม่พบข้อมูลจริงๆ ครับ รบกวนพิมพ์เองนะพี่</p>";
                 }
+            })
+            .catch(function(err) {
+                alert("เชื่อมต่อแผนที่ไม่ได้: " + err);
                 listContainer.innerHTML = "";
-            }, { enableHighAccuracy: true, timeout: 5000 });
-        }
+            });
+        }, function(error) {
+            alert("GPS ขัดข้อง: " + error.message);
+            listContainer.innerHTML = "";
+        }, { enableHighAccuracy: true, timeout: 5000 });
+    }
 
-        // --- ส่วนจัดการเพลงและสถิติ ---
-        function solve(id, status) {
-            var card = document.getElementById('card-' + id);
-            var historyBox = document.getElementById('history-container');
-            if (card) {
-                var btnArea = card.querySelector('.btn-area');
-                if(btnArea) btnArea.remove();
-                
-                var label = document.createElement('div');
-                label.className = (status === 'ok' ? "text-emerald-500" : "text-red-500") + " font-black text-[10px] mt-1";
-                label.innerText = (status === 'ok' ? "PLAYED ✅" : "DECLINED ❌");
-                card.appendChild(label);
-
-                card.classList.add('is-history');
-                historyBox.prepend(card);
-
-                var finalStatus = (status === 'ok' ? 'played' : 'declined');
-                sb.from('requests').update({ status: finalStatus }).eq('id', id).then(function(){});
-            }
-        }
-
-        function draw(req) {
-            if (document.getElementById('card-' + req.id)) return;
-            var container = document.getElementById('queue-container');
-            var div = document.createElement('div');
-            div.id = 'card-' + req.id;
-            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
-            div.innerHTML = '<div>' +
-                '<p class="text-[9px] text-slate-500 font-bold mb-1">จาก: ' + (req.customer_name || "ไม่ระบุ") + '</p>' +
-                '<h3 class="text-lg font-black text-white leading-tight">' + req.song_name + '</h3>' +
-                '</div>' +
-                '<div class="btn-area flex gap-2">' +
-                '<button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">เล่นได้</button>' +
-                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">ไม่ได้</button>' +
-                '</div>';
-            container.prepend(div);
-        }
-
-        async function load() {
-            if (!artistId) return;
-            var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
-            if (resMusician.data) {
-                isSystemOpen = resMusician.data.is_active;
-                document.getElementById('venue-input').value = resMusician.data.current_venue || "";
-                document.getElementById('display-artist-name').innerText = resMusician.data.display_name || resMusician.data.name;
-                updateUI(resMusician.data.current_venue);
-            }
-            var resReq = await sb.from('requests').select('*').eq('musician_id', artistId).eq('status', 'pending');
-            if (resReq.data) { resReq.data.forEach(function(r) { draw(r); }); }
-        }
-
-        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
-            function(p) { draw(p.new); }).subscribe();
-
-        async function toggleSystem() {
-            var v = document.getElementById('venue-input').value || "ร้านประจำ";
-            var next = !isSystemOpen;
-            if(!next) { document.getElementById('queue-container').innerHTML = ""; document.getElementById('history-container').innerHTML = ""; }
-            await sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId);
-            isSystemOpen = next; updateUI(v);
-        }
-
-        function updateUI(v) {
-            var b = document.getElementById('system-btn');
-            var d = document.getElementById('status-dot');
-            var s = document.getElementById('status-text');
-            if (isSystemOpen) {
-                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
-                d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
-                s.innerText = "Online";
-            } else {
-                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
-                d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]";
-                s.innerText = "Offline";
-            }
-        }
-
-        load();
-    </script>
-</body>
-</html>
+    // ... (ส่วนที่เหลือเหมือนเดิม) ...
+</script>
