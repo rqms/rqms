@@ -6,56 +6,90 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0f172a] text-white p-4">
-    <div class="max-w-md mx-auto space-y-6">
-        <div id="artist-info" class="text-center py-6 bg-gradient-to-b from-emerald-900/50 to-transparent rounded-3xl">
-            <h1 id="artist-name" class="text-3xl font-black text-emerald-400 uppercase tracking-widest">LOADING...</h1>
-            <p id="venue-text" class="text-slate-400 text-sm mt-1">ยังไม่เปิดระบบรับเพลง</p>
+<body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <div id="loading-screen" class="text-center p-10 bg-[#1e293b] rounded-3xl border border-slate-700 shadow-2xl">
+            <h2 class="text-4xl font-black text-emerald-400 mb-2 animate-pulse">LOADING...</h2>
+            <p id="status-text" class="text-slate-400">ยังไม่เปิดระบบรับเพลง</p>
         </div>
 
-        <div id="request-form" class="bg-[#1e293b] p-6 rounded-3xl border border-slate-700 shadow-xl space-y-4">
-            <input type="text" id="song" placeholder="ชื่อเพลง / ศิลปิน" class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-slate-600 focus:border-emerald-500">
-            <input type="text" id="sender" placeholder="จากคุณ..." class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-slate-600 focus:border-emerald-500">
-            <button onclick="sendRequest()" id="btn-send" class="w-full bg-emerald-600 py-4 rounded-xl font-bold shadow-lg shadow-emerald-900/40">ส่งเพลงขอ 🚀</button>
-            <div class="text-center pt-2">
-                <p class="text-[10px] text-slate-500 mb-2 uppercase font-bold">อยากได้เพลงไว? เปย์ทิปให้กำลังใจเลย</p>
-                <button onclick="showTip()" class="bg-amber-500/10 text-amber-500 border border-amber-500/50 px-4 py-2 rounded-full text-xs font-bold">💰 ดูช่องทางให้ TIPS</button>
+        <div id="request-form" class="hidden bg-[#1e293b] rounded-3xl p-8 border border-slate-700 shadow-2xl space-y-6">
+            <div class="text-center mb-6">
+                <h2 id="venue-name" class="text-emerald-400 font-bold text-xl uppercase tracking-widest">กำลังทำการแสดง</h2>
+                <p class="text-slate-400 text-sm">พิมพ์ชื่อเพลงที่อยากฟังได้เลยครับ</p>
+            </div>
+            
+            <input type="text" id="song" placeholder="ชื่อเพลง / ศิลปิน" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white">
+            <input type="text" id="user" placeholder="จากคุณ..." class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white">
+            
+            <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-900/20">
+                ส่งเพลงขอ 🚀
+            </button>
+
+            <div class="text-center pt-4 border-t border-slate-700">
+                <p class="text-[10px] text-slate-500 mb-2">อยากได้เพลงไว? เปย์ทิปเป็นกำลังใจเลย</p>
+                <button onclick="showTip()" class="bg-amber-600/20 text-amber-500 border border-amber-500/50 px-4 py-2 rounded-full text-xs font-bold hover:bg-amber-600/30 transition-all">
+                    💰 ดูช่องทางให้ TIPS
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- ใส่ URL/KEY ของพี่แขกตรงนี้ ---
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        const artistId = new URLSearchParams(window.location.search).get('id');
-        let promptPayNum = "";
+        // ------------------------------
 
-        async function init() {
-            const { data } = await supabase.from('musicians').select('*').eq('id', artistId).single();
-            if(data) {
-                document.getElementById('artist-name').innerText = data.display_name;
-                promptPayNum = data.promptpay;
-                if(data.is_active) document.getElementById('venue-text').innerText = "📍 กำลังเล่นที่: " + (data.current_venue || 'ร้านอาหาร');
+        const sbClient = supabase.createClient(SB_URL, SB_KEY);
+        const artistId = new URLSearchParams(window.location.search).get('id');
+
+        async function checkStatus() {
+            if(!artistId) return;
+
+            // ดึงข้อมูลสถานะและชื่อร้าน
+            const { data, error } = await sbClient
+                .from('musicians')
+                .select('is_active, current_venue')
+                .eq('id', artistId)
+                .single();
+
+            if (data && data.is_active) {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('request-form').classList.remove('hidden');
+                document.getElementById('venue-name').innerText = data.current_venue || "กำลังทำการแสดง";
+            } else {
+                document.getElementById('loading-screen').classList.remove('hidden');
+                document.getElementById('request-form').classList.add('hidden');
             }
         }
 
-        async function sendRequest() {
+        async function sendSong() {
             const song = document.getElementById('song').value;
-            const sender = document.getElementById('sender').value;
-            if(!song) return alert("ใส่ชื่อเพลงก่อนจ้า");
+            const user = document.getElementById('user').value;
+            if(!song) return alert("ใส่ชื่อเพลงด้วยครับพี่!");
 
-            const { error } = await supabase.from('requests').insert([{ musician_id: artistId, song_name: song, customer_name: sender }]);
-            if(!error) {
-                alert("ส่งคิวเพลงเรียบร้อย! รอฟังได้เลย");
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+            btn.innerText = "กำลังส่ง...";
+
+            const { error } = await sbClient
+                .from('requests')
+                .insert([{ musician_id: artistId, song_name: song, customer_name: user }]);
+
+            if(error) {
+                alert("ส่งไม่สำเร็จ: " + error.message);
+            } else {
+                alert("ส่งเพลงแล้ว! รอฟังได้เลยครับ");
                 document.getElementById('song').value = "";
             }
+            btn.disabled = false;
+            btn.innerText = "ส่งเพลงขอ 🚀";
         }
 
-        function showTip() {
-            alert("สามารถสแกนทิปได้ที่หน้าเวที หรือใช้เบอร์ PromptPay: " + promptPayNum);
-        }
-        init();
+        // เช็กสถานะทุกๆ 5 วินาที เผื่อพี่กดเปิด/ปิดระบบใน iPad
+        setInterval(checkStatus, 5000);
+        checkStatus();
     </script>
 </body>
 </html>
