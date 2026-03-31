@@ -59,7 +59,7 @@
                 btn.disabled = false;
             } else {
                 const base = window.location.origin + window.location.pathname.replace('index.html', '');
-                const requestUrl = base + 'request.html?id=' + artistId;
+                const requestUrl = window.location.href.replace('index.html', 'request.html?id=' + artistId);
                 const dashUrl = base + 'dashboard.html?id=' + artistId;
 
                 document.getElementById('qrcode').src = `https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=${encodeURIComponent(requestUrl)}`;
