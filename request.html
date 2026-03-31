@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ขอเพลง - RQMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-[#0f172a] text-white p-4">
+    <div class="max-w-md mx-auto space-y-6">
+        <div id="artist-info" class="text-center py-6 bg-gradient-to-b from-emerald-900/50 to-transparent rounded-3xl">
+            <h1 id="artist-name" class="text-3xl font-black text-emerald-400 uppercase tracking-widest">LOADING...</h1>
+            <p id="venue-text" class="text-slate-400 text-sm mt-1">ยังไม่เปิดระบบรับเพลง</p>
+        </div>
+
+        <div id="request-form" class="bg-[#1e293b] p-6 rounded-3xl border border-slate-700 shadow-xl space-y-4">
+            <input type="text" id="song" placeholder="ชื่อเพลง / ศิลปิน" class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-slate-600 focus:border-emerald-500">
+            <input type="text" id="sender" placeholder="จากคุณ..." class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-slate-600 focus:border-emerald-500">
+            <button onclick="sendRequest()" id="btn-send" class="w-full bg-emerald-600 py-4 rounded-xl font-bold shadow-lg shadow-emerald-900/40">ส่งเพลงขอ 🚀</button>
+            <div class="text-center pt-2">
+                <p class="text-[10px] text-slate-500 mb-2 uppercase font-bold">อยากได้เพลงไว? เปย์ทิปให้กำลังใจเลย</p>
+                <button onclick="showTip()" class="bg-amber-500/10 text-amber-500 border border-amber-500/50 px-4 py-2 rounded-full text-xs font-bold">💰 ดูช่องทางให้ TIPS</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        const artistId = new URLSearchParams(window.location.search).get('id');
+        let promptPayNum = "";
+
+        async function init() {
+            const { data } = await supabase.from('musicians').select('*').eq('id', artistId).single();
+            if(data) {
+                document.getElementById('artist-name').innerText = data.display_name;
+                promptPayNum = data.promptpay;
+                if(data.is_active) document.getElementById('venue-text').innerText = "📍 กำลังเล่นที่: " + (data.current_venue || 'ร้านอาหาร');
+            }
+        }
+
+        async function sendRequest() {
+            const song = document.getElementById('song').value;
+            const sender = document.getElementById('sender').value;
+            if(!song) return alert("ใส่ชื่อเพลงก่อนจ้า");
+
+            const { error } = await supabase.from('requests').insert([{ musician_id: artistId, song_name: song, customer_name: sender }]);
+            if(!error) {
+                alert("ส่งคิวเพลงเรียบร้อย! รอฟังได้เลย");
+                document.getElementById('song').value = "";
+            }
+        }
+
+        function showTip() {
+            alert("สามารถสแกนทิปได้ที่หน้าเวที หรือใช้เบอร์ PromptPay: " + promptPayNum);
+        }
+        init();
+    </script>
+</body>
+</html>

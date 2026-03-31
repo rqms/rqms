@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQMS - Artist Setup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-[#1e293b] rounded-3xl p-8 border border-slate-700 shadow-2xl">
+        <h1 class="text-3xl font-black text-emerald-400 text-center mb-8">RQMS 🎸</h1>
+        
+        <div id="setup-form" class="space-y-4">
+            <input type="text" id="name" placeholder="ชื่อศิลปิน / วงดนตรี" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500">
+            <input type="text" id="pay" placeholder="PromptPay (เบอร์โทร/เลขบัตร)" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500">
+            <button onclick="register()" id="btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all">สร้างระบบและรับ QR Code</button>
+        </div>
+
+        <div id="result" class="hidden text-center space-y-6">
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl"><img id="qrcode" class="w-64 h-64"></div>
+            <p class="text-emerald-400 font-bold text-xl">บันทึก QR ไปแปะหน้าเวทีได้เลย!</p>
+            <div class="bg-slate-800 p-4 rounded-xl text-left border border-slate-700">
+                <a id="dashLink" href="#" target="_blank" class="text-blue-400 underline break-all text-sm">👉 คลิกเปิดหน้า Dashboard (สำหรับ iPad)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+        async function register() {
+            const name = document.getElementById('name').value;
+            const pay = document.getElementById('pay').value;
+            if(!name || !pay) return alert("กรุณากรอกข้อมูลให้ครบครับพี่");
+
+            const id = 'art-' + Math.random().toString(36).substr(2, 9);
+            const { error } = await supabase.from('musicians').insert([{ id, display_name: name, promptpay: pay }]);
+
+            if(!error) {
+                const base = window.location.origin + window.location.pathname.replace('index.html', '');
+                document.getElementById('qrcode').src = `https://chart.googleapis.com/chart?cht=qr&chs=400x400&chl=${encodeURIComponent(base + 'request.html?id=' + id)}`;
+                document.getElementById('dashLink').href = base + 'dashboard.html?id=' + id;
+                document.getElementById('setup-form').classList.add('hidden');
+                document.getElementById('result').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
