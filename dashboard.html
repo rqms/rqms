@@ -9,11 +9,16 @@
 <body class="bg-[#020617] text-slate-200 min-h-screen p-6">
     <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
         <h1 class="text-4xl font-black text-emerald-500 tracking-tighter">SONG QUEUE 🎸</h1>
-        <div class="flex gap-4 items-center w-full md:w-auto">
-            <input type="text" id="venue-input" placeholder="ชื่อร้านที่เล่นวันนี้" 
-                class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg outline-none focus:border-emerald-500 flex-1">
+        <div class="flex flex-col gap-2 w-full md:w-auto">
+            <div class="flex gap-2">
+                <input type="text" id="venue-input" placeholder="ชื่อร้านที่เล่นวันนี้" 
+                    class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg outline-none focus:border-emerald-500 flex-1">
+                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-lg border border-slate-600 shadow-sm" title="ดึงที่อยู่จาก GPS">
+                    📍
+                </button>
+            </div>
             <button id="system-btn" onclick="toggleSystem()" 
-                class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg min-w-[120px]">
+                class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg w-full">
                 เปิดระบบ
             </button>
         </div>
@@ -24,75 +29,78 @@
     </div>
 
     <script>
-        // --- ข้อมูล Supabase ของพี่แขก ---
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
         const urlParams = new URLSearchParams(window.location.search);
         const artistId = urlParams.get('id');
-
         let isSystemOpen = false;
 
-        // 1. โหลดสถานะเดิมจาก Supabase (ทำให้เปิดมาแล้วค่าไม่หาย)
+        // --- ฟังก์ชันดึงตำแหน่งจาก GPS ---
+        function getLocation() {
+            if (navigator.geolocation) {
+                const btn = event.currentTarget;
+                btn.innerText = "⏳";
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    // ใช้ OpenStreetMap (ฟรี) เพื่อแปลงพิกัดเป็นชื่อสถานที่
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+                        const data = await response.json();
+                        // พยายามดึงชื่อร้านหรือชื่อถนน/ย่าน
+                        const placeName = data.address.amenity || data.address.building || data.address.road || "ตำแหน่งปัจจุบัน";
+                        document.getElementById('venue-input').value = placeName;
+                    } catch (e) {
+                        alert("ดึงชื่อร้านไม่สำเร็จ แต่ดึงพิกัดได้ครับ");
+                    }
+                    btn.innerText = "📍";
+                }, () => {
+                    alert("กรุณาอนุญาตให้เข้าถึงตำแหน่งใน iPad ด้วยครับพี่");
+                    btn.innerText = "📍";
+                });
+            } else {
+                alert("อุปกรณ์นี้ไม่รองรับ GPS ครับ");
+            }
+        }
+
         async function loadCurrentStatus() {
             if (!artistId) return;
             try {
-                const { data, error } = await sbClient
-                    .from('musicians')
-                    .select('is_active, current_venue')
-                    .eq('id', artistId)
-                    .single();
-
+                const { data } = await sbClient.from('musicians').select('is_active, current_venue').eq('id', artistId).single();
                 if (data) {
                     isSystemOpen = data.is_active;
                     document.getElementById('venue-input').value = data.current_venue || "";
                     updateButtonUI();
                 }
-            } catch (e) { console.error("Load status error:", e); }
+            } catch (e) { console.error(e); }
         }
 
-        // 2. สลับสถานะ เปิด/ปิด
         async function toggleSystem() {
             if (!artistId) return alert("ไม่พบรหัสศิลปิน!");
-            
             const venue = document.getElementById('venue-input').value || "ร้านประจำ";
             const newStatus = !isSystemOpen;
-
-            const { error } = await sbClient
-                .from('musicians')
-                .update({ is_active: newStatus, current_venue: venue })
-                .eq('id', artistId);
-
-            if (error) {
-                alert("บันทึกไม่สำเร็จ: " + error.message);
-            } else {
-                isSystemOpen = newStatus;
-                updateButtonUI();
-            }
+            const { error } = await sbClient.from('musicians').update({ is_active: newStatus, current_venue: venue }).eq('id', artistId);
+            if (!error) { isSystemOpen = newStatus; updateButtonUI(); }
         }
 
-        // 3. อัปเดตสีปุ่ม
         function updateButtonUI() {
             const btn = document.getElementById('system-btn');
             if (isSystemOpen) {
                 btn.innerText = "ปิดระบบ";
-                btn.className = "bg-red-600 hover:bg-red-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg shadow-red-900/20";
+                btn.className = "bg-red-600 hover:bg-red-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg";
             } else {
                 btn.innerText = "เปิดระบบ";
-                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg shadow-emerald-900/20";
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2 rounded-full font-bold transition-all shadow-lg";
             }
         }
 
-        // 4. ดักจับเพลงใหม่
         function subscribeRequests() {
             if (!artistId) return;
-
-            // ดึงเพลงเก่า
             sbClient.from('requests').select('*').eq('musician_id', artistId).order('created_at', { ascending: false })
                 .then(({ data }) => { if (data) data.forEach(req => renderNewRequest(req)); });
 
-            // ดักเพลงใหม่แบบ Real-time
             sbClient.channel('db-changes').on('postgres_changes', 
                 { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, 
                 payload => { renderNewRequest(payload.new); }
@@ -103,24 +111,15 @@
             const container = document.getElementById('queue-container');
             const emptyMsg = document.getElementById('empty-msg');
             if (emptyMsg) emptyMsg.remove();
-
             const card = document.createElement('div');
-            card.className = "bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg animate-in fade-in slide-in-from-left duration-500";
-            card.innerHTML = `
-                <p class="text-[10px] text-slate-500 mb-1 uppercase tracking-wider">จากคุณ: ${req.customer_name || 'ไม่ระบุชื่อ'}</p>
-                <h3 class="text-xl font-bold text-white">${req.song_name}</h3>
-                <p class="text-[10px] text-slate-400 mt-2">${new Date(req.created_at).toLocaleTimeString()}</p>
-            `;
+            card.className = "bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg animate-in fade-in slide-in-from-left";
+            card.innerHTML = `<p class="text-[10px] text-slate-500 mb-1">จากคุณ: ${req.customer_name || 'ไม่ระบุ'}</p>
+                              <h3 class="text-xl font-bold text-white">${req.song_name}</h3>
+                              <p class="text-[10px] text-slate-400 mt-2">${new Date(req.created_at).toLocaleTimeString()}</p>`;
             container.prepend(card);
         }
 
-        // เริ่มทำงาน
-        if (artistId) {
-            loadCurrentStatus();
-            subscribeRequests();
-        } else {
-            document.body.innerHTML = "<div class='text-center p-20'>ไม่พบรหัสศิลปิน (Invalid ID)</div>";
-        }
+        if (artistId) { loadCurrentStatus(); subscribeRequests(); }
     </script>
 </body>
 </html>
