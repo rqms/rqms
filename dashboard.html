@@ -116,7 +116,7 @@
             if (data) {
                 isSystemOpen = data.is_active;
                 document.getElementById('venue-input').value = data.current_venue || "";
-                document.getElementById('display-artist-name').innerText = data.name || "ยังไม่ได้ตั้งชื่อ";
+                document.getElementById('display-artist-name').innerText = data.display_name || "ยังไม่ได้ตั้งชื่อ";
                 updateUI(data.current_venue);
             }
         }
