@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iPad Dashboard - Final Fix</title>
+    <title>iPad Dashboard - GPS & Stats</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; pointer-events: none; }
         .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
-        button:active { background-color: #000 !important; opacity: 0.7; }
+        .big-btn { cursor: pointer; -webkit-appearance: none; }
+        .big-btn:active { background-color: #000 !important; opacity: 0.7; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
 
     <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
         <div class="flex items-center gap-4">
-            <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
             <div>
                 <p class="text-[8px] uppercase text-slate-500 font-bold">Status</p>
                 <h2 id="status-text" class="text-lg font-black text-white uppercase leading-none">Offline</h2>
@@ -31,18 +32,22 @@
         </div>
     </div>
 
-    <div class="flex gap-2 mb-8">
-        <input type="text" id="venue-input" placeholder="ระบุชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold">
-        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 px-8 py-4 rounded-xl font-black text-white">เปิดระบบ</button>
+    <div class="grid grid-cols-1 gap-2 mb-8">
+        <div class="flex gap-2">
+            <input type="text" id="venue-input" placeholder="ระบุชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold text-lg">
+            <button onclick="getLocation()" class="bg-slate-800 px-6 rounded-xl border border-slate-600 text-2xl big-btn">📍</button>
+        </div>
+        <div id="venue-list" class="flex flex-wrap gap-1"></div>
+        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white py-4 rounded-xl font-black uppercase shadow-lg big-btn">เปิดระบบ</button>
     </div>
 
     <div class="mb-10">
-        <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2">🔥 LIVE REQUESTS</h3>
+        <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2 tracking-widest">🔥 LIVE REQUESTS</h3>
         <div id="queue-container"></div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold text-[10px] mb-4 italic px-2">💾 HISTORY (PLAYED)</h3>
+        <h3 class="text-slate-500 font-bold text-[10px] mb-4 italic px-2 tracking-widest">💾 HISTORY (STATS COLLECTED)</h3>
         <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
@@ -57,7 +62,33 @@
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }, 1000);
 
-        // *** จุดที่แก้: ใส่เครื่องหมายคำพูดครอบ ID เพื่อรองรับ UUID ***
+        // 1. ฟังก์ชัน GPS (เอากลับมาแล้วครับพี่)
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(p) {
+                    fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + p.coords.latitude + '&lon=' + p.coords.longitude)
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        var addr = data.address;
+                        var items = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure].filter(Boolean);
+                        var list = document.getElementById('venue-list');
+                        list.innerHTML = "";
+                        items.forEach(function(i) {
+                            var btn = document.createElement('button');
+                            btn.className = "bg-slate-800 text-[10px] px-3 py-1 rounded-full text-slate-400 border border-slate-700";
+                            btn.innerText = i;
+                            btn.onclick = function() { 
+                                document.getElementById('venue-input').value = i; 
+                                list.innerHTML = ""; 
+                            };
+                            list.appendChild(btn);
+                        });
+                    });
+                });
+            }
+        }
+
+        // 2. จัดการเพลง (Update Status แทนการลบ)
         function solve(id, status) {
             var card = document.getElementById('card-' + id);
             var historyBox = document.getElementById('history-container');
@@ -67,14 +98,16 @@
                 
                 var label = document.createElement('div');
                 label.className = (status === 'ok' ? "text-emerald-500" : "text-red-500") + " font-bold text-xs";
-                label.innerText = (status === 'ok' ? "เล่นแล้ว ✅" : "ไม่ได้ ❌");
+                label.innerText = (status === 'ok' ? "PLAYED ✅" : "DECLINED ❌");
                 card.appendChild(label);
 
                 card.classList.add('is-history');
                 historyBox.prepend(card);
 
-                // ลบใน DB
-                sb.from('requests').delete().eq('id', id).then(function(){ console.log("Deleted", id); });
+                var finalStatus = (status === 'ok' ? 'played' : 'declined');
+                sb.from('requests').update({ status: finalStatus }).eq('id', id).then(function(){ 
+                    console.log("Updated Stats:", id); 
+                });
             }
         }
 
@@ -85,14 +118,13 @@
             div.id = 'card-' + req.id;
             div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
             
-            // ใช้เครื่องหมายคำพูด ' ' ครอบ req.id ในฟังก์ชัน solve
             div.innerHTML = '<div>' +
-                '<p class="text-[9px] text-slate-500 font-bold mb-1">REQ: ' + (req.customer_name || "ไม่ระบุ") + '</p>' +
-                '<h3 class="text-lg font-black text-white">' + req.song_name + '</h3>' +
+                '<p class="text-[9px] text-slate-500 font-bold mb-1">จาก: ' + (req.customer_name || "ไม่ระบุ") + '</p>' +
+                '<h3 class="text-lg font-black text-white leading-tight">' + req.song_name + '</h3>' +
                 '</div>' +
                 '<div class="btn-area flex gap-2">' +
-                '<button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold text-xs">เล่นได้</button>' +
-                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-bold text-xs">ไม่ได้</button>' +
+                '<button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-4 rounded-xl font-bold text-xs big-btn">เล่นได้</button>' +
+                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-4 rounded-xl font-bold text-xs big-btn">ไม่ได้</button>' +
                 '</div>';
             
             container.prepend(div);
@@ -107,7 +139,8 @@
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name || resMusician.data.name;
                 updateUI(resMusician.data.current_venue);
             }
-            var resReq = await sb.from('requests').select('*').eq('musician_id', artistId);
+            // ดึงเฉพาะเพลงที่ยังไม่เล่น (Pending)
+            var resReq = await sb.from('requests').select('*').eq('musician_id', artistId).eq('status', 'pending');
             if (resReq.data) { resReq.data.forEach(function(r) { draw(r); }); }
         }
 
@@ -117,7 +150,10 @@
         async function toggleSystem() {
             var v = document.getElementById('venue-input').value || "ร้านประจำ";
             var next = !isSystemOpen;
-            if(!next) { document.getElementById('queue-container').innerHTML = ""; document.getElementById('history-container').innerHTML = ""; }
+            if(!next) { 
+                document.getElementById('queue-container').innerHTML = ""; 
+                document.getElementById('history-container').innerHTML = ""; 
+            }
             await sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId);
             isSystemOpen = next; updateUI(v);
         }
@@ -127,11 +163,11 @@
             var d = document.getElementById('status-dot');
             var s = document.getElementById('status-text');
             if (isSystemOpen) {
-                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white px-8 py-4 rounded-xl font-black";
+                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn";
                 d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
                 s.innerText = "Online";
             } else {
-                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white px-8 py-4 rounded-xl font-black";
+                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn";
                 d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]";
                 s.innerText = "Offline";
             }
