@@ -5,6 +5,11 @@
     <title>iPad Dashboard - RQMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* สไตล์พิเศษสำหรับเพลงที่จัดการแล้ว */
+        .history-card { opacity: 0.6; transform: scale(0.95); filter: grayscale(0.5); }
+        .request-card { transition: all 0.3s ease; }
+    </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 md:p-6 font-sans">
     
@@ -45,16 +50,16 @@
     </div>
 
     <div class="mb-10">
-        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-xs mb-4 px-2 italic">🔥 New Requests (บนสุด)</h3>
-        <div id="queue-container" class="space-y-4">
+        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-xs mb-4 px-2 italic">🔥 New Requests (คิวใหม่บนสุด)</h3>
+        <div id="queue-container" class="space-y-4 min-h-[100px]">
             <p id="empty-msg" class="text-slate-600 italic text-center py-10 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">ไม่มีคิวเพลงใหม่...</p>
         </div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2">💾 History (เล่นแล้ว / ร้องไม่ได้)</h3>
-        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-50 scale-95 origin-top">
-        </div>
+        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2">💾 ประวัติการเล่น/ปฏิเสธคืนนี้</h3>
+        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            </div>
     </div>
 
     <script>
@@ -75,7 +80,6 @@
             if (data) {
                 isSystemOpen = data.is_active;
                 document.getElementById('venue-input').value = data.current_venue || "";
-                // ดึงจาก display_name ให้ตรงกับตารางในรูปของพี่
                 document.getElementById('display-artist-name').innerText = data.display_name || data.name || "ศิลปิน";
                 updateUI(data.current_venue);
             }
@@ -85,9 +89,9 @@
             const venue = document.getElementById('venue-input').value || "ร้านประจำ";
             const newStatus = !isSystemOpen;
             
-            // เมื่อปิดระบบ: ล้างคิวเพลงบนหน้าจอ iPad ทั้งหมด
+            // เมื่อปิดระบบ: ล้างคิวหน้าจอทั้งหมด
             if (!newStatus) {
-                document.getElementById('queue-container').innerHTML = '<p class="text-slate-600 italic text-center py-10">ปิดระบบเรียบร้อย...</p>';
+                document.getElementById('queue-container').innerHTML = '<p class="text-slate-600 italic text-center py-10">ปิดระบบแล้ว...</p>';
                 document.getElementById('history-container').innerHTML = '';
             }
 
@@ -112,21 +116,37 @@
             }
         }
 
-        // --- ระบบย้ายเพลงลง History ---
+        // --- จุดสำคัญ: ฟังก์ชันย้ายเพลงลง History ---
         async function setSongStatus(reqId, status, songName, customerName) {
             const card = document.getElementById(`req-${reqId}`);
-            if(card) card.remove();
-
             const histContainer = document.getElementById('history-container');
-            const histItem = document.createElement('div');
-            histItem.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center";
             
-            const badge = status === 'yes' ? '<span class="text-emerald-500 text-[10px] font-bold">✅ เล่นแล้ว</span>' : '<span class="text-red-500 text-[10px] font-bold">❌ ไม่ได้</span>';
+            if (card) {
+                // 1. ลบปุ่มออก
+                card.querySelector('.btn-group').remove();
+                
+                // 2. ปรับหน้าตาให้เป็นประวัติ (จางลง)
+                card.classList.add('history-card');
+                card.classList.remove('request-card', 'border-l-4', 'border-emerald-500');
+                
+                // 3. ใส่ป้ายกำกับสถานะ
+                const badge = status === 'yes' ? '<span class="text-emerald-500 font-bold text-xs">เล่นแล้ว ✅</span>' : '<span class="text-red-500 font-bold text-xs">ไม่ได้ ❌</span>';
+                card.innerHTML += badge;
 
-            histItem.innerHTML = `<div><p class="text-white font-bold text-sm leading-tight">${songName}</p><p class="text-[9px] text-slate-500">${customerName}</p></div>${badge}`;
-            
-            histContainer.prepend(histItem); // ย้ายลงไปด้านล่าง
-            await sbClient.from('requests').delete().eq('id', reqId); // ลบคิวออกจาก Database
+                // 4. ย้ายตัวมันเองลงไปที่ History Container (ด้านล่าง)
+                histContainer.prepend(card);
+            }
+
+            // 5. ลบออกจาก Database (เพื่อไม่ให้ค้างในระบบ)
+            await sbClient.from('requests').delete().eq('id', reqId);
+            checkEmpty();
+        }
+
+        function checkEmpty() {
+            const container = document.getElementById('queue-container');
+            if (container.querySelectorAll('.request-card').length === 0) {
+                container.innerHTML = '<p id="empty-msg" class="text-slate-600 italic text-center py-10 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">ไม่มีคิวเพลงใหม่...</p>';
+            }
         }
 
         function subscribeRequests() {
@@ -137,23 +157,24 @@
 
         function renderNewRequest(req) {
             const container = document.getElementById('queue-container');
-            const emptyMsg = container.querySelector('#empty-msg');
+            const emptyMsg = document.getElementById('empty-msg');
             if (emptyMsg) emptyMsg.remove();
 
             const card = document.createElement('div');
             card.id = `req-${req.id}`;
-            card.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center animate-in slide-in-from-top duration-300";
+            card.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center";
             card.innerHTML = `
                 <div>
                     <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">จาก: ${req.customer_name || 'ไม่ระบุ'}</p>
                     <h3 class="text-xl font-bold text-white">${req.song_name}</h3>
                 </div>
-                <div class="flex gap-2">
+                <div class="btn-group flex gap-2">
                     <button onclick="setSongStatus(${req.id}, 'yes', '${req.song_name}', '${req.customer_name}')" class="bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 px-4 py-2 rounded-lg font-bold text-xs hover:bg-emerald-600">เล่นได้ ✅</button>
                     <button onclick="setSongStatus(${req.id}, 'no', '${req.song_name}', '${req.customer_name}')" class="bg-red-600/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-lg font-bold text-xs hover:bg-red-600">ไม่ได้ ❌</button>
                 </div>
             `;
-            container.prepend(card); // เพลงใหม่เด้งขึ้นบนสุด
+            // ใช้ prepend เพื่อให้เพลงใหม่มาอยู่ด้านบนสุดเสมอ
+            container.prepend(card);
         }
 
         function getLocation() {
