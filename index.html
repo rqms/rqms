@@ -62,7 +62,10 @@
                 const requestUrl = window.location.href.replace('index.html', 'request.html?id=' + artistId);
                 const dashUrl = base + 'dashboard.html?id=' + artistId;
 
-                const finalRequestUrl = window.location.href.replace('index.html', 'request.html?id=' + artistId);
+                // แก้ให้เป็นแบบระบุชื่อไฟล์ตรงๆ ไปเลยครับ
+const artistId = 'art-' + Math.random().toString(36).substr(2, 9); // บรรทัดนี้มีอยู่แล้ว
+const finalRequestUrl = window.location.origin + window.location.pathname.replace('index.html', 'request.html') + '?id=' + artistId;
+
 const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(finalRequestUrl)}`;
 document.getElementById('qrcode').src = qrApi;
                 document.getElementById('dashLink').href = dashUrl;
