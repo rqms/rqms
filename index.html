@@ -16,103 +16,68 @@
             <button onclick="registerNow()" id="btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all">สร้างระบบและรับ QR Code</button>
         </div>
 
-        <div id="result" class="hidden text-center space-y-6">
-            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl"><img id="qrcode" class="w-64 h-64"></div>
+        <div id="result-area" class="hidden text-center space-y-6">
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
+                <img id="qrcode-img" class="w-64 h-64" src="" alt="QR Code">
+            </div>
             <p class="text-emerald-400 font-bold text-xl">บันทึก QR ไปแปะหน้าเวทีได้เลย!</p>
             <div class="bg-slate-800 p-4 rounded-xl text-left border border-slate-700">
-                <p class="text-xs text-slate-400 mb-2">ลิงก์หน้า Dashboard สำหรับพี่:</p>
-                <a id="dashLink" href="#" target="_blank" class="text-blue-400 underline break-all text-sm">คลิกเปิด Dashboard</a>
+                <p class="text-xs text-slate-400 mb-2 text-center">ลิงก์หน้า Dashboard สำหรับเปิดใน iPad:</p>
+                <a id="dash-link" href="#" target="_blank" class="text-blue-400 underline break-all text-sm block text-center">คลิกเปิด Dashboard</a>
             </div>
         </div>
     </div>
 
     <script>
-        async function registerNow() {
-            const name = document.getElementById('name').value;
-            const pay = document.getElementById('pay').value;
-            
-            if(!name || !pay) {
-                alert("กรุณากรอกข้อมูลให้ครบครับพี่");
-                return;
-            }
-
-            const btn = document.getElementById('btn');
-            btn.innerText = "กำลังสร้างระบบ...";
-            btn.disabled = true;
-
-            const artistId = 'art-' + Math.random().toString(36).substr(2, 9);
-            
-            const { error } = await supabaseClient
-                .from('musicians')
-                .insert([{ id: artistId, display_name: name, promptpay: pay }]);
-
-            if(error) {
-                console.error(error);
-                alert("เกิดข้อผิดพลาด: " + error.message);
-                btn.innerText = "ลองใหม่อีกครั้ง";
-                btn.disabled = false;
-            } else {
-                // --- จุดที่แก้ไขให้ไม่ค้าง ---
-                const currentUrl = window.location.href.split('?')[0];
-                const baseDir = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
-                
-                const requestUrl = baseDir + 'request.html?id=' + artistId;
-                const dashUrl = baseDir + 'dashboard.html?id=' + artistId;
-
-                const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(requestUrl)}`;
-                
-                document.getElementById('qrcode').src = qrApi;
-                document.getElementById('dashLink').href = dashUrl;
-                
-                document.getElementById('setup-form').classList.add('hidden');
-                document.getElementById('result').classList.remove('hidden');
-            }
-        }
-        // --- ใส่ค่าของพี่ตรงนี้ ---
+        // --- ใส่ URL และ KEY ของพี่ตรงนี้ ---
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        // -----------------------
+        // ---------------------------------
 
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const sbClient = supabase.createClient(SB_URL, SB_KEY);
 
         async function registerNow() {
-            const name = document.getElementById('name').value;
-            const pay = document.getElementById('pay').value;
+            const nameInput = document.getElementById('name').value;
+            const payInput = document.getElementById('pay').value;
+            const btn = document.getElementById('btn');
             
-            if(!name || !pay) {
-                alert("กรุณากรอกข้อมูลให้ครบครับพี่");
+            if(!nameInput || !payInput) {
+                alert("กรุณากรอกข้อมูลให้ครบครับพี่แขก");
                 return;
             }
 
-            const btn = document.getElementById('btn');
             btn.innerText = "กำลังสร้างระบบ...";
             btn.disabled = true;
 
             const artistId = 'art-' + Math.random().toString(36).substr(2, 9);
             
-            const { error } = await supabaseClient
-                .from('musicians')
-                .insert([{ id: artistId, display_name: name, promptpay: pay }]);
+            try {
+                const { error } = await sbClient
+                    .from('musicians')
+                    .insert([{ id: artistId, display_name: nameInput, promptpay: payInput }]);
 
-            if(error) {
-                alert("เกิดข้อผิดพลาด: " + error.message);
+                if(error) throw error;
+
+                // สร้างลิงก์แบบ Dynamic ไม่สนชื่อไฟล์
+                const currentPath = window.location.pathname;
+                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+                const fullBase = window.location.origin + basePath;
+
+                const requestUrl = fullBase + 'request.html?id=' + artistId;
+                const dashUrl = fullBase + 'dashboard.html?id=' + artistId;
+
+                // สั่งแสดงผลหน้า QR
+                document.getElementById('qrcode-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(requestUrl)}`;
+                document.getElementById('dash-link').href = dashUrl;
+                
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('result-area').classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                alert("ติดปัญหา: " + err.message);
                 btn.innerText = "ลองใหม่อีกครั้ง";
                 btn.disabled = false;
-            } else {
-                const base = window.location.origin + window.location.pathname.replace('index.html', '');
-                const requestUrl = window.location.href.replace('index.html', 'request.html?id=' + artistId);
-                const dashUrl = base + 'dashboard.html?id=' + artistId;
-
-                // แก้ให้เป็นแบบระบุชื่อไฟล์ตรงๆ ไปเลยครับ
-const artistId = 'art-' + Math.random().toString(36).substr(2, 9); // บรรทัดนี้มีอยู่แล้ว
-const finalRequestUrl = window.location.origin + window.location.pathname.replace('index.html', 'request.html') + '?id=' + artistId;
-
-const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(finalRequestUrl)}`;
-document.getElementById('qrcode').src = qrApi;
-                document.getElementById('dashLink').href = dashUrl;
-                
-                document.getElementById('setup-form').classList.add('hidden');
-                document.getElementById('result').classList.remove('hidden');
             }
         }
     </script>
