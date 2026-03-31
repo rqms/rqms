@@ -6,61 +6,96 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-black text-white p-6">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-4xl font-black text-emerald-400">SONG QUEUE</h1>
-        <div id="gig-status" class="flex items-center gap-4">
-            <input type="text" id="venue" placeholder="ชื่อร้านที่เล่นวันนี้" class="bg-gray-900 border border-gray-700 p-2 rounded-lg text-sm">
-            <button onclick="toggleGig(true)" id="btn-start" class="bg-green-600 px-6 py-2 rounded-full font-bold">เปิดระบบ</button>
-            <button onclick="toggleGig(false)" id="btn-stop" class="hidden bg-red-600 px-6 py-2 rounded-full font-bold">ปิดระบบ</button>
+<body class="bg-[#020617] text-slate-200 min-h-screen p-6">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-4xl font-black text-emerald-500 tracking-tighter">SONG QUEUE</h1>
+        <div class="flex gap-4 items-center">
+            <input type="text" id="venue-input" placeholder="ชื่อร้านที่เล่นวันนี้" class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg outline-none focus:border-emerald-500">
+            <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-full font-bold transition-all shadow-lg shadow-emerald-900/20">
+                เปิดระบบ
+            </button>
         </div>
     </div>
 
-    <div id="queue-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        </div>
+    <div id="queue-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p id="empty-msg" class="text-slate-500 italic col-span-full text-center py-20">ยังไม่มีคำขอเพลงในขณะนี้...</p>
+    </div>
 
     <script>
-        const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        const artistId = new URLSearchParams(window.location.search).get('id');
+        // --- ใส่ URL และ KEY ของพี่ตรงนี้ ---
+        const SB_URL = "URL_ของพี่"; 
+        const SB_KEY = "KEY_ของพี่";
+        // ---------------------------------
 
-        async function toggleGig(status) {
-            const venue = document.getElementById('venue').value;
-            await supabase.from('musicians').update({ is_active: status, current_venue: venue }).eq('id', artistId);
-            document.getElementById('btn-start').classList.toggle('hidden', status);
-            document.getElementById('btn-stop').classList.toggle('hidden', !status);
+        const sbClient = supabase.createClient(SB_URL, SB_KEY);
+        const urlParams = new URLSearchParams(window.location.search);
+        const artistId = urlParams.get('id');
+
+        let isSystemOpen = false;
+
+        async function toggleSystem() {
+            if (!artistId) return alert("ไม่พบรหัสศิลปิน!");
+            
+            const venue = document.getElementById('venue-input').value || "ร้านประจำ";
+            isSystemOpen = !isSystemOpen;
+
+            const { error } = await sbClient
+                .from('musicians')
+                .update({ is_active: isSystemOpen, current_venue: venue })
+                .eq('id', artistId);
+
+            if (error) {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+            } else {
+                updateButtonUI();
+            }
         }
 
-        async function fetchQueue() {
-            const { data } = await supabase.from('requests').select('*').eq('musician_id', artistId).neq('status', 'done').order('created_at', { ascending: true });
-            const list = document.getElementById('queue-list');
-            list.innerHTML = data.map(q => `
-                <div class="bg-[#1e293b] p-6 rounded-2xl border-l-8 ${q.status === 'playing' ? 'border-amber-500 bg-amber-900/20' : 'border-emerald-500'}">
-                    <h3 class="text-2xl font-bold">${q.song_name}</h3>
-                    <p class="text-slate-400 mt-2">ขอโดย: ${q.customer_name || 'ไม่ระบุชื่อ'}</p>
-                    <div class="mt-4 flex gap-2">
-                        <button onclick="updateStatus('${q.id}', 'playing')" class="bg-amber-600 px-4 py-2 rounded-lg text-xs font-bold uppercase">กำลังร้อง</button>
-                        <button onclick="updateStatus('${q.id}', 'done')" class="bg-emerald-600 px-4 py-2 rounded-lg text-xs font-bold uppercase">เล่นเสร็จแล้ว</button>
-                    </div>
-                </div>
-            `).join('');
+        function updateButtonUI() {
+            const btn = document.getElementById('system-btn');
+            if (isSystemOpen) {
+                btn.innerText = "ปิดระบบ";
+                btn.className = "bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-full font-bold transition-all";
+            } else {
+                btn.innerText = "เปิดระบบ";
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-full font-bold transition-all";
+            }
         }
 
-        async function updateStatus(id, status) {
-            await supabase.from('requests').update({ status }).eq('id', id);
-            fetchQueue();
+        // ฟังก์ชันดึงข้อมูลเพลงแบบ Real-time
+        function subscribeRequests() {
+            sbClient
+                .channel('public:requests')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, payload => {
+                    renderNewRequest(payload.new);
+                })
+                .subscribe();
         }
 
-        // Real-time Update: ฟังความเปลี่ยนแปลงจาก Supabase
-        supabase.channel('custom-all-channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => {
-            fetchQueue();
-            const audio = new Audio('https://www.soundjay.com/buttons/beep-07a.mp3');
-            audio.play(); // เสียงเตือนเพลงเข้า
-          }).subscribe();
+        function renderNewRequest(req) {
+            const container = document.getElementById('queue-container');
+            const emptyMsg = document.getElementById('empty-msg');
+            if (emptyMsg) emptyMsg.remove();
 
-        fetchQueue();
+            const card = document.createElement('div');
+            card.className = "bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg animate-bounce-short";
+            card.innerHTML = `
+                <p class="text-xs text-slate-500 mb-1">จากคุณ: ${req.customer_name || 'ผู้ไม่ประสงค์ออกนาม'}</p>
+                <h3 class="text-xl font-bold text-white">${req.song_name}</h3>
+                <p class="text-xs text-slate-400 mt-2">${new Date(req.created_at).toLocaleTimeString()}</p>
+            `;
+            container.prepend(card);
+        }
+
+        if (artistId) subscribeRequests();
     </script>
+
+    <style>
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-short { animation: bounce-short 0.5s ease-in-out; }
+    </style>
 </body>
 </html>
