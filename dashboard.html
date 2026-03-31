@@ -2,17 +2,16 @@
 <html>
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPad Dashboard - RQMS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>iPad Dashboard - Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* สไตล์สำหรับการ์ดที่ถูกย้ายลงมาประวัติ */
-        .is-history { opacity: 0.5 !important; transform: scale(0.95); filter: grayscale(0.8); border-left-color: #475569 !important; }
-        .request-card { transition: all 0.2s ease-in-out; }
+        .is-history { opacity: 0.4; filter: grayscale(1); transform: scale(0.95); border-left-color: #475569 !important; pointer-events: none; }
+        .request-card { transition: all 0.2s ease; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 md:p-6 font-sans">
-    
+
     <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap justify-between items-center gap-4 shadow-2xl">
         <div class="flex items-center gap-4">
             <div id="status-dot" class="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
@@ -23,9 +22,9 @@
         </div>
         <div class="border-l border-slate-800 pl-4">
             <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Musician / Band</p>
-            <h2 id="display-artist-name" class="text-xl font-black text-emerald-500 leading-none tracking-tight">---</h2>
+            <h2 id="display-artist-name" class="text-xl font-black text-emerald-500 leading-none">---</h2>
         </div>
-        <div class="border-l border-slate-800 pl-4">
+        <div class="border-l border-slate-800 pl-4 pr-4">
             <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">At Venue</p>
             <h2 id="display-venue" class="text-xl font-black text-white leading-none">---</h2>
         </div>
@@ -37,23 +36,22 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
         <div class="md:col-span-3 flex flex-col gap-2">
             <div class="flex gap-2">
-                <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white">
-                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 px-6 rounded-xl border border-slate-600 text-2xl active:scale-90">📍</button>
+                <input type="text" id="venue-input" placeholder="ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white">
+                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 px-6 rounded-xl border border-slate-600 text-2xl">📍</button>
             </div>
             <div id="venue-list" class="flex flex-wrap gap-1"></div>
         </div>
-        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg h-full active:scale-95 transition-all">เปิดระบบ</button>
+        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg h-full active:scale-95 transition-all">เปิดระบบ</button>
     </div>
 
     <div class="mb-10">
-        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">🔥 New Requests (บนสุด)</h3>
-        <div id="queue-container" class="space-y-4">
-            <p id="empty-msg" class="text-slate-600 italic text-center py-10 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">ไม่มีคิวเพลงใหม่...</p>
-        </div>
+        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">🔥 New Requests (ใหม่สุดอยู่บน)</h3>
+        <div id="queue-container" class="space-y-4 min-h-[100px]">
+            </div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2">💾 History (คืนนี้จัดการแล้ว)</h3>
+        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">💾 History (คืนนี้จัดการแล้ว)</h3>
         <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             </div>
     </div>
@@ -70,14 +68,22 @@
         }
         setInterval(updateClock, 1000);
 
-        async function loadCurrentStatus() {
+        async function init() {
             if (!artistId) return;
-            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
-            if (data) {
-                isSystemOpen = data.is_active;
-                document.getElementById('venue-input').value = data.current_venue || "";
-                document.getElementById('display-artist-name').innerText = data.display_name || data.name || "ศิลปิน";
-                updateUI(data.current_venue);
+            // 1. โหลดข้อมูลวง
+            const { data: musician } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+            if (musician) {
+                isSystemOpen = musician.is_active;
+                document.getElementById('venue-input').value = musician.current_venue || "";
+                document.getElementById('display-artist-name').innerText = musician.display_name || musician.name || "ศิลปิน";
+                updateUI(musician.current_venue);
+            }
+            // 2. โหลดเพลงที่ค้างอยู่ในระบบ (แก้ปัญหารีเฟรชแล้วหาย)
+            const { data: requests } = await sbClient.from('requests').select('*').eq('musician_id', artistId).order('created_at', { ascending: false });
+            if (requests) {
+                const container = document.getElementById('queue-container');
+                container.innerHTML = "";
+                requests.forEach(req => renderNewRequest(req));
             }
         }
 
@@ -85,8 +91,8 @@
             const venue = document.getElementById('venue-input').value || "ร้านประจำ";
             const newStatus = !isSystemOpen;
             if (!newStatus) {
-                document.getElementById('queue-container').innerHTML = '<p id="empty-msg" class="text-slate-600 italic text-center py-10">ปิดระบบแล้ว...</p>';
-                document.getElementById('history-container').innerHTML = '';
+                document.getElementById('queue-container').innerHTML = "";
+                document.getElementById('history-container').innerHTML = "";
             }
             const { error } = await sbClient.from('musicians').update({ is_active: newStatus, current_venue: venue }).eq('id', artistId);
             if (!error) { isSystemOpen = newStatus; updateUI(venue); }
@@ -98,74 +104,63 @@
             const statusTxt = document.getElementById('status-text');
             document.getElementById('display-venue').innerText = venue || "---";
             if (isSystemOpen) {
-                btn.innerText = "ปิดระบบ"; btn.className = "bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
+                btn.innerText = "ปิดระบบ"; btn.className = "bg-red-600 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
                 dot.className = "w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]";
                 statusTxt.innerText = "Online";
             } else {
-                btn.innerText = "เปิดระบบ"; btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
+                btn.innerText = "เปิดระบบ"; btn.className = "bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
                 dot.className = "w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse";
                 statusTxt.innerText = "Offline";
             }
         }
 
-        // --- ฟังก์ชันหัวใจหลัก: ย้ายที่อยู่ทันที ---
-        async function handleAction(reqId, status) {
+        // --- แก้ไข: ย้ายเพลงทันที ไม่ต้องรอ Database ---
+        function handleAction(reqId, status) {
             const card = document.getElementById(`req-${reqId}`);
+            if (!card) return;
+
             const histBox = document.getElementById('history-container');
             
-            if (card) {
-                // 1. ลบปุ่มออกทันที
-                const btns = card.querySelector('.btns');
-                if(btns) btns.remove();
-                
-                // 2. ใส่ตราประทับสถานะ
-                const tag = document.createElement('div');
-                tag.className = status === 'yes' ? "text-emerald-500 font-black text-xs" : "text-red-500 font-black text-xs";
-                tag.innerText = status === 'yes' ? "PLAYED ✅" : "DECLINED ❌";
-                card.appendChild(tag);
-                
-                // 3. ปรับแต่งสไตล์ให้ดูเป็นประวัติ
-                card.classList.add('is-history');
-                
-                // 4. ย้าย Element ทั้งใบลงไปที่กล่อง History
-                histBox.prepend(card);
-                
-                // 5. ลบจาก Database (Async)
-                await sbClient.from('requests').delete().eq('id', reqId);
-                
-                // 6. เช็กว่าคิวบนว่างไหม
-                const qContainer = document.getElementById('queue-container');
-                if (qContainer.children.length === 0) {
-                    qContainer.innerHTML = '<p id="empty-msg" class="text-slate-600 italic text-center py-10 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">ไม่มีคิวเพลงใหม่...</p>';
-                }
-            }
-        }
-
-        function subscribeRequests() {
-            if (!artistId) return;
-            sbClient.channel('db-changes').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, 
-                payload => renderNewRequest(payload.new)).subscribe();
+            // 1. ลบปุ่มกดทิ้งทันที
+            const btns = card.querySelector('.btns-group');
+            if(btns) btns.remove();
+            
+            // 2. ใส่ป้ายสถานะ
+            const tag = document.createElement('div');
+            tag.className = status === 'yes' ? "text-emerald-500 font-black text-xs" : "text-red-500 font-black text-xs";
+            tag.innerText = status === 'yes' ? "PLAYED ✅" : "DECLINED ❌";
+            card.appendChild(tag);
+            
+            // 3. ย้ายที่อยู่ลงข้างล่าง
+            card.classList.add('is-history');
+            histBox.prepend(card);
+            
+            // 4. สั่งลบใน Database (ทำงานเบื้องหลัง)
+            sbClient.from('requests').delete().eq('id', reqId).then();
         }
 
         function renderNewRequest(req) {
             const container = document.getElementById('queue-container');
-            const emptyMsg = document.getElementById('empty-msg');
-            if (emptyMsg) emptyMsg.remove();
-
             const card = document.createElement('div');
             card.id = `req-${req.id}`;
             card.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center";
             card.innerHTML = `
                 <div>
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">REQ: ${req.customer_name || 'Anonymous'}</p>
+                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">REQ: ${req.customer_name || 'ไม่ระบุ'}</p>
                     <h3 class="text-lg font-black text-white leading-tight">${req.song_name}</h3>
                 </div>
-                <div class="btns flex gap-2">
+                <div class="btns-group flex gap-2">
                     <button onclick="handleAction(${req.id}, 'yes')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-xs active:scale-90">เล่นได้</button>
                     <button onclick="handleAction(${req.id}, 'no')" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs active:scale-90">ไม่ได้</button>
                 </div>
             `;
-            container.prepend(card); // ใหม่สุดอยู่บนสุด
+            container.prepend(card);
+        }
+
+        function subscribeRequests() {
+            if (!artistId) return;
+            sbClient.channel('custom-insert-channel').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, 
+                payload => renderNewRequest(payload.new)).subscribe();
         }
 
         function getLocation() {
@@ -187,7 +182,10 @@
                 });
             }
         }
-        if (artistId) { loadCurrentStatus(); subscribeRequests(); updateClock(); }
+
+        init();
+        subscribeRequests();
+        updateClock();
     </script>
 </body>
 </html>
