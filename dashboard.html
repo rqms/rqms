@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iPad Dashboard - Legacy Support</title>
+    <title>iPad Dashboard - Final Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* สไตล์ดั้งเดิมที่พี่ชอบ */
-        .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; }
-        .request-card { transition: all 0.2s ease; margin-bottom: 15px; }
-        /* ปุ่มใหญ่พิเศษสำหรับนิ้วจิ้ม */
-        .big-btn { -webkit-appearance: none; cursor: pointer; }
-        .big-btn:active { background-color: #000 !important; transform: scale(0.9); }
+        .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; pointer-events: none; }
+        .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
+        button:active { background-color: #000 !important; opacity: 0.7; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
 
     <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
         <div class="flex items-center gap-4">
-            <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
+            <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500"></div>
             <div>
                 <p class="text-[8px] uppercase text-slate-500 font-bold">Status</p>
                 <h2 id="status-text" class="text-lg font-black text-white uppercase leading-none">Offline</h2>
@@ -35,127 +32,94 @@
     </div>
 
     <div class="flex gap-2 mb-8">
-        <input type="text" id="venue-input" placeholder="ระบุชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold text-lg">
-        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 px-8 py-4 rounded-xl font-black uppercase text-white big-btn">เปิดระบบ</button>
+        <input type="text" id="venue-input" placeholder="ระบุชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold">
+        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 px-8 py-4 rounded-xl font-black text-white">เปิดระบบ</button>
     </div>
 
     <div class="mb-10">
-        <h3 class="text-emerald-400 font-bold text-xs mb-4 italic px-2">🔥 LIVE REQUESTS (NEW ON TOP)</h3>
-        <div id="queue-container">
-            </div>
+        <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2">🔥 LIVE REQUESTS</h3>
+        <div id="queue-container"></div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold text-xs mb-4 italic px-2">💾 HISTORY (MANAGED)</h3>
-        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
+        <h3 class="text-slate-500 font-bold text-[10px] mb-4 italic px-2">💾 HISTORY (PLAYED)</h3>
+        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
     <script>
-        // ใช้ชื่อตัวแปรแบบดั้งเดิม กัน Browser เก่างง
         var SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         var sb = supabase.createClient(SB_URL, SB_KEY);
-        
-        var urlParams = new URLSearchParams(window.location.search);
-        var artistId = urlParams.get('id');
+        var artistId = new URLSearchParams(window.location.search).get('id');
         var isSystemOpen = false;
 
-        // 1. นาฬิกาแบบ Standard
         setInterval(function() {
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }, 1000);
 
-        // 2. ฟังก์ชันจัดการเพลง (บังคับย้ายทันที ไม่ใช้ Arrow Function)
+        // *** จุดที่แก้: ใส่เครื่องหมายคำพูดครอบ ID เพื่อรองรับ UUID ***
         function solve(id, status) {
             var card = document.getElementById('card-' + id);
             var historyBox = document.getElementById('history-container');
-            
             if (card) {
-                // ก. ลบปุ่มทิ้งทันที
                 var btnArea = card.querySelector('.btn-area');
-                if(btnArea) { btnArea.style.display = 'none'; }
-
-                // ข. แปะป้ายสถานะ
+                if(btnArea) btnArea.remove();
+                
                 var label = document.createElement('div');
-                label.style.fontWeight = 'bold';
-                label.style.fontSize = '12px';
-                if(status === 'ok') {
-                    label.style.color = '#10b981';
-                    label.innerText = 'เล่นแล้ว ✅';
-                } else {
-                    label.style.color = '#ef4444';
-                    label.innerText = 'ไม่ได้ ❌';
-                }
+                label.className = (status === 'ok' ? "text-emerald-500" : "text-red-500") + " font-bold text-xs";
+                label.innerText = (status === 'ok' ? "เล่นแล้ว ✅" : "ไม่ได้ ❌");
                 card.appendChild(label);
 
-                // ค. ย้ายลงล่าง
-                card.className += ' is-history';
-                historyBox.insertBefore(card, historyBox.firstChild);
+                card.classList.add('is-history');
+                historyBox.prepend(card);
 
-                // ง. ลบใน DB ลับหลัง
-                sb.from('requests').delete().eq('id', id).then(function() { console.log('Deleted'); });
+                // ลบใน DB
+                sb.from('requests').delete().eq('id', id).then(function(){ console.log("Deleted", id); });
             }
         }
 
-        // 3. วาดการ์ดเพลง (ใช้การเขียน HTML แบบต่อ String ดั้งเดิม)
         function draw(req) {
             if (document.getElementById('card-' + req.id)) return;
             var container = document.getElementById('queue-container');
             var div = document.createElement('div');
             div.id = 'card-' + req.id;
-            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center";
+            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
             
-            var html = '<div>';
-            html += '<p style="font-size: 10px; color: #64748b; font-weight: bold;">จาก: ' + (req.customer_name || 'ไม่ระบุ') + '</p>';
-            html += '<h3 style="font-size: 18px; font-weight: 900; color: #fff;">' + req.song_name + '</h3>';
-            html += '</div>';
-            html += '<div class="btn-area" style="display: flex; gap: 8px;">';
-            html += '<button onclick="solve(' + req.id + ', \'ok\')" class="bg-emerald-600 text-white px-6 py-4 rounded-xl font-bold big-btn">เล่นได้</button>';
-            html += '<button onclick="solve(' + req.id + ', \'no\')" class="bg-red-600 text-white px-6 py-4 rounded-xl font-bold big-btn">ไม่ได้</button>';
-            html += '</div>';
+            // ใช้เครื่องหมายคำพูด ' ' ครอบ req.id ในฟังก์ชัน solve
+            div.innerHTML = '<div>' +
+                '<p class="text-[9px] text-slate-500 font-bold mb-1">REQ: ' + (req.customer_name || "ไม่ระบุ") + '</p>' +
+                '<h3 class="text-lg font-black text-white">' + req.song_name + '</h3>' +
+                '</div>' +
+                '<div class="btn-area flex gap-2">' +
+                '<button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold text-xs">เล่นได้</button>' +
+                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-bold text-xs">ไม่ได้</button>' +
+                '</div>';
             
-            div.innerHTML = html;
-            container.insertBefore(div, container.firstChild); // ใหม่สุดอยู่บนสุด
+            container.prepend(div);
         }
 
-        // 4. โหลดข้อมูล (กันรีเฟรชแล้วหาย)
-        function loadData() {
+        async function load() {
             if (!artistId) return;
-            // ดึงข้อมูลศิลปิน
-            sb.from('musicians').select('*').eq('id', artistId).single().then(function(res) {
-                var m = res.data;
-                if (m) {
-                    isSystemOpen = m.is_active;
-                    document.getElementById('venue-input').value = m.current_venue || "";
-                    document.getElementById('display-artist-name').innerText = m.display_name || m.name;
-                    updateUI(m.current_venue);
-                }
-            });
-            // ดึงเพลงค้างระบบ
-            sb.from('requests').select('*').eq('musician_id', artistId).then(function(res) {
-                if (res.data) {
-                    res.data.forEach(function(item) { draw(item); });
-                }
-            });
+            var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
+            if (resMusician.data) {
+                isSystemOpen = resMusician.data.is_active;
+                document.getElementById('venue-input').value = resMusician.data.current_venue || "";
+                document.getElementById('display-artist-name').innerText = resMusician.data.display_name || resMusician.data.name;
+                updateUI(resMusician.data.current_venue);
+            }
+            var resReq = await sb.from('requests').select('*').eq('musician_id', artistId);
+            if (resReq.data) { resReq.data.forEach(function(r) { draw(r); }); }
         }
 
-        // 5. ระบบ Real-time
-        sb.channel('realtime-req').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
-            function(p) { draw(p.new); }
-        ).subscribe();
+        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
+            function(p) { draw(p.new); }).subscribe();
 
-        // 6. เปิด-ปิดระบบ
-        function toggleSystem() {
+        async function toggleSystem() {
             var v = document.getElementById('venue-input').value || "ร้านประจำ";
             var next = !isSystemOpen;
-            if(!next) { 
-                document.getElementById('queue-container').innerHTML = ""; 
-                document.getElementById('history-container').innerHTML = ""; 
-            }
-            sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId).then(function(res) {
-                if (!res.error) { isSystemOpen = next; updateUI(v); }
-            });
+            if(!next) { document.getElementById('queue-container').innerHTML = ""; document.getElementById('history-container').innerHTML = ""; }
+            await sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId);
+            isSystemOpen = next; updateUI(v);
         }
 
         function updateUI(v) {
@@ -163,17 +127,17 @@
             var d = document.getElementById('status-dot');
             var s = document.getElementById('status-text');
             if (isSystemOpen) {
-                b.innerText = "ปิดระบบ"; b.style.backgroundColor = "#dc2626";
-                d.style.backgroundColor = "#10b981"; d.style.boxShadow = "0 0 10px #10b981";
+                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white px-8 py-4 rounded-xl font-black";
+                d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
                 s.innerText = "Online";
             } else {
-                b.innerText = "เปิดระบบ"; b.style.backgroundColor = "#059669";
-                d.style.backgroundColor = "#ef4444"; d.style.boxShadow = "0 0 10px #ef4444";
+                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white px-8 py-4 rounded-xl font-black";
+                d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]";
                 s.innerText = "Offline";
             }
         }
 
-        loadData();
+        load();
     </script>
 </body>
 </html>
