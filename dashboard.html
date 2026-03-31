@@ -2,21 +2,15 @@
 <html>
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPad Dashboard - RQMS Pro</title>
+    <title>iPad Dashboard - RQMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* สไตล์สำหรับประวัติเพลงที่เล่นแล้ว/ไม่ได้ */
-        .played-card { opacity: 0.5; filter: grayscale(0.8); scale: 0.95; border-left-color: #10b981 !important; }
-        .declined-card { opacity: 0.5; filter: grayscale(0.8); scale: 0.95; border-left-color: #ef4444 !important; }
-        .action-buttons button { transition: all 0.2s; }
-    </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 md:p-6 font-sans">
     
     <div id="status-bar" class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap justify-between items-center gap-4 shadow-2xl">
         <div class="flex items-center gap-4">
-            <div id="status-dot" class="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]"></div>
+            <div id="status-dot" class="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
             <div>
                 <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Status</p>
                 <h2 id="status-text" class="text-xl font-black text-white leading-none uppercase">Offline</h2>
@@ -39,84 +33,50 @@
         <div class="md:col-span-3 flex flex-col gap-2">
             <div class="flex gap-2">
                 <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน หรือกด 📍" 
-                    class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white shadow-inner">
-                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 px-6 rounded-xl border border-slate-600 text-2xl transition-all active:scale-95">📍</button>
+                    class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white">
+                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 px-6 rounded-xl border border-slate-600 text-2xl">📍</button>
             </div>
-            <div id="venue-list" class="flex flex-wrap gap-2 min-h-[30px]"></div>
+            <div id="venue-list" class="flex flex-wrap gap-2"></div>
         </div>
         <button id="system-btn" onclick="toggleSystem()" 
-            class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg transition-all active:scale-95 h-full">
+            class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg h-full transition-all active:scale-95">
             เปิดระบบ
         </button>
     </div>
 
     <div class="mb-10">
-        <div class="flex justify-between items-center mb-4 px-2">
-            <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-sm">🔥 Waiting Queue</h3>
-            <span id="queue-count" class="bg-emerald-500/10 text-emerald-500 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/20">0 เพลง</span>
-        </div>
+        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-xs mb-4 px-2 italic">🔥 New Requests (บนสุด)</h3>
         <div id="queue-container" class="space-y-4">
-            <p id="empty-msg" class="text-slate-600 italic text-center py-20 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">ยังไม่มีคิวเพลงใหม่...</p>
+            <p id="empty-msg" class="text-slate-600 italic text-center py-10 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">ไม่มีคิวเพลงใหม่...</p>
         </div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-sm mb-4 px-2 italic">💾 Tonight's History</h3>
-        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            </div>
+        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2">💾 History (เล่นแล้ว / ร้องไม่ได้)</h3>
+        <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-50 scale-95 origin-top">
+        </div>
     </div>
 
     <script>
-        // --- ส่วนเชื่อมต่อ Database (ข้อมูลเดิมของพี่) ---
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
         const artistId = new URLSearchParams(window.location.search).get('id');
         let isSystemOpen = false;
 
-        // --- ระบบเวลา ---
         function updateClock() {
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }
         setInterval(updateClock, 1000);
 
-        // --- ระบบดึงพิกัด (GPS เดิมที่พี่แก้ไว้) ---
-        function getLocation() {
-            if (navigator.geolocation) {
-                const btn = event.currentTarget; btn.innerText = "⏳";
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    try {
-                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=18`);
-                        const data = await res.json();
-                        const addr = data.address;
-                        const suggs = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.office, addr.leisure].filter(Boolean);
-                        renderVenueOptions(suggs);
-                    } catch (e) { console.error(e); }
-                    btn.innerText = "📍";
-                }, () => { alert("กรุณาอนุญาตพิกัดใน iPad ครับ"); btn.innerText = "📍"; });
-            }
-        }
-
-        function renderVenueOptions(opts) {
-            const container = document.getElementById('venue-list');
-            container.innerHTML = "";
-            opts.forEach(name => {
-                const pill = document.createElement('button');
-                pill.className = "bg-slate-800 hover:bg-emerald-600 text-[10px] px-3 py-1 rounded-full border border-slate-700 text-slate-300 transition-all";
-                pill.innerText = name;
-                pill.onclick = () => { document.getElementById('venue-input').value = name; container.innerHTML = ""; };
-                container.appendChild(pill);
-            });
-        }
-
-        // --- ระบบโหลดสถานะ และ บันทึกข้อมูลตอนปิดระบบ ---
         async function loadCurrentStatus() {
             if (!artistId) return;
             const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
             if (data) {
                 isSystemOpen = data.is_active;
                 document.getElementById('venue-input').value = data.current_venue || "";
-                document.getElementById('display-artist-name').innerText = data.display_name || "ยังไม่ได้ตั้งชื่อ";
+                // ดึงจาก display_name ให้ตรงกับตารางในรูปของพี่
+                document.getElementById('display-artist-name').innerText = data.display_name || data.name || "ศิลปิน";
                 updateUI(data.current_venue);
             }
         }
@@ -125,16 +85,14 @@
             const venue = document.getElementById('venue-input').value || "ร้านประจำ";
             const newStatus = !isSystemOpen;
             
-            // บันทึกเข้า Supabase ทันทีที่กดปุ่ม
-            const { error } = await sbClient.from('musicians').update({ 
-                is_active: newStatus, 
-                current_venue: venue 
-            }).eq('id', artistId);
-
-            if (!error) { 
-                isSystemOpen = newStatus; 
-                updateUI(venue);
+            // เมื่อปิดระบบ: ล้างคิวเพลงบนหน้าจอ iPad ทั้งหมด
+            if (!newStatus) {
+                document.getElementById('queue-container').innerHTML = '<p class="text-slate-600 italic text-center py-10">ปิดระบบเรียบร้อย...</p>';
+                document.getElementById('history-container').innerHTML = '';
             }
+
+            const { error } = await sbClient.from('musicians').update({ is_active: newStatus, current_venue: venue }).eq('id', artistId);
+            if (!error) { isSystemOpen = newStatus; updateUI(venue); }
         }
 
         function updateUI(venue) {
@@ -154,73 +112,68 @@
             }
         }
 
-        // --- ระบบจัดการเพลง (History & Queue) ---
-        async function setSongStatus(reqId, status) {
+        // --- ระบบย้ายเพลงลง History ---
+        async function setSongStatus(reqId, status, songName, customerName) {
             const card = document.getElementById(`req-${reqId}`);
-            const historyContainer = document.getElementById('history-container');
+            if(card) card.remove();
+
+            const histContainer = document.getElementById('history-container');
+            const histItem = document.createElement('div');
+            histItem.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center";
             
-            // 1. ลบปุ่มออก และเปลี่ยน Tag สถานะ
-            card.querySelector('.action-buttons').remove();
-            const tag = card.querySelector('.status-tag');
+            const badge = status === 'yes' ? '<span class="text-emerald-500 text-[10px] font-bold">✅ เล่นแล้ว</span>' : '<span class="text-red-500 text-[10px] font-bold">❌ ไม่ได้</span>';
+
+            histItem.innerHTML = `<div><p class="text-white font-bold text-sm leading-tight">${songName}</p><p class="text-[9px] text-slate-500">${customerName}</p></div>${badge}`;
             
-            if (status === 'yes') {
-                card.classList.add('played-card');
-                tag.innerHTML = "✅ เล่นแล้ว";
-                tag.className = "status-tag text-[9px] bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20";
-            } else {
-                card.classList.add('declined-card');
-                tag.innerHTML = "❌ เล่นไม่ได้";
-                tag.className = "status-tag text-[9px] bg-red-900/30 text-red-400 px-2 py-0.5 rounded border border-red-500/20";
-            }
-            
-            // 2. ย้ายลงไปประวัติด้านล่าง (Prepend ให้ล่าสุดอยู่หน้า)
-            historyContainer.prepend(card);
-            
-            // 3. ลบคิวออกจากคิวหลักใน Database เพื่อให้ระบบขอเพลงทำงานต่อได้
-            await sbClient.from('requests').delete().eq('id', reqId);
-            
-            updateQueueCount();
+            histContainer.prepend(histItem); // ย้ายลงไปด้านล่าง
+            await sbClient.from('requests').delete().eq('id', reqId); // ลบคิวออกจาก Database
         }
 
         function subscribeRequests() {
             if (!artistId) return;
-            // ดึงเพลงค้างเก่า
-            sbClient.from('requests').select('*').eq('musician_id', artistId).order('created_at', { ascending: true })
-                .then(({ data }) => { if (data) data.forEach(req => renderNewRequest(req)); });
-            
-            // ดักเพลงใหม่แบบ Real-time
             sbClient.channel('db-changes').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, 
                 payload => renderNewRequest(payload.new)).subscribe();
         }
 
         function renderNewRequest(req) {
             const container = document.getElementById('queue-container');
-            const emptyMsg = document.getElementById('empty-msg');
+            const emptyMsg = container.querySelector('#empty-msg');
             if (emptyMsg) emptyMsg.remove();
 
             const card = document.createElement('div');
             card.id = `req-${req.id}`;
-            card.className = "bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-2xl shadow-xl flex justify-between items-center animate-in slide-in-from-top duration-500";
+            card.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center animate-in slide-in-from-top duration-300";
             card.innerHTML = `
                 <div>
-                    <div class="flex gap-2 items-center mb-1">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">จาก: ${req.customer_name || 'ไม่ระบุ'}</p>
-                        <span class="status-tag text-[9px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 border border-slate-700">คิวใหม่</span>
-                    </div>
-                    <h3 class="text-2xl font-black text-white leading-tight">${req.song_name}</h3>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">จาก: ${req.customer_name || 'ไม่ระบุ'}</p>
+                    <h3 class="text-xl font-bold text-white">${req.song_name}</h3>
                 </div>
-                <div class="action-buttons flex gap-2">
-                    <button onclick="setSongStatus(${req.id}, 'yes')" class="bg-emerald-600/10 text-emerald-500 border border-emerald-500/30 px-6 py-2 rounded-xl font-black hover:bg-emerald-600 hover:text-white transition-all text-sm">เล่นได้ ✅</button>
-                    <button onclick="setSongStatus(${req.id}, 'no')" class="bg-red-600/10 text-red-500 border border-red-500/30 px-6 py-2 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all text-sm">ไม่ได้ ❌</button>
+                <div class="flex gap-2">
+                    <button onclick="setSongStatus(${req.id}, 'yes', '${req.song_name}', '${req.customer_name}')" class="bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 px-4 py-2 rounded-lg font-bold text-xs hover:bg-emerald-600">เล่นได้ ✅</button>
+                    <button onclick="setSongStatus(${req.id}, 'no', '${req.song_name}', '${req.customer_name}')" class="bg-red-600/20 text-red-500 border border-red-500/30 px-4 py-2 rounded-lg font-bold text-xs hover:bg-red-600">ไม่ได้ ❌</button>
                 </div>
             `;
-            container.prepend(card);
-            updateQueueCount();
+            container.prepend(card); // เพลงใหม่เด้งขึ้นบนสุด
         }
 
-        function updateQueueCount() {
-            const count = document.getElementById('queue-container').querySelectorAll('.bg-slate-900').length;
-            document.getElementById('queue-count').innerText = `${count} เพลง`;
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=18`);
+                    const data = await res.json();
+                    const addr = data.address;
+                    const suggs = [addr.amenity, addr.building, addr.shop, addr.tourism].filter(Boolean);
+                    const container = document.getElementById('venue-list');
+                    container.innerHTML = "";
+                    suggs.forEach(name => {
+                        const pill = document.createElement('button');
+                        pill.className = "bg-slate-800 text-[10px] px-3 py-1 rounded-full border border-slate-700 text-slate-300";
+                        pill.innerText = name;
+                        pill.onclick = () => { document.getElementById('venue-input').value = name; container.innerHTML = ""; };
+                        container.appendChild(pill);
+                    });
+                });
+            }
         }
 
         if (artistId) { loadCurrentStatus(); subscribeRequests(); updateClock(); }
