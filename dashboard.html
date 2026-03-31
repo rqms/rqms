@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPad Dashboard - Pro</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iPad Dashboard - Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .is-history { opacity: 0.4; filter: grayscale(1); transform: scale(0.95); border-left-color: #475569 !important; pointer-events: none; }
-        .request-card { transition: all 0.2s ease; }
+        .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.95); border-left-color: #475569 !important; pointer-events: none; }
+        button:active { transform: scale(0.9); transition: 0.1s; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 md:p-6 font-sans">
@@ -36,156 +36,165 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
         <div class="md:col-span-3 flex flex-col gap-2">
             <div class="flex gap-2">
-                <input type="text" id="venue-input" placeholder="ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white">
-                <button onclick="getLocation()" class="bg-slate-800 hover:bg-slate-700 px-6 rounded-xl border border-slate-600 text-2xl">📍</button>
+                <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl outline-none focus:border-emerald-500 flex-1 text-lg font-bold text-white">
+                <button onclick="getLocation()" class="bg-slate-800 px-6 rounded-xl border border-slate-600 text-2xl">📍</button>
             </div>
             <div id="venue-list" class="flex flex-wrap gap-1"></div>
         </div>
-        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg h-full active:scale-95 transition-all">เปิดระบบ</button>
+        <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl uppercase shadow-lg">เปิดระบบ</button>
     </div>
 
     <div class="mb-10">
-        <h3 class="text-emerald-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">🔥 New Requests (ใหม่สุดอยู่บน)</h3>
-        <div id="queue-container" class="space-y-4 min-h-[100px]">
+        <h3 class="text-emerald-400 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">🔥 LIVE REQUESTS</h3>
+        <div id="queue-container" class="space-y-4">
             </div>
     </div>
 
     <div class="border-t border-slate-800 pt-10 pb-20">
-        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">💾 History (คืนนี้จัดการแล้ว)</h3>
+        <h3 class="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] mb-4 px-2 italic">💾 HISTORY (TONIGHT)</h3>
         <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             </div>
     </div>
 
     <script>
+        // 1. ตั้งค่าพื้นฐาน
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-        const sbClient = supabase.createClient(SB_URL, SB_KEY);
-        const artistId = new URLSearchParams(window.location.search).get('id');
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+        const urlParams = new URLSearchParams(window.location.search);
+        const artistId = urlParams.get('id');
         let isSystemOpen = false;
 
-        function updateClock() {
+        // 2. นาฬิกา
+        setInterval(() => {
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
-        }
-        setInterval(updateClock, 1000);
+        }, 1000);
 
-        async function init() {
+        // 3. ฟังก์ชันหลัก: ย้ายเพลงทันทีเมื่อกด
+        async function solveRequest(id, status) {
+            console.log("กำลังจัดการเพลง ID:", id); // เช็กใน Log
+            const card = document.getElementById('card-' + id);
+            const historyBox = document.getElementById('history-container');
+
+            if (card) {
+                // ย้ายทันทีบนหน้าจอ (UI First)
+                const actionBtns = card.querySelector('.action-btns');
+                if (actionBtns) actionBtns.remove(); // ลบปุ่มทิ้ง
+
+                const statusTag = document.createElement('div');
+                statusTag.className = status === 'ok' ? 'text-emerald-500 font-bold text-xs' : 'text-red-500 font-bold text-xs';
+                statusTag.innerText = status === 'ok' ? 'เล่นแล้ว ✅' : 'ร้องไม่ได้ ❌';
+                card.appendChild(statusTag);
+
+                card.classList.add('is-history');
+                historyBox.prepend(card); // ย้ายลงล่าง
+
+                // ลบใน Database ลับหลัง
+                await sb.from('requests').delete().eq('id', id);
+            }
+        }
+
+        // 4. แสดงผลการ์ดเพลง
+        function drawCard(req) {
+            const container = document.getElementById('queue-container');
+            // เช็กว่ามีการ์ดเดิมอยู่ไหม ถ้ามีไม่ต้องวาดซ้ำ
+            if (document.getElementById('card-' + req.id)) return;
+
+            const div = document.createElement('div');
+            div.id = 'card-' + req.id;
+            div.className = "bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
+            div.innerHTML = `
+                <div>
+                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">จาก: ${req.customer_name || 'ไม่ระบุ'}</p>
+                    <h3 class="text-lg font-black text-white leading-tight">${req.song_name}</h3>
+                </div>
+                <div class="action-btns flex gap-2">
+                    <button onclick="solveRequest(${req.id}, 'ok')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-xs">เล่นได้</button>
+                    <button onclick="solveRequest(${req.id}, 'no')" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs">ไม่ได้</button>
+                </div>
+            `;
+            container.prepend(div); // เพลงใหม่เด้งขึ้นบนสุด
+        }
+
+        // 5. โหลดข้อมูลเมื่อเปิดหน้าจอ (แก้ปัญหารีเฟรชแล้วหาย)
+        async function loadData() {
             if (!artistId) return;
-            // 1. โหลดข้อมูลวง
-            const { data: musician } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+            
+            // โหลดสถานะวง
+            const { data: musician } = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (musician) {
                 isSystemOpen = musician.is_active;
                 document.getElementById('venue-input').value = musician.current_venue || "";
-                document.getElementById('display-artist-name').innerText = musician.display_name || musician.name || "ศิลปิน";
+                document.getElementById('display-artist-name').innerText = musician.display_name || musician.name;
                 updateUI(musician.current_venue);
             }
-            // 2. โหลดเพลงที่ค้างอยู่ในระบบ (แก้ปัญหารีเฟรชแล้วหาย)
-            const { data: requests } = await sbClient.from('requests').select('*').eq('musician_id', artistId).order('created_at', { ascending: false });
+
+            // โหลดเพลงที่ค้างอยู่
+            const { data: requests } = await sb.from('requests').select('*').eq('musician_id', artistId).order('created_at', { ascending: true });
             if (requests) {
-                const container = document.getElementById('queue-container');
-                container.innerHTML = "";
-                requests.forEach(req => renderNewRequest(req));
+                requests.forEach(r => drawCard(r));
             }
         }
 
+        // 6. ระบบ Real-time
+        function startListen() {
+            sb.channel('any').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
+                payload => drawCard(payload.new)
+            ).subscribe();
+        }
+
+        // 7. เปิด-ปิดระบบ
         async function toggleSystem() {
-            const venue = document.getElementById('venue-input').value || "ร้านประจำ";
-            const newStatus = !isSystemOpen;
-            if (!newStatus) {
+            const v = document.getElementById('venue-input').value || "ร้านประจำ";
+            const next = !isSystemOpen;
+            if (!next) {
                 document.getElementById('queue-container').innerHTML = "";
                 document.getElementById('history-container').innerHTML = "";
             }
-            const { error } = await sbClient.from('musicians').update({ is_active: newStatus, current_venue: venue }).eq('id', artistId);
-            if (!error) { isSystemOpen = newStatus; updateUI(venue); }
+            const { error } = await sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId);
+            if (!error) { isSystemOpen = next; updateUI(v); }
         }
 
-        function updateUI(venue) {
-            const btn = document.getElementById('system-btn');
-            const dot = document.getElementById('status-dot');
-            const statusTxt = document.getElementById('status-text');
-            document.getElementById('display-venue').innerText = venue || "---";
+        function updateUI(v) {
+            const b = document.getElementById('system-btn');
+            const d = document.getElementById('status-dot');
+            const s = document.getElementById('status-text');
+            document.getElementById('display-venue').innerText = v || "---";
             if (isSystemOpen) {
-                btn.innerText = "ปิดระบบ"; btn.className = "bg-red-600 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
-                dot.className = "w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]";
-                statusTxt.innerText = "Online";
+                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white px-8 py-4 rounded-xl font-black text-2xl w-full shadow-lg";
+                d.className = "w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]";
+                s.innerText = "Online";
             } else {
-                btn.innerText = "เปิดระบบ"; btn.className = "bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl shadow-lg w-full transition-all";
-                dot.className = "w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse";
-                statusTxt.innerText = "Offline";
+                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white px-8 py-4 rounded-xl font-black text-2xl w-full shadow-lg";
+                d.className = "w-4 h-4 rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse";
+                s.innerText = "Offline";
             }
         }
 
-        // --- แก้ไข: ย้ายเพลงทันที ไม่ต้องรอ Database ---
-        function handleAction(reqId, status) {
-            const card = document.getElementById(`req-${reqId}`);
-            if (!card) return;
-
-            const histBox = document.getElementById('history-container');
-            
-            // 1. ลบปุ่มกดทิ้งทันที
-            const btns = card.querySelector('.btns-group');
-            if(btns) btns.remove();
-            
-            // 2. ใส่ป้ายสถานะ
-            const tag = document.createElement('div');
-            tag.className = status === 'yes' ? "text-emerald-500 font-black text-xs" : "text-red-500 font-black text-xs";
-            tag.innerText = status === 'yes' ? "PLAYED ✅" : "DECLINED ❌";
-            card.appendChild(tag);
-            
-            // 3. ย้ายที่อยู่ลงข้างล่าง
-            card.classList.add('is-history');
-            histBox.prepend(card);
-            
-            // 4. สั่งลบใน Database (ทำงานเบื้องหลัง)
-            sbClient.from('requests').delete().eq('id', reqId).then();
-        }
-
-        function renderNewRequest(req) {
-            const container = document.getElementById('queue-container');
-            const card = document.createElement('div');
-            card.id = `req-${req.id}`;
-            card.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl shadow-lg flex justify-between items-center";
-            card.innerHTML = `
-                <div>
-                    <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">REQ: ${req.customer_name || 'ไม่ระบุ'}</p>
-                    <h3 class="text-lg font-black text-white leading-tight">${req.song_name}</h3>
-                </div>
-                <div class="btns-group flex gap-2">
-                    <button onclick="handleAction(${req.id}, 'yes')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-xs active:scale-90">เล่นได้</button>
-                    <button onclick="handleAction(${req.id}, 'no')" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs active:scale-90">ไม่ได้</button>
-                </div>
-            `;
-            container.prepend(card);
-        }
-
-        function subscribeRequests() {
-            if (!artistId) return;
-            sbClient.channel('custom-insert-channel').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: `musician_id=eq.${artistId}` }, 
-                payload => renderNewRequest(payload.new)).subscribe();
-        }
-
+        // GPS
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=18`);
+                navigator.geolocation.getCurrentPosition(async (p) => {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${p.coords.latitude}&lon=${p.coords.longitude}`);
                     const data = await res.json();
                     const addr = data.address;
-                    const suggs = [addr.amenity, addr.building, addr.shop, addr.tourism].filter(Boolean);
-                    const container = document.getElementById('venue-list');
-                    container.innerHTML = "";
-                    suggs.forEach(name => {
-                        const pill = document.createElement('button');
-                        pill.className = "bg-slate-800 text-[10px] px-2 py-1 rounded-full border border-slate-700 text-slate-400";
-                        pill.innerText = name;
-                        pill.onclick = () => { document.getElementById('venue-input').value = name; container.innerHTML = ""; };
-                        container.appendChild(pill);
+                    const items = [addr.amenity, addr.building, addr.shop, addr.tourism].filter(Boolean);
+                    const list = document.getElementById('venue-list');
+                    list.innerHTML = "";
+                    items.forEach(i => {
+                        const btn = document.createElement('button');
+                        btn.className = "bg-slate-800 text-[10px] px-2 py-1 rounded-full text-slate-400";
+                        btn.innerText = i;
+                        btn.onclick = () => { document.getElementById('venue-input').value = i; list.innerHTML = ""; };
+                        list.appendChild(btn);
                     });
                 });
             }
         }
 
-        init();
-        subscribeRequests();
-        updateClock();
+        // เริ่มทำงาน
+        loadData();
+        startListen();
     </script>
 </body>
 </html>
