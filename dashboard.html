@@ -156,12 +156,31 @@
             }
         }
 
-        function logout() {
-            if(confirm("ต้องการ Logout ใช่ไหมครับ?")) {
-                localStorage.removeItem('access_' + artistId);
-                location.reload();
-            }
+        // --- ฟังก์ชัน Logout แบบถามก่อน (Smart Logout) ---
+async function logout() {
+    // 1. เช็คว่าถ้าระบบ "เปิดใช้งาน (Online)" อยู่
+    if (isSystemOpen) {
+        const confirmClose = confirm("🎸 พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบขอเพลง + Logout (จบโชว์)\nกด [ยกเลิก] = Logout อย่างเดียว (ระบบยังรันต่อ)");
+        
+        if (confirmClose) {
+            // กรณีเลือกปิดระบบด้วย (Update DB ก่อนออก)
+            await sb.from('musicians').update({ is_active: false }).eq('id', artistId);
+            executeLogout();
+            return;
         }
+    }
+    
+    // 2. ถ้าระบบปิดอยู่แล้ว หรือเลือกแค่ Logout อย่างเดียว
+    if (confirm("ยืนยันการออกจากระบบ (Logout) ใช่ไหมครับ?")) {
+        executeLogout();
+    }
+}
+
+// ฟังก์ชันล้างค่าในเครื่องและ Reload
+function executeLogout() {
+    localStorage.removeItem('access_' + artistId);
+    location.reload();
+}
 
         // --- 📍 ฟังก์ชัน GPS (ของเดิมที่พี่เน้นย้ำ) ---
         function getLocation() {
