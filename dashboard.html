@@ -62,12 +62,12 @@
         }, 1000);
 
         // --- ฟังก์ชัน GPS แบบเน้นความชัวร์ ---
-        function getLocation() {
+                function getLocation() {
             var listContainer = document.getElementById('venue-list');
-            listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
+            listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาพิกัดร้าน...</p>";
 
             if (!navigator.geolocation) {
-                alert("iPad ของพี่ไม่รองรับ GPS บน Browser นี้ครับ");
+                alert("iPad ไม่รองรับ GPS ครับ");
                 return;
             }
 
@@ -75,26 +75,36 @@
                 var lat = pos.coords.latitude;
                 var lon = pos.coords.longitude;
                 
-                // ใช้ API แผนที่ (ระบุ Zoom และ Address Details)
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                // ปรับ Zoom เป็น 17 เพื่อให้รัศมีกว้างขึ้นนิดนึง จะได้ไม่หลุดจากตัวอาคาร
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=17&addressdetails=1';
                 
-                fetch(url)
+                fetch(url, { headers: { 'Accept-Language': 'th' } }) // ดึงชื่อภาษาไทย
                 .then(function(res) { return res.json(); })
                 .then(function(data) {
                     var addr = data.address;
-                    // รวมชื่อสถานที่ที่เป็นไปได้ทั้งหมด
+                    // รวมชื่อสถานที่ (เน้นธุรกิจก่อน)
                     var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
                     
-                    listContainer.innerHTML = ""; // ล้างตัวโหลดออก
+                    // --- ส่วนที่เพิ่ม: แผนสำรองถ้าไม่เจอชื่อร้าน ---
+                    if (names.length === 0) {
+                        // ถ้าไม่เจอชื่อร้าน ให้เอาชื่อ ถนน, ซอย, หรือ ตำบล มาโชว์แทน
+                        var backup = [addr.road, addr.suburb, addr.neighbourhood].filter(Boolean);
+                        names = backup;
+                    }
+
+                    listContainer.innerHTML = "";
                     
                     if (names.length === 0) {
-                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้านในพิกัดนี้ ลองพิมพ์ชื่อเองนะครับ</p>";
+                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อสถานที่ ลองพิมพ์ชื่อร้านเองนะครับ</p>";
                         return;
                     }
 
-                    names.forEach(function(name) {
+                    // ลบชื่อซ้ำ (ถ้ามี)
+                    var uniqueNames = [...new Set(names)];
+
+                    uniqueNames.forEach(function(name) {
                         var pill = document.createElement('button');
-                        pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold";
+                        pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold mb-1 mr-1";
                         pill.innerText = name;
                         pill.onclick = function() {
                             document.getElementById('venue-input').value = name;
@@ -104,24 +114,12 @@
                     });
                 })
                 .catch(function(err) {
-                    alert("ไม่สามารถดึงข้อมูลแผนที่ได้: " + err);
-                    listContainer.innerHTML = "";
+                    listContainer.innerHTML = "<p class='text-[10px] text-red-400'>เชื่อมต่อแผนที่ไม่ได้</p>";
                 });
             }, function(error) {
-                // แจ้งเตือนถ้า iPad ปฏิเสธ GPS
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert("พี่ต้องกด 'อนุญาต' (Allow) ให้เข้าถึงตำแหน่งใน Safari/Chrome ก่อนครับ");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert("ไม่พบข้อมูลตำแหน่ง (ลองขยับไปใกล้หน้าต่างดูครับ)");
-                        break;
-                    case error.TIMEOUT:
-                        alert("ขอข้อมูลตำแหน่งนานเกินไป ลองกดใหม่อีกครั้งครับ");
-                        break;
-                }
+                alert("กรุณาเปิด GPS และอนุญาตให้เข้าถึงตำแหน่งครับ");
                 listContainer.innerHTML = "";
-            }, { enableHighAccuracy: true, timeout: 5000 });
+            }, { enableHighAccuracy: true, timeout: 7000 });
         }
 
         // --- ส่วนจัดการเพลงและสถิติ ---
