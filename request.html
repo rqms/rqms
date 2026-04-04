@@ -191,16 +191,31 @@
             btn.disabled = false; btn.innerText = "ส่งเพลงขอ 🚀";
         }
 
-        function copyPromptPay() { navigator.clipboard.writeText(currentPromptPay); alert("คัดลอกเลขพร้อมเพย์แล้ว!"); }
-        function showQR() {
-            if (!currentPromptPay) {
-                alert("นักดนตรีคนนี้ยังไม่ได้กรอกเบอร์พร้อมเพย์ครับ!");
-                return;
-            }
-            // ใช้ API ของ promptpay.io เพื่อสร้าง QR Code สดๆ
-            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`;
-            document.getElementById('qr-modal').classList.remove('hidden');
-        }
+        // 1. ฟังก์ชันแสดง QR Code (แบบกันพัง)
+function showQR() {
+    // เช็คก่อนว่ามีเลขพร้อมเพย์หลุดมาถึงหน้าเครื่องลูกค้าหรือยัง
+    if (!currentPromptPay || currentPromptPay.trim() === "") {
+        alert("⚠️ นักดนตรียังไม่ได้ตั้งค่าการรับเงิน (PromptPay) ครับ");
+        return;
+    }
+    
+    const qrImg = document.getElementById('promptpay-qr');
+    // ใช้ API สร้าง QR Code สดๆ โดยใส่เลขพร้อมเพย์เข้าไป
+    qrImg.src = `https://promptpay.io/${currentPromptPay.trim()}.png`;
+    
+    // แสดง Modal ขึ้นมา
+    document.getElementById('qr-modal').classList.remove('hidden');
+}
+
+// 2. ฟังก์ชันคัดลอกเลข (แบบกันพัง)
+function copyPromptPay() {
+    if (!currentPromptPay || currentPromptPay.trim() === "") {
+        alert("⚠️ ยังไม่มีเลขพร้อมเพย์ให้คัดลอกครับ");
+        return;
+    }
+    navigator.clipboard.writeText(currentPromptPay.trim());
+    alert("✅ คัดลอกเลขพร้อมเพย์ " + currentPromptPay + " แล้วครับ!");
+}
 
         setInterval(checkStatus, 10000);
         checkStatus();
