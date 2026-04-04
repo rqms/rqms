@@ -24,7 +24,7 @@
             <button onclick="checkPin()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">
                 ยืนยันรหัสผ่าน
             </button>
-            <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้อง</p>
+            <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้องครับพี่แขก</p>
         </div>
     </div>
 
@@ -116,12 +116,25 @@
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }, 1000);
 
-        // --- ระบบความปลอดภัย ---
+        // --- ระบบความปลอดภัย (ปรับปรุงใหม่เพื่อรองรับ Admin QR) ---
         async function initAuth() {
             if (!artistId) return alert("ไม่พบ ID ศิลปิน");
+            
+            // ดักจับรหัสลับจาก URL (กรณีสแกนจาก QR Admin)
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoAuth = urlParams.get('auth');
+
             const { data } = await sb.from('musicians').select('pin').eq('id', artistId).single();
             if (data) {
                 masterPin = data.pin;
+                
+                // ถ้ามีรหัสลับมากับ URL และตรงกับรหัสจริง ให้ปล่อยผ่านและจำเครื่องไว้
+                if (autoAuth && atob(autoAuth) === masterPin) {
+                    localStorage.setItem('access_' + artistId, 'true');
+                    // ล้างรหัสลับออกจาก URL เพื่อความปลอดภัย
+                    window.history.replaceState({}, document.title, window.location.pathname + "?id=" + artistId);
+                }
+
                 if (localStorage.getItem('access_' + artistId) === 'true') {
                     document.getElementById('lock-screen').classList.add('hidden');
                     load();
@@ -150,7 +163,7 @@
             }
         }
 
-        // --- 📍 ฟังก์ชัน GPS (ยกมาจากโค้ดเดิมของพี่) ---
+        // --- 📍 ฟังก์ชัน GPS (ของเดิมที่พี่เน้นย้ำ) ---
         function getLocation() {
             var listContainer = document.getElementById('venue-list');
             listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
@@ -196,7 +209,7 @@
             }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
-        // --- ระบบจัดการคิวและสถานะ ---
+        // --- ระบบจัดการคิวและสถานะ (คงเดิม) ---
         async function load() {
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (resMusician.data) {
@@ -259,11 +272,9 @@
             }
         }
 
-        // --- Real-time Listen ---
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
             function(p) { draw(p.new); }).subscribe();
 
-        // --- Settings Modal ---
         async function openEditModal() {
             const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (data) {
