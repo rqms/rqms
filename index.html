@@ -15,10 +15,11 @@
             <input type="text" id="pay" placeholder="PromptPay (เบอร์โทร/เลขบัตร)" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white">
             
             <div class="relative">
-                <input type="password" id="pin" maxlength="6" inputmode="numeric" placeholder="ตั้งรหัส PIN 6 หลัก (สำหรับเข้า Dashboard)" 
-                       class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white tracking-[0.3em]">
-                <p class="text-[10px] text-slate-500 mt-1">* จำรหัสนี้ไว้เพื่อเข้าหน้าคิวเพลงใน iPad นะครับ</p>
-            </div>
+    <input type="password" id="pin" maxlength="6" inputmode="numeric" 
+           placeholder="ตั้งรหัส PIN 6 หลัก (เลข 6 ตัว)" 
+           class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white text-center text-lg shadow-inner">
+    <p class="text-[10px] text-slate-500 mt-1 text-center">* รหัสนี้ใช้เข้าหน้าควบคุมคิวเพลงใน iPad/tablet</p>
+</div>
 
             <button onclick="registerNow()" id="btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all">สร้างระบบและรับ QR Code</button>
         </div>
