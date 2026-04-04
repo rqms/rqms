@@ -192,7 +192,15 @@
         }
 
         function copyPromptPay() { navigator.clipboard.writeText(currentPromptPay); alert("คัดลอกเลขพร้อมเพย์แล้ว!"); }
-        function showQR() { document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`; document.getElementById('qr-modal').classList.remove('hidden'); }
+        function showQR() {
+            if (!currentPromptPay) {
+                alert("นักดนตรีคนนี้ยังไม่ได้กรอกเบอร์พร้อมเพย์ครับ!");
+                return;
+            }
+            // ใช้ API ของ promptpay.io เพื่อสร้าง QR Code สดๆ
+            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`;
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
 
         setInterval(checkStatus, 10000);
         checkStatus();
