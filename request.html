@@ -6,87 +6,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-[#020617] text-white min-h-screen p-4 font-sans">
+<body class="bg-[#020617] text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-md mx-auto space-y-4">
-        
-        <div id="top-banner" class="hidden rounded-2xl overflow-hidden border border-slate-800 shadow-lg">
-            <a id="banner-link" href="#">
-                <img id="banner-img" src="https://via.placeholder.com/400x100?text=พื้นที่โฆษณา+ติดต่อ+Admin" class="w-full object-cover">
-            </a>
+    <div class="max-w-md w-full space-y-4">
+        <div id="loading-screen" class="text-center p-10 glass-card rounded-[2.5rem]">
+            <div id="spinner" class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 id="status-title" class="text-2xl font-black text-emerald-400 mb-2 uppercase">RQMS</h2>
+            <p id="status-desc" class="text-slate-400 text-sm">กำลังตรวจสอบสถานะการแสดง...</p>
         </div>
 
-        <div class="glass-card rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden">
-            <div id="loading-screen" class="text-center py-10">
-                <div class="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p class="text-slate-400 animate-pulse uppercase tracking-widest text-xs">Waiting for Stage...</p>
-            </div>
-
-            <div id="request-form" class="hidden space-y-5">
-                <div class="text-center space-y-2">
-                    <img id="artist-img" src="" class="w-20 h-20 rounded-full mx-auto border-2 border-emerald-500 p-1 object-cover bg-slate-800">
-                    <h2 id="artist-name" class="text-2xl font-black text-white leading-none">---</h2>
-                    <div class="inline-flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-                        <span id="venue-name" class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">LIVE NOW</span>
-                    </div>
+        <div id="request-form" class="hidden glass-card rounded-[2.5rem] p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-3">
+                <img id="artist-img" src="" class="w-20 h-20 rounded-full mx-auto border-2 border-emerald-500 p-1 object-cover bg-slate-800">
+                <div>
+                    <h2 id="artist-display-name" class="text-2xl font-black text-white">---</h2>
+                    <p id="venue-display-name" class="text-emerald-400 font-bold text-xs uppercase tracking-widest mt-1">---</p>
                 </div>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="text" id="song" placeholder="ชื่อเพลง / ศิลปิน" class="w-full p-4 bg-slate-900 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white font-bold">
+                <input type="text" id="user" placeholder="จากคุณ..." class="w-full p-4 bg-slate-900 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white text-sm">
                 
-                <div class="space-y-3">
-                    <input type="text" id="song" placeholder="ชื่อเพลงที่อยากฟัง..." class="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white placeholder:text-slate-600 font-bold">
-                    <input type="text" id="user" placeholder="จากคุณ (ใส่ชื่อเล่นได้ครับ)" class="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white placeholder:text-slate-600 text-sm">
-                    <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg transition-all shadow-lg shadow-emerald-900/40 active:scale-95">
-                        ส่งคำขอเพลง 🚀
+                <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-all">
+                    ส่งเพลงขอ 🚀
+                </button>
+            </div>
+
+            <div id="tip-area" class="hidden pt-6 border-t border-slate-800 text-center">
+                <p class="text-[10px] text-slate-500 mb-3 uppercase font-bold italic">Support Artist</p>
+                <div class="flex gap-2">
+                    <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
+                        📋 คัดลอกเลขพร้อมเพย์
                     </button>
-                </div>
-
-                <div id="tip-section" class="hidden pt-4 border-t border-slate-800">
-                    <p class="text-[10px] text-center text-slate-500 mb-3 uppercase tracking-tighter italic">Support Artist & Get Song Faster</p>
-                    <div class="flex gap-2">
-                        <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 border border-slate-700">
-                            <span class="text-lg">🏦</span>
-                            <div class="text-left">
-                                <p class="text-[8px] text-slate-500 leading-none">PromptPay</p>
-                                <p id="tip-number" class="text-xs font-bold text-slate-300 leading-none mt-1">---</p>
-                            </div>
-                        </button>
-                        <button onclick="showQR()" class="w-14 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center text-xl hover:bg-amber-500/30 transition-all">📸</button>
-                    </div>
+                    <button onclick="showQR()" class="bg-amber-600/20 border border-amber-600/50 p-3 rounded-xl text-lg">📸</button>
                 </div>
             </div>
         </div>
-
-        <div class="glass-card rounded-3xl p-4 flex items-center gap-4 border-dashed border-slate-700">
-            <div class="w-16 h-16 bg-white rounded-xl flex-shrink-0 flex items-center justify-center p-2">
-                <img id="aff-img" src="https://via.placeholder.com/100" class="object-contain">
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-[10px] text-emerald-400 font-bold uppercase">Item Recommended</p>
-                <h4 id="aff-title" class="text-sm font-bold text-white truncate">ไอเทมที่นักดนตรีเลือกใช้</h4>
-                <a id="aff-link" href="#" target="_blank" class="text-[10px] text-slate-400 underline">ดูรายละเอียด/เช็คราคาที่ Shopee/Lazada</a>
-            </div>
-            <div class="text-right">
-                <a id="aff-buy-btn" href="#" target="_blank" class="bg-orange-600 px-3 py-2 rounded-lg text-[10px] font-black uppercase">ซื้อเลย</a>
-            </div>
-        </div>
-
-        <div id="footer-ads" class="text-center py-4 opacity-50 grayscale hover:grayscale-0 transition-all">
-            <p class="text-[8px] text-slate-600">Sponsored Ads</p>
-        </div>
-
     </div>
 
-    <div id="qr-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-8 backdrop-blur-md">
-        <div class="bg-white p-6 rounded-[2rem] text-center max-w-xs w-full">
-            <p class="text-slate-900 font-black mb-4">SCAN TO TIP 💸</p>
-            <img id="promptpay-qr" src="" class="w-full mb-4">
-            <p id="qr-artist-name" class="text-slate-500 text-xs font-bold uppercase"></p>
-            <p class="text-[10px] text-slate-400 mt-2 italic">แตะเพื่อปิด</p>
+    <div id="qr-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-8">
+        <div class="bg-white p-6 rounded-3xl text-center max-w-xs w-full">
+            <img id="promptpay-qr" src="" class="w-full mb-2">
+            <p class="text-slate-900 font-black text-sm uppercase">Scan to Tip</p>
+            <p class="text-slate-400 text-[10px] mt-1">แตะเพื่อปิด</p>
         </div>
     </div>
 
@@ -100,85 +67,94 @@
 
         async function checkStatus() {
             if(!artistId) return;
-            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
 
-            if (data && data.is_active) {
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('request-form').classList.remove('hidden');
-                
-                // อัปเดตข้อมูลนักดนตรี
-                document.getElementById('artist-name').innerText = data.display_name;
-                document.getElementById('venue-name').innerText = data.current_venue || "LIVE NOW";
-                
-                // ดึงรูปโปรไฟล์ (DiceBear ถ้าไม่มีรูป)
-                document.getElementById('artist-img').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+            const { data, error } = await sbClient
+                .from('musicians')
+                .select('*')
+                .eq('id', artistId)
+                .single();
 
-                // ระบบ Tip
-                if(data.promptpay) {
+            const loadingScreen = document.getElementById('loading-screen');
+            const requestForm = document.getElementById('request-form');
+
+            // 1. ตรวจสอบว่าระบบ "เปิด" อยู่หรือไม่
+            if (data && data.is_active === true) {
+                loadingScreen.classList.add('hidden');
+                requestForm.classList.remove('hidden');
+                
+                // อัปเดตชื่อศิลปินและร้าน
+                document.getElementById('artist-display-name').innerText = data.display_name;
+                document.getElementById('venue-display-name').innerText = data.current_venue || "กำลังแสดงสด";
+
+                // 2. จัดการเรื่องรูป Profile (ดึงจาก social_contact)
+                updateProfilePic(data.display_name, data.social_contact);
+
+                // 3. จัดการเรื่อง Tip
+                if (data.promptpay) {
                     currentPromptPay = data.promptpay;
-                    document.getElementById('tip-number').innerText = data.promptpay;
-                    document.getElementById('tip-section').classList.remove('hidden');
+                    document.getElementById('tip-area').classList.remove('hidden');
+                } else {
+                    document.getElementById('tip-area').classList.add('hidden');
                 }
-
-                // ดึงข้อมูล Affiliate & Ads (พี่แขกแก้ข้อมูลใน DB ตารางใหม่ชื่อ 'settings' หรือใส่ Hardcode ตรงนี้)
-                loadAffiliate();
-                loadAds();
+            } else {
+                // ถ้าปิดระบบ (is_active เป็น false หรือหา data ไม่เจอ)
+                loadingScreen.classList.remove('hidden');
+                requestForm.classList.add('hidden');
+                document.getElementById('spinner').classList.add('hidden');
+                document.getElementById('status-title').innerText = "CLOSED";
+                document.getElementById('status-desc').innerText = "ขณะนี้ศิลปินยังไม่เปิดรับคำขอเพลงครับ";
             }
         }
 
-        // --- ระบบ Tip ---
-        function copyPromptPay() {
-            navigator.clipboard.writeText(currentPromptPay);
-            alert("คัดลอกเลขพร้อมเพย์แล้วครับพี่ ขอบคุณที่สนับสนุนศิลปินครับ! 🙏");
-        }
-
-        function showQR() {
-            const qrUrl = `https://promptpay.io/${currentPromptPay}.png`;
-            document.getElementById('promptpay-qr').src = qrUrl;
-            document.getElementById('qr-artist-name').innerText = document.getElementById('artist-name').innerText;
-            document.getElementById('qr-modal').classList.remove('hidden');
-        }
-
-        // --- ระบบ Affiliate & Ads (จัดการโดยพี่แขก) ---
-        function loadAffiliate() {
-            // พี่สามารถเปลี่ยน Link ตรงนี้เป็น Affiliate ID ของพี่ได้เลย
-            const myAffID = "KAEN_SHOP"; 
-            const items = [
-                { title: "ไมค์ร้องเพลงเสียงใส", img: "https://m.media-amazon.com/images/I/61S-B7NfS6L.jpg", link: `https://shope.ee/example?aff_id=${myAffID}` },
-                { title: "สายกีตาร์ Elixir ทนทาน", img: "https://m.media-amazon.com/images/I/71P4r1T4OBL._AC_SL1500_.jpg", link: `https://shope.ee/example2?aff_id=${myAffID}` }
-            ];
-            const pick = items[Math.floor(Math.random() * items.length)];
-            document.getElementById('aff-title').innerText = pick.title;
-            document.getElementById('aff-img').src = pick.img;
-            document.getElementById('aff-link').href = pick.link;
-            document.getElementById('aff-buy-btn').href = pick.link;
-        }
-
-        function loadAds() {
-            // ดึง Banner จาก Supabase (ถ้าพี่มีตารางโฆษณา)
-            // หรือใส่รูปโฆษณาร้านที่พี่ไปรับจ้างมา
-            const topBanner = document.getElementById('top-banner');
-            topBanner.classList.remove('hidden');
+        function updateProfilePic(name, social) {
+            const imgTag = document.getElementById('artist-img');
+            // ถ้ามีคำว่า facebook ในช่องโซเชียล ให้ดึงรูปจาก FB
+            if (social && social.includes('facebook.com/')) {
+                try {
+                    const parts = social.split('facebook.com/')[1].split('/')[0].split('?')[0];
+                    imgTag.src = `https://graph.facebook.com/${parts}/picture?type=large`;
+                } catch(e) {
+                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+                }
+            } else {
+                // ถ้าไม่มีโซเชียล ให้ใช้ตัวการ์ตูน DiceBear กันรูปพัง
+                imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+            }
         }
 
         async function sendSong() {
             const song = document.getElementById('song').value;
             const user = document.getElementById('user').value;
-            if(!song) return alert("ใส่ชื่อเพลงด้วยครับพี่!");
+            if(!song) return alert("ใส่ชื่อเพลงด้วยครับ!");
 
             const btn = document.getElementById('send-btn');
-            btn.disabled = true; btn.innerText = "กำลังส่งเพลง...";
+            btn.disabled = true;
+            btn.innerText = "กำลังส่ง...";
 
-            const { error } = await sbClient.from('requests').insert([{ musician_id: artistId, song_name: song, customer_name: user }]);
+            const { error } = await sbClient
+                .from('requests')
+                .insert([{ musician_id: artistId, song_name: song, customer_name: user }]);
 
             if(!error) {
-                alert("ส่งเพลงแล้ว! ระหว่างรอ... แวะดูสินค้าแนะนำด้านล่างได้นะครับ 🙏");
+                alert("ส่งเพลงแล้ว! รอฟังนะครับ 🎸");
                 document.getElementById('song').value = "";
             }
-            btn.disabled = false; btn.innerText = "ส่งคำขอเพลง 🚀";
+            btn.disabled = false;
+            btn.innerText = "ส่งเพลงขอ 🚀";
         }
 
-        setInterval(checkStatus, 10000);
+        function copyPromptPay() {
+            navigator.clipboard.writeText(currentPromptPay);
+            alert("คัดลอกเลขพร้อมเพย์แล้วครับ!");
+        }
+
+        function showQR() {
+            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`;
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        // เช็คสถานะทุก 5 วินาที
+        setInterval(checkStatus, 5000);
         checkStatus();
     </script>
 </body>
