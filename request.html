@@ -8,52 +8,70 @@
     <style>
         .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .hidden { display: none !important; }
+        /* สไตล์สำหรับรายการค้นหาเพลง */
+        #song-results { max-height: 200px; overflow-y: auto; z-index: 50; }
+        .song-item:hover { background-color: #059669; }
     </style>
 </head>
-<body class="bg-[#020617] text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-[#020617] text-white min-h-screen p-4 font-sans flex flex-col items-center">
 
     <div class="max-w-md w-full space-y-4">
-        <div id="loading-screen" class="text-center p-10 glass-card rounded-[2.5rem]">
-            <div id="spinner" class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h2 id="status-title" class="text-2xl font-black text-emerald-400 mb-2 uppercase">RQMS</h2>
-            <p id="status-desc" class="text-slate-400 text-sm">กำลังตรวจสอบสถานะการแสดง...</p>
+        <div id="top-ads" class="rounded-2xl overflow-hidden border border-slate-800 shadow-lg bg-slate-900">
+            <img src="https://via.placeholder.com/400x100?text=พื้นที่โฆษณา+ติดต่อ+Admin" class="w-full object-cover opacity-80">
         </div>
 
-        <div id="request-form" class="hidden glass-card rounded-[2.5rem] p-8 shadow-2xl space-y-6">
+        <div id="loading-screen" class="text-center p-10 glass-card rounded-[2.5rem]">
+            <div id="spinner" class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 id="status-title" class="text-2xl font-black text-emerald-400 mb-2">RQMS</h2>
+            <p id="status-desc" class="text-slate-400 text-sm italic">กำลังรอสัญญาณจากเวที...</p>
+        </div>
+
+        <div id="request-form" class="hidden glass-card rounded-[2.5rem] p-8 shadow-2xl space-y-6 relative">
             <div class="text-center space-y-3">
                 <img id="artist-img" src="" class="w-20 h-20 rounded-full mx-auto border-2 border-emerald-500 p-1 object-cover bg-slate-800">
-                <div>
-                    <h2 id="artist-display-name" class="text-2xl font-black text-white">---</h2>
-                    <p id="venue-display-name" class="text-emerald-400 font-bold text-xs uppercase tracking-widest mt-1">---</p>
-                </div>
+                <h2 id="artist-display-name" class="text-2xl font-black text-white leading-none">---</h2>
+                <p id="venue-display-name" class="text-emerald-400 font-bold text-[10px] uppercase tracking-widest mt-2">LIVE NOW</p>
             </div>
             
-            <div class="space-y-4">
-                <input type="text" id="song" placeholder="ชื่อเพลง / ศิลปิน" class="w-full p-4 bg-slate-900 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white font-bold">
-                <input type="text" id="user" placeholder="จากคุณ..." class="w-full p-4 bg-slate-900 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white text-sm">
+            <div class="space-y-4 relative">
+                <div class="relative">
+                    <input type="text" id="song" oninput="searchMusic(this.value)" placeholder="🔍 พิมพ์ชื่อเพลงหรือศิลปิน..." autocomplete="off" class="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white font-bold">
+                    <div id="song-results" class="hidden absolute left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50"></div>
+                </div>
+
+                <input type="text" id="user" placeholder="จากคุณ..." class="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white text-sm">
                 
-                <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg shadow-lg active:scale-95 transition-all">
+                <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg shadow-emerald-900/40">
                     ส่งเพลงขอ 🚀
                 </button>
             </div>
 
             <div id="tip-area" class="hidden pt-6 border-t border-slate-800 text-center">
-                <p class="text-[10px] text-slate-500 mb-3 uppercase font-bold italic">Support Artist</p>
+                <p class="text-[9px] text-slate-500 mb-3 uppercase font-black italic">Support Artist</p>
                 <div class="flex gap-2">
-                    <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-xs font-bold text-slate-300">
-                        📋 คัดลอกเลขพร้อมเพย์
-                    </button>
-                    <button onclick="showQR()" class="bg-amber-600/20 border border-amber-600/50 p-3 rounded-xl text-lg">📸</button>
+                    <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300">📋 คัดลอกเลขพร้อมเพย์</button>
+                    <button onclick="showQR()" class="bg-amber-600/20 border border-amber-500/50 p-3 rounded-xl text-xl">📸</button>
                 </div>
             </div>
         </div>
+
+        <div id="affiliate-card" class="glass-card rounded-3xl p-4 flex items-center gap-4 border-dashed border-slate-700">
+            <div class="w-14 h-14 bg-white rounded-xl flex-shrink-0 flex items-center justify-center p-1">
+                <img id="aff-img" src="" class="object-contain w-full h-full">
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[9px] text-orange-400 font-bold uppercase">Item Recommended</p>
+                <h4 id="aff-title" class="text-xs font-bold text-white truncate italic">---</h4>
+                <a id="aff-link" href="#" target="_blank" class="text-[9px] text-slate-500 underline">เช็คราคาที่ Shopee/Lazada</a>
+            </div>
+            <a id="aff-buy-btn" href="#" target="_blank" class="bg-orange-600 px-3 py-2 rounded-lg text-[10px] font-black uppercase">ซื้อ</a>
+        </div>
     </div>
 
-    <div id="qr-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center p-8">
-        <div class="bg-white p-6 rounded-3xl text-center max-w-xs w-full">
-            <img id="promptpay-qr" src="" class="w-full mb-2">
-            <p class="text-slate-900 font-black text-sm uppercase">Scan to Tip</p>
-            <p class="text-slate-400 text-[10px] mt-1">แตะเพื่อปิด</p>
+    <div id="qr-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 z-[100] bg-black/95 hidden flex items-center justify-center p-8 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-[2.5rem] text-center max-w-xs w-full">
+            <img id="promptpay-qr" src="" class="w-full mb-3 rounded-xl">
+            <p class="text-slate-900 font-black text-sm uppercase italic">Scan to Support</p>
         </div>
     </div>
 
@@ -62,99 +80,113 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
         const artistId = new URLSearchParams(window.location.search).get('id');
-
         let currentPromptPay = "";
 
+        // --- 1. ระบบค้นหาเพลง (iTunes API) ---
+        async function searchMusic(query) {
+            const resultsDiv = document.getElementById('song-results');
+            if (query.length < 2) { resultsDiv.classList.add('hidden'); return; }
+
+            try {
+                const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&country=th`);
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = '';
+                if (data.results.length > 0) {
+                    data.results.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'song-item p-3 border-b border-slate-700 cursor-pointer flex items-center gap-3 transition-colors';
+                        div.innerHTML = `
+                            <img src="${item.artworkUrl30}" class="rounded">
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-white">${item.trackName}</p>
+                                <p class="text-[10px] text-slate-400">${item.artistName}</p>
+                            </div>
+                        `;
+                        div.onclick = () => {
+                            document.getElementById('song').value = `${item.trackName} - ${item.artistName}`;
+                            resultsDiv.classList.add('hidden');
+                            loadSmartAffiliate(item.trackName); // สุ่มสินค้าตามชื่อเพลงที่เลือก
+                        };
+                        resultsDiv.appendChild(div);
+                    });
+                    resultsDiv.classList.remove('hidden');
+                }
+            } catch (e) { console.error("Search error", e); }
+        }
+
+        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ ---
         async function checkStatus() {
             if(!artistId) return;
-
-            const { data, error } = await sbClient
-                .from('musicians')
-                .select('*')
-                .eq('id', artistId)
-                .single();
-
+            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
             const loadingScreen = document.getElementById('loading-screen');
             const requestForm = document.getElementById('request-form');
 
-            // 1. ตรวจสอบว่าระบบ "เปิด" อยู่หรือไม่
-            if (data && data.is_active === true) {
+            if (data && data.is_active) {
                 loadingScreen.classList.add('hidden');
                 requestForm.classList.remove('hidden');
-                
-                // อัปเดตชื่อศิลปินและร้าน
                 document.getElementById('artist-display-name').innerText = data.display_name;
-                document.getElementById('venue-display-name').innerText = data.current_venue || "กำลังแสดงสด";
+                document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
+                
+                // รูป Profile (Stable Version)
+                const imgTag = document.getElementById('artist-img');
+                const social = data.social_contact || "";
+                if (social.includes('facebook.com/')) {
+                    const fbUser = social.split('facebook.com/')[1].split('/')[0].split('?')[0];
+                    imgTag.src = `https://graph.facebook.com/${fbUser}/picture?type=large`;
+                } else {
+                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+                }
 
-                // 2. จัดการเรื่องรูป Profile (ดึงจาก social_contact)
-                updateProfilePic(data.display_name, data.social_contact);
-
-                // 3. จัดการเรื่อง Tip
                 if (data.promptpay) {
                     currentPromptPay = data.promptpay;
                     document.getElementById('tip-area').classList.remove('hidden');
-                } else {
-                    document.getElementById('tip-area').classList.add('hidden');
                 }
+                loadSmartAffiliate(""); // โหลดสินค้าเริ่มต้น
             } else {
-                // ถ้าปิดระบบ (is_active เป็น false หรือหา data ไม่เจอ)
                 loadingScreen.classList.remove('hidden');
                 requestForm.classList.add('hidden');
-                document.getElementById('spinner').classList.add('hidden');
-                document.getElementById('status-title').innerText = "CLOSED";
-                document.getElementById('status-desc').innerText = "ขณะนี้ศิลปินยังไม่เปิดรับคำขอเพลงครับ";
             }
         }
 
-        function updateProfilePic(name, social) {
-            const imgTag = document.getElementById('artist-img');
-            // ถ้ามีคำว่า facebook ในช่องโซเชียล ให้ดึงรูปจาก FB
-            if (social && social.includes('facebook.com/')) {
-                try {
-                    const parts = social.split('facebook.com/')[1].split('/')[0].split('?')[0];
-                    imgTag.src = `https://graph.facebook.com/${parts}/picture?type=large`;
-                } catch(e) {
-                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
-                }
-            } else {
-                // ถ้าไม่มีโซเชียล ให้ใช้ตัวการ์ตูน DiceBear กันรูปพัง
-                imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+        // --- 3. ระบบ Smart Affiliate (Random ตามชื่อเพลง) ---
+        function loadSmartAffiliate(songName) {
+            const affId = "KAEN_SHOP";
+            const song = songName.toLowerCase();
+            let items = [
+                { title: "สายกีตาร์ Elixir ทนทาน", img: "https://m.media-amazon.com/images/I/71P4r1T4OBL._AC_SL1500_.jpg", link: `https://shope.ee/ex1?aff_id=${affId}` },
+                { title: "พาวเวอร์แบงค์ พกกลับบ้าน", img: "https://m.media-amazon.com/images/I/61-mS5N-06L._AC_SL1500_.jpg", link: `https://shope.ee/ex2?aff_id=${affId}` }
+            ];
+
+            // Logic วิเคราะห์ชื่อเพลง
+            if (song.includes("เศร้า") || song.includes("เลิก") || song.includes("อกหัก")) {
+                items = [{ title: "ทิชชู่ซับน้ำตา (เกรดพรีเมียม)", img: "https://m.media-amazon.com/images/I/71X8Xh7jF7L._AC_SL1500_.jpg", link: `...` }];
+            } else if (song.includes("เมา") || song.includes("เหล้า") || song.includes("เบียร์")) {
+                items = [{ title: "วิตามินแก้แฮงค์ (ตื่นมาไม่มึน)", img: "https://m.media-amazon.com/images/I/61N+V3qU7uL._AC_SL1000_.jpg", link: `...` }];
             }
+
+            const pick = items[Math.floor(Math.random() * items.length)];
+            document.getElementById('aff-title').innerText = pick.title;
+            document.getElementById('aff-img').src = pick.img;
+            document.getElementById('aff-link').href = pick.link;
+            document.getElementById('aff-buy-btn').href = pick.link;
         }
 
         async function sendSong() {
             const song = document.getElementById('song').value;
             const user = document.getElementById('user').value;
-            if(!song) return alert("ใส่ชื่อเพลงด้วยครับ!");
-
+            if(!song) return alert("เลือกเพลงก่อนครับพี่!");
             const btn = document.getElementById('send-btn');
-            btn.disabled = true;
-            btn.innerText = "กำลังส่ง...";
-
-            const { error } = await sbClient
-                .from('requests')
-                .insert([{ musician_id: artistId, song_name: song, customer_name: user }]);
-
-            if(!error) {
-                alert("ส่งเพลงแล้ว! รอฟังนะครับ 🎸");
-                document.getElementById('song').value = "";
-            }
-            btn.disabled = false;
-            btn.innerText = "ส่งเพลงขอ 🚀";
+            btn.disabled = true; btn.innerText = "ส่งแล้ว...";
+            const { error } = await sbClient.from('requests').insert([{ musician_id: artistId, song_name: song, customer_name: user }]);
+            if(!error) { alert("ส่งเพลงสำเร็จ! ขอบคุณครับ"); document.getElementById('song').value = ""; }
+            btn.disabled = false; btn.innerText = "ส่งเพลงขอ 🚀";
         }
 
-        function copyPromptPay() {
-            navigator.clipboard.writeText(currentPromptPay);
-            alert("คัดลอกเลขพร้อมเพย์แล้วครับ!");
-        }
+        function copyPromptPay() { navigator.clipboard.writeText(currentPromptPay); alert("คัดลอกเลขพร้อมเพย์แล้ว!"); }
+        function showQR() { document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`; document.getElementById('qr-modal').classList.remove('hidden'); }
 
-        function showQR() {
-            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`;
-            document.getElementById('qr-modal').classList.remove('hidden');
-        }
-
-        // เช็คสถานะทุก 5 วินาที
-        setInterval(checkStatus, 5000);
+        setInterval(checkStatus, 10000);
         checkStatus();
     </script>
 </body>
