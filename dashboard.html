@@ -62,49 +62,48 @@
         }, 1000);
 
         // --- ฟังก์ชัน GPS แบบเน้นความชัวร์ ---
-                function getLocation() {
-    var listContainer = document.getElementById('venue-list');
-    listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังค้นหาตำแหน่ง...</p>";
-
-    if (!navigator.geolocation) {
-        alert("iPad ไม่รองรับ GPS ครับ");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(function(pos) {
-        var lat = pos.coords.latitude;
-        var lon = pos.coords.longitude;
-        
-        // ใช้ Zoom 16 เพื่อให้ครอบคลุมรัศมีรอบตัวพี่มากขึ้น
-        var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=16&addressdetails=1';
-        
-        fetch(url, { headers: { 'Accept-Language': 'th' } })
+                        fetch(url, { headers: { 'Accept-Language': 'th' } })
         .then(function(res) { return res.json(); })
         .then(function(data) {
             listContainer.innerHTML = "";
             var results = [];
 
-            // 1. ดึงจากที่อยู่ละเอียด (เหมือนเดิมแต่เพิ่มฟิลด์)
+            // 1. ดึงชื่อหลักที่ API สรุปมาให้ (อันนี้แม่นสุด)
+            if (data.name) results.push(data.name);
+
+            // 2. ขุดจาก Address ทุกหมวดที่น่าจะเป็น "ชื่อสถานที่"
             if (data.address) {
                 var a = data.address;
-                var raw = [a.amenity, a.building, a.shop, a.office, a.leisure, a.restaurant, a.cafe, a.bar, a.road, a.suburb];
-                results = raw.filter(Boolean);
+                // รวมฮิตชื่อสถานที่: ร้านอาหาร, ผับ, บาร์, อาคาร, ร้านค้า, จุดท่องเที่ยว, สาธารณสุข
+                var poiFields = [
+                    a.amenity, a.restaurant, a.cafe, a.bar, a.pub, a.fast_food, a.food_court, 
+                    a.building, a.house_name, a.office, a.shop, a.supermarket,
+                    a.tourism, a.hotel, a.hostel, a.guest_house, a.attraction, a.museum,
+                    a.healthcare, a.hospital, a.clinic, a.pharmacy, // เผื่อพี่แคนอยู่ที่ทำงาน
+                    a.government, a.police, a.place_of_worship, a.temple
+                ];
+                
+                poiFields.forEach(function(val) {
+                    if (val && results.indexOf(val) === -1) results.push(val);
+                });
             }
 
-            // 2. แผนสำรอง: ถ้าข้างบนว่าง ให้เอาชื่อเต็ม (display_name) มาตัดแบ่ง
-            if (results.length === 0 && data.display_name) {
-                // ตัดเอา 3 ส่วนแรกของที่อยู่ (ส่วนใหญ่จะเป็น ชื่อสถานที่, ซอย, ถนน)
-                var parts = data.display_name.split(',').slice(0, 3);
-                results = parts.map(function(s) { return s.trim(); });
+            // 3. ถ้าผลลัพธ์ยังน้อยไป ให้เอาชื่อเต็ม (display_name) มาตัดเอา 2 ส่วนแรกมาเป็นตัวเลือก
+            if (results.length < 2 && data.display_name) {
+                var parts = data.display_name.split(',');
+                if(parts[0]) results.push(parts[0].trim());
+                if(parts[1]) results.push(parts[1].trim());
             }
 
-            if (results.length === 0) {
-                listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อสถานที่ในพิกัดนี้</p>";
+            // แสดงผลเป็นปุ่ม (คัดชื่อซ้ำและตัดช่องว่าง)
+            var finalButtons = [...new Set(results)].filter(Boolean);
+            
+            if (finalButtons.length === 0) {
+                listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อสถานที่ใกล้เคียง</p>";
                 return;
             }
 
-            // แสดงผลเป็นปุ่ม
-            [...new Set(results)].forEach(function(name) {
+            finalButtons.forEach(function(name) {
                 var pill = document.createElement('button');
                 pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold mb-1 mr-1";
                 pill.innerText = name;
@@ -115,14 +114,6 @@
                 listContainer.appendChild(pill);
             });
         })
-        .catch(function(err) {
-            listContainer.innerHTML = "<p class='text-[10px] text-red-400'>ขออภัย ระบบแผนที่ขัดข้อง</p>";
-        });
-    }, function(error) {
-        alert("กรุณาเปิด 'ตำแหน่งที่ตั้ง' ในการตั้งค่า iPad ด้วยครับ");
-        listContainer.innerHTML = "";
-    }, { enableHighAccuracy: true, timeout: 8000 });
-}
 
         // --- ส่วนจัดการเพลงและสถิติ ---
         function solve(id, status) {
