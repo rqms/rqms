@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RQMS Dashboard - Secured</title>
+    <title>RQMS Dashboard - Secured & GPS Active</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,7 +24,7 @@
             <button onclick="checkPin()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">
                 ยืนยันรหัสผ่าน
             </button>
-            <p id="pin-error" class="text-red-500 text-sm hidden">❌ รหัสผ่านไม่ถูกต้องครับพี่</p>
+            <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้องครับพี่แขก</p>
         </div>
     </div>
 
@@ -37,17 +37,19 @@
                     <h2 id="status-text" class="text-lg font-black text-white uppercase leading-none">Offline</h2>
                 </div>
             </div>
-            <div class="border-l border-slate-800 pl-4 flex items-center gap-3 text-right">
-                <div>
+            <div class="border-l border-slate-800 pl-4 flex items-center gap-3">
+                <div class="text-right">
                     <p class="text-[8px] uppercase text-slate-500 font-bold">Artist</p>
                     <h2 id="display-artist-name" class="text-lg font-black text-emerald-500 leading-none">---</h2>
                 </div>
                 <button onclick="openEditModal()" class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-sm hover:bg-slate-700">⚙️</button>
             </div>
+            <div class="text-right ml-auto">
+                <h2 id="display-time" class="text-2xl font-mono font-black text-emerald-500 leading-none">00:00:00</h2>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-2 mb-8 text-right">
-            <h2 id="display-time" class="text-4xl font-mono font-black text-emerald-500 mb-2">00:00:00</h2>
+        <div class="grid grid-cols-1 gap-2 mb-8">
             <div class="flex gap-2">
                 <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold text-lg outline-none focus:border-emerald-500">
                 <button onclick="getLocation()" class="bg-slate-800 px-6 rounded-xl border border-slate-600 text-2xl big-btn">📍</button>
@@ -69,25 +71,29 @@
         <button onclick="logout()" class="text-slate-600 text-[10px] uppercase font-bold w-full py-8 hover:text-red-400">🚪 ออกจากระบบ (Logout)</button>
     </div>
 
-    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 font-sans">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl">
             <h2 class="text-xl font-black text-white uppercase mb-6">Settings</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 text-left">
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ชื่อศิลปิน/วง</label>
-                    <input type="text" id="edit_display_name" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none">
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ชื่อวง</label>
+                    <input type="text" id="edit_display_name" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="text-[10px] text-emerald-500 font-bold mb-1 block">💸 พร้อมเพย์รับทิป (เบอร์โทร/เลขบัตร)</label>
-                    <input type="text" id="edit_promptpay" placeholder="เช่น 0812345678" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold text-lg">
+                    <label class="text-[10px] text-emerald-500 font-bold mb-1 block">💸 PromptPay รับทิป</label>
+                    <input type="text" id="edit_promptpay" placeholder="เบอร์โทร / เลขบัตร" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold text-lg">
                 </div>
                 <div>
                     <label class="text-[10px] text-slate-500 font-bold mb-1 block">แนวเพลง</label>
-                    <input type="text" id="edit_genres" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none">
+                    <input type="text" id="edit_genres" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">โซเชียลติดต่อ</label>
+                    <input type="text" id="edit_social" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
                 </div>
                 <div>
                     <label class="text-[10px] text-slate-500 font-bold mb-1 block">เพลงแนะนำ</label>
-                    <textarea id="edit_songs" rows="3" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none"></textarea>
+                    <textarea id="edit_songs" rows="3" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500"></textarea>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3 mt-8">
@@ -103,18 +109,20 @@
         var sb = supabase.createClient(SB_URL, SB_KEY);
         var artistId = new URLSearchParams(window.location.search).get('id');
         var isSystemOpen = false;
-        var masterPin = ""; // เก็บ PIN จาก DB ไว้เช็ค
+        var masterPin = "";
 
-        // --- 🔒 ระบบตรวจสอบความปลอดภัย ---
+        // --- ระบบเวลา ---
+        setInterval(function() {
+            document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
+        }, 1000);
+
+        // --- ระบบความปลอดภัย ---
         async function initAuth() {
             if (!artistId) return alert("ไม่พบ ID ศิลปิน");
-            
-            const { data } = await sb.from('musicians').select('pin, display_name').eq('id', artistId).single();
+            const { data } = await sb.from('musicians').select('pin').eq('id', artistId).single();
             if (data) {
                 masterPin = data.pin;
-                // เช็คว่าเครื่องนี้เคย Login ไว้หรือยัง
-                const savedAccess = localStorage.getItem('access_' + artistId);
-                if (savedAccess === 'true') {
+                if (localStorage.getItem('access_' + artistId) === 'true') {
                     document.getElementById('lock-screen').classList.add('hidden');
                     load();
                 } else {
@@ -136,17 +144,59 @@
         }
 
         function logout() {
-            if(confirm("ต้องการออกจากระบบและให้ถามรหัสผ่านใหม่ใช่ไหมครับ?")) {
+            if(confirm("ต้องการ Logout ใช่ไหมครับ?")) {
                 localStorage.removeItem('access_' + artistId);
                 location.reload();
             }
         }
 
-        // --- ระบบเดิมที่คงไว้ ---
-        setInterval(function() {
-            document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
-        }, 1000);
+        // --- 📍 ฟังก์ชัน GPS (ยกมาจากโค้ดเดิมของพี่) ---
+        function getLocation() {
+            var listContainer = document.getElementById('venue-list');
+            listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
 
+            if (!navigator.geolocation) {
+                alert("iPad ไม่รองรับ GPS ครับ");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var lat = pos.coords.latitude;
+                var lon = pos.coords.longitude;
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                
+                fetch(url)
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    var addr = data.address;
+                    var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
+                    listContainer.innerHTML = "";
+                    if (names.length === 0) {
+                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้าน ลองพิมพ์เองนะครับ</p>";
+                        return;
+                    }
+                    names.forEach(function(name) {
+                        var pill = document.createElement('button');
+                        pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold";
+                        pill.innerText = name;
+                        pill.onclick = function() {
+                            document.getElementById('venue-input').value = name;
+                            listContainer.innerHTML = "";
+                        };
+                        listContainer.appendChild(pill);
+                    });
+                })
+                .catch(function(err) {
+                    alert("ดึงข้อมูลแผนที่ไม่ได้: " + err);
+                    listContainer.innerHTML = "";
+                });
+            }, function(error) {
+                alert("กรุณาเปิด GPS และกดยอมรับการเข้าถึงตำแหน่งครับ");
+                listContainer.innerHTML = "";
+            }, { enableHighAccuracy: true, timeout: 5000 });
+        }
+
+        // --- ระบบจัดการคิวและสถานะ ---
         async function load() {
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (resMusician.data) {
@@ -159,45 +209,6 @@
             if (resReq.data) { resReq.data.forEach(function(r) { draw(r); }); }
         }
 
-        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
-            function(p) { draw(p.new); }).subscribe();
-
-        // (คงฟังก์ชัน getLocation, toggleSystem, draw, solve, updateUI เหมือนเดิม)
-        function getLocation() { /* โค้ดเดิมของพี่ */ } 
-        // [เนื่องจากโค้ดเดิมยาว ผมขอย่อไว้ แต่พี่ใช้โค้ดเดิมที่พี่มีได้เลยครับ]
-        
-        async function openEditModal() {
-            const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
-            if (data) {
-                document.getElementById('edit_display_name').value = data.display_name || "";
-                document.getElementById('edit_genres').value = data.genres || "";
-                document.getElementById('edit_promptpay').value = data.promptpay || ""; // ดึงพร้อมเพย์
-                document.getElementById('edit_songs').value = data.recommended_songs || "";
-                document.getElementById('editProfileModal').classList.remove('hidden');
-            }
-        }
-
-        async function saveProfile() {
-            const updates = {
-                display_name: document.getElementById('edit_display_name').value,
-                genres: document.getElementById('edit_genres').value,
-                promptpay: document.getElementById('edit_promptpay').value, // บันทึกพร้อมเพย์
-                recommended_songs: document.getElementById('edit_songs').value
-            };
-            const { error } = await sb.from('musicians').update(updates).eq('id', artistId);
-            if (!error) {
-                alert("บันทึกข้อมูลเรียบร้อย!");
-                document.getElementById('display-artist-name').innerText = updates.display_name;
-                document.getElementById('editProfileModal').classList.add('hidden');
-            }
-        }
-
-        // เริ่มระบบความปลอดภัย
-        initAuth();
-    </script>
-    
-    <script>
-        // ก๊อปปี้ฟังก์ชันที่เหลือมาวางตรงนี้เพื่อให้ทำงานได้
         async function toggleSystem() {
             var v = document.getElementById('venue-input').value || "ร้านประจำ";
             var next = !isSystemOpen;
@@ -236,7 +247,8 @@
         function solve(id, status) {
             var card = document.getElementById('card-' + id);
             if (card) {
-                card.querySelector('.btn-area').remove();
+                var btnArea = card.querySelector('.btn-area');
+                if(btnArea) btnArea.remove();
                 var label = document.createElement('div');
                 label.className = (status === 'ok' ? "text-emerald-500" : "text-red-500") + " font-black text-[10px] mt-1";
                 label.innerText = (status === 'ok' ? "PLAYED ✅" : "DECLINED ❌");
@@ -246,7 +258,41 @@
                 sb.from('requests').update({ status: (status === 'ok' ? 'played' : 'declined') }).eq('id', id).then(function(){});
             }
         }
-        // พี่ก๊อปฟังก์ชัน getLocation เดิมของพี่มาใส่ตรงนี้ได้เลยนะครับ!
+
+        // --- Real-time Listen ---
+        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
+            function(p) { draw(p.new); }).subscribe();
+
+        // --- Settings Modal ---
+        async function openEditModal() {
+            const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
+            if (data) {
+                document.getElementById('edit_display_name').value = data.display_name || "";
+                document.getElementById('edit_genres').value = data.genres || "";
+                document.getElementById('edit_social').value = data.social_contact || "";
+                document.getElementById('edit_promptpay').value = data.promptpay || "";
+                document.getElementById('edit_songs').value = data.recommended_songs || "";
+                document.getElementById('editProfileModal').classList.remove('hidden');
+            }
+        }
+
+        async function saveProfile() {
+            const updates = {
+                display_name: document.getElementById('edit_display_name').value,
+                genres: document.getElementById('edit_genres').value,
+                social_contact: document.getElementById('edit_social').value,
+                promptpay: document.getElementById('edit_promptpay').value,
+                recommended_songs: document.getElementById('edit_songs').value
+            };
+            const { error } = await sb.from('musicians').update(updates).eq('id', artistId);
+            if (!error) {
+                alert("บันทึกสำเร็จ!");
+                document.getElementById('display-artist-name').innerText = updates.display_name;
+                document.getElementById('editProfileModal').classList.add('hidden');
+            }
+        }
+
+        initAuth();
     </script>
 </body>
 </html>
