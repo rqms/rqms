@@ -1,126 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RQMS - Artist Setup</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0 text-sm">
+    <title>RQMS - Artist Setup (Dual QR)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* ตกแต่งเล็กน้อยให้ช่อง PIN ดูเป็นระเบียบ */
-        input::placeholder {
-            text-align: center;
-            letter-spacing: normal;
-        }
-    </style>
 </head>
 <body class="bg-[#0f172a] text-white min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-[#1e293b] rounded-3xl p-8 border border-slate-700 shadow-2xl">
         <h1 class="text-3xl font-black text-emerald-400 text-center mb-8">RQMS 🎸</h1>
         
         <div id="setup-form" class="space-y-4">
-            <div>
-                <label class="text-xs text-slate-400 ml-2 mb-1 block">ชื่อวงหรือชื่อศิลปิน</label>
-                <input type="text" id="name" placeholder="ระบุชื่อศิลปิน / วงดนตรี" 
-                       class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white transition-all">
-            </div>
-
-            <div>
-                <label class="text-xs text-slate-400 ml-2 mb-1 block">รหัส PIN สำหรับเข้าควบคุมระบบ</label>
-                <input type="password" id="pin" maxlength="6" inputmode="numeric" 
-                       placeholder="ตั้งรหัส PIN 6 หลัก (เลข 6 ตัว)" 
-                       class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white text-center text-lg font-mono tracking-widest transition-all">
-                <p class="text-[10px] text-slate-500 mt-2 text-center">* สำคัญ: ใช้สำหรับเข้าหน้า Dashboard ใน iPad/tablet เพื่อจัดการคิวเพลง</p>
-            </div>
-
-            <button onclick="registerNow()" id="btn" 
-                    class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all mt-4 shadow-lg active:scale-95">
-                สร้างระบบและรับ QR Code
-            </button>
+            <input type="text" id="name" placeholder="ชื่อศิลปิน / วงดนตรี" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white">
+            <input type="password" id="pin" maxlength="6" inputmode="numeric" placeholder="ตั้ง PIN 6 หลัก" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-600 outline-none focus:border-emerald-500 text-white text-center text-xl tracking-[0.3em]">
+            <button onclick="registerNow()" id="btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold transition-all">สร้างระบบและรับ QR Code</button>
         </div>
 
-        <div id="result-area" class="hidden text-center space-y-6">
-            <div class="bg-white p-4 rounded-2xl inline-block shadow-xl">
-                <img id="qrcode-img" class="w-64 h-64" src="" alt="QR Code">
-            </div>
-            
+        <div id="result-area" class="hidden text-center space-y-8">
             <div class="space-y-2">
-                <p class="text-emerald-400 font-bold text-xl">สร้างระบบสำเร็จ!</p>
-                <p class="text-slate-400 text-sm">บันทึกภาพ QR ไปวางที่หน้าเวทีได้เลย</p>
+                <p class="text-emerald-400 font-black text-sm uppercase">1. ใบสำหรับวางหน้าเวที</p>
+                <div class="bg-white p-3 rounded-2xl inline-block shadow-xl border-4 border-emerald-500">
+                    <img id="qr-public" class="w-48 h-48" src="" alt="Public QR">
+                </div>
+                <p class="text-[10px] text-slate-400">ให้ลูกค้าสแกนเพื่อขอเพลงและให้ทิป</p>
             </div>
 
-            <div class="bg-slate-800 p-4 rounded-xl text-left border border-slate-700">
-                <p class="text-[11px] text-orange-400 mb-2 text-center font-bold">⚠️ เข้าไปตั้งค่าพร้อมเพย์ได้ที่หน้า Dashboard</p>
-                <p class="text-xs text-slate-400 mb-2 text-center">ลิงก์หน้า Dashboard สำหรับ iPad/tablet:</p>
-                <a id="dash-link" href="#" target="_blank" class="text-blue-400 underline break-all text-sm block text-center font-medium">คลิกเปิด Dashboard</a>
+            <hr class="border-slate-700">
+
+            <div class="space-y-2">
+                <p class="text-orange-400 font-black text-sm uppercase">2. ใบสำหรับเข้าหลังบ้าน (ADMIN)</p>
+                <div class="bg-white p-3 rounded-2xl inline-block shadow-xl border-4 border-orange-500">
+                    <img id="qr-admin" class="w-48 h-48" src="" alt="Admin QR">
+                </div>
+                <p class="text-[10px] text-orange-200 font-bold">⚠️ สำคัญ: เซฟรูปนี้เก็บไว้ในเครื่อง!<br>ใช้สแกนเข้า Dashboard ได้ทันทีโดยไม่ต้องใส่ PIN</p>
             </div>
             
-            <button onclick="location.reload()" class="text-slate-500 text-xs hover:text-white transition-all">สร้างวงอื่นเพิ่ม +</button>
+            <button onclick="location.reload()" class="text-slate-500 text-xs underline">สร้างวงอื่นเพิ่ม</button>
         </div>
     </div>
 
     <script>
-        // --- ข้อมูลเชื่อมต่อ Supabase (ใช้ค่าเดิมของพี่) ---
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
-
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
 
         async function registerNow() {
-            const nameInput = document.getElementById('name').value.trim();
-            const pinInput = document.getElementById('pin').value.trim();
-            const btn = document.getElementById('btn');
-            
-            // ตรวจสอบข้อมูลเบื้องต้น
-            if(!nameInput) {
-                alert("กรุณาระบุชื่อศิลปินหรือชื่อวง");
-                return;
-            }
-            if(pinInput.length !== 6 || isNaN(pinInput)) {
-                alert("กรุณาตั้งรหัส PIN เป็นตัวเลข 6 หลัก");
-                return;
-            }
+            const name = document.getElementById('name').value;
+            const pin = document.getElementById('pin').value;
+            if(!name || pin.length < 6) return alert("กรุณากรอกชื่อวงและ PIN 6 หลัก");
 
-            btn.innerText = "กำลังสร้างระบบ...";
-            btn.disabled = true;
-
-            // เจน ID แบบสุ่มเหมือนเดิม
+            document.getElementById('btn').innerText = "กำลังสร้าง...";
             const artistId = 'art-' + Math.random().toString(36).substr(2, 9);
             
             try {
-                // บันทึกข้อมูล (ไม่ส่ง promptpay เพราะจะไปตั้งใน Dashboard)
-                const { error } = await sbClient
-                    .from('musicians')
-                    .insert([{ 
-                        id: artistId, 
-                        display_name: nameInput, 
-                        pin: pinInput 
-                    }]);
-
+                const { error } = await sbClient.from('musicians').insert([{ id: artistId, display_name: name, pin: pin }]);
                 if(error) throw error;
 
-                // สร้าง URL สำหรับ Request และ Dashboard
-                const currentPath = window.location.pathname;
-                const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-                const fullBase = window.location.origin + basePath;
-
-                const requestUrl = fullBase + 'request.html?id=' + artistId;
-                const dashUrl = fullBase + 'dashboard.html?id=' + artistId;
-
-                // แสดงผล QR Code และ Link
-                document.getElementById('qrcode-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(requestUrl)}`;
-                document.getElementById('dash-link').href = dashUrl;
+                const fullBase = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
                 
-                // สลับหน้าฟอร์มเป็นหน้าผลลัพธ์
+                const publicLink = fullBase + 'request.html?id=' + artistId;
+                const adminLink = fullBase + 'dashboard.html?id=' + artistId + '&auth=' + btoa(pin); // ส่ง PIN แบบเข้ารหัสเบื้องต้น
+
+                document.getElementById('qr-public').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(publicLink)}`;
+                document.getElementById('qr-admin').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(adminLink)}`;
+                
                 document.getElementById('setup-form').style.display = 'none';
                 document.getElementById('result-area').classList.remove('hidden');
-
-            } catch (err) {
-                console.error(err);
-                alert("เกิดข้อผิดพลาด: " + err.message);
-                btn.innerText = "ลองใหม่อีกครั้ง";
-                btn.disabled = false;
-            }
+            } catch (e) { alert(e.message); }
         }
     </script>
 </body>
