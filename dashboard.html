@@ -161,7 +161,49 @@
                 '</div>';
             container.prepend(div);
         }
+// ฟังก์ชันเปิด Modal และดึงข้อมูลเดิมมาแสดง
+async function openEditModal() {
+  const artistId = 'art-hwels6tl9'; // ID ของคุณ
+  const { data, error } = await supabase
+    .from('musicians')
+    .select('*')
+    .eq('id', artistId)
+    .single();
 
+  if (data) {
+    document.getElementById('edit_display_name').value = data.display_name || '';
+    document.getElementById('edit_genres').value = data.genres || '';
+    document.getElementById('edit_social').value = data.social_contact || '';
+    document.getElementById('edit_songs').value = data.recommended_songs || '';
+    document.getElementById('edit_tip_msg').value = data.tip_message || '';
+    document.getElementById('editProfileModal').style.display = 'block';
+  }
+}
+
+// ฟังก์ชันบันทึกข้อมูลกลับไปที่ Supabase
+async function saveProfile() {
+  const artistId = 'art-hwels6tl9';
+  const updates = {
+    display_name: document.getElementById('edit_display_name').value,
+    genres: document.getElementById('edit_genres').value,
+    social_contact: document.getElementById('edit_social').value,
+    recommended_songs: document.getElementById('edit_songs').value,
+    tip_message: document.getElementById('edit_tip_msg').value
+  };
+
+  const { error } = await supabase
+    .from('musicians')
+    .update(updates)
+    .eq('id', artistId);
+
+  if (error) {
+    alert('เกิดข้อผิดพลาด: ' + error.message);
+  } else {
+    alert('บันทึกโปรไฟล์เรียบร้อย!');
+    document.getElementById('editProfileModal').style.display = 'none';
+    location.reload(); // รีโหลดหน้าเพื่ออัปเดตชื่อที่แสดง
+  }
+}
         async function load() {
             if (!artistId) return;
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
@@ -203,5 +245,34 @@
 
         load();
     </script>
+    <button onclick="openEditModal()" style="background:none; border:1px solid #00e676; color:#00e676; padding:8px 15px; border-radius:20px; cursor:pointer; margin-bottom:10px;">
+  ⚙️ ตั้งค่าโปรไฟล์
+</button>
+<div id="editProfileModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8); overflow:auto;">
+  <div style="background:#1a1d21; margin:5% auto; padding:20px; border:1px solid #333; width:90%; max-width:500px; border-radius:12px; color:white;">
+    <h2 style="color:#00e676;">แก้ไขโปรไฟล์</h2>
+    <hr style="border:0.5px solid #333; margin-bottom:20px;">
+    
+    <label>ชื่อวง / ชื่อศิลปิน:</label><br>
+    <input type="text" id="edit_display_name" style="width:100%; padding:10px; margin:10px 0; background:#0d1117; border:1px solid #333; color:white; border-radius:5px;">
+
+    <label>แนวเพลง (เช่น Folk, Pop, 90's):</label><br>
+    <input type="text" id="edit_genres" style="width:100%; padding:10px; margin:10px 0; background:#0d1117; border:1px solid #333; color:white; border-radius:5px;">
+
+    <label>ช่องทางติดต่อ (Line ID / FB):</label><br>
+    <input type="text" id="edit_social" style="width:100%; padding:10px; margin:10px 0; background:#0d1117; border:1px solid #333; color:white; border-radius:5px;">
+
+    <label>เพลงที่แนะนำให้ลูกค้าขอ (คั่นด้วยจุลภาค):</label><br>
+    <textarea id="edit_songs" rows="3" style="width:100%; padding:10px; margin:10px 0; background:#0d1117; border:1px solid #333; color:white; border-radius:5px;"></textarea>
+
+    <label>ข้อความขอบคุณ (หลังโอนทิป):</label><br>
+    <input type="text" id="edit_tip_msg" style="width:100%; padding:10px; margin:10px 0; background:#0d1117; border:1px solid #333; color:white; border-radius:5px;">
+
+    <div style="margin-top:20px; display:flex; gap:10px;">
+      <button onclick="saveProfile()" style="flex:1; padding:12px; background:#00e676; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">บันทึกข้อมูล</button>
+      <button onclick="document.getElementById('editProfileModal').style.display='none'" style="flex:1; padding:12px; background:#333; border:none; border-radius:8px; color:white; cursor:pointer;">ยกเลิก</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
