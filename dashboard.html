@@ -62,58 +62,67 @@
         }, 1000);
 
         // --- ฟังก์ชัน GPS แบบเน้นความชัวร์ ---
-                        fetch(url, { headers: { 'Accept-Language': 'th' } })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            listContainer.innerHTML = "";
-            var results = [];
+        function getLocation() {
+            var listContainer = document.getElementById('venue-list');
+            listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
 
-            // 1. ดึงชื่อหลักที่ API สรุปมาให้ (อันนี้แม่นสุด)
-            if (data.name) results.push(data.name);
-
-            // 2. ขุดจาก Address ทุกหมวดที่น่าจะเป็น "ชื่อสถานที่"
-            if (data.address) {
-                var a = data.address;
-                // รวมฮิตชื่อสถานที่: ร้านอาหาร, ผับ, บาร์, อาคาร, ร้านค้า, จุดท่องเที่ยว, สาธารณสุข
-                var poiFields = [
-                    a.amenity, a.restaurant, a.cafe, a.bar, a.pub, a.fast_food, a.food_court, 
-                    a.building, a.house_name, a.office, a.shop, a.supermarket,
-                    a.tourism, a.hotel, a.hostel, a.guest_house, a.attraction, a.museum,
-                    a.healthcare, a.hospital, a.clinic, a.pharmacy, // เผื่อพี่แคนอยู่ที่ทำงาน
-                    a.government, a.police, a.place_of_worship, a.temple
-                ];
-                
-                poiFields.forEach(function(val) {
-                    if (val && results.indexOf(val) === -1) results.push(val);
-                });
-            }
-
-            // 3. ถ้าผลลัพธ์ยังน้อยไป ให้เอาชื่อเต็ม (display_name) มาตัดเอา 2 ส่วนแรกมาเป็นตัวเลือก
-            if (results.length < 2 && data.display_name) {
-                var parts = data.display_name.split(',');
-                if(parts[0]) results.push(parts[0].trim());
-                if(parts[1]) results.push(parts[1].trim());
-            }
-
-            // แสดงผลเป็นปุ่ม (คัดชื่อซ้ำและตัดช่องว่าง)
-            var finalButtons = [...new Set(results)].filter(Boolean);
-            
-            if (finalButtons.length === 0) {
-                listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อสถานที่ใกล้เคียง</p>";
+            if (!navigator.geolocation) {
+                alert("iPad ของพี่ไม่รองรับ GPS บน Browser นี้ครับ");
                 return;
             }
 
-            finalButtons.forEach(function(name) {
-                var pill = document.createElement('button');
-                pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold mb-1 mr-1";
-                pill.innerText = name;
-                pill.onclick = function() {
-                    document.getElementById('venue-input').value = name;
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var lat = pos.coords.latitude;
+                var lon = pos.coords.longitude;
+                
+                // ใช้ API แผนที่ (ระบุ Zoom และ Address Details)
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                
+                fetch(url)
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    var addr = data.address;
+                    // รวมชื่อสถานที่ที่เป็นไปได้ทั้งหมด
+                    var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
+                    
+                    listContainer.innerHTML = ""; // ล้างตัวโหลดออก
+                    
+                    if (names.length === 0) {
+                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้านในพิกัดนี้ ลองพิมพ์ชื่อเองนะครับ</p>";
+                        return;
+                    }
+
+                    names.forEach(function(name) {
+                        var pill = document.createElement('button');
+                        pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold";
+                        pill.innerText = name;
+                        pill.onclick = function() {
+                            document.getElementById('venue-input').value = name;
+                            listContainer.innerHTML = "";
+                        };
+                        listContainer.appendChild(pill);
+                    });
+                })
+                .catch(function(err) {
+                    alert("ไม่สามารถดึงข้อมูลแผนที่ได้: " + err);
                     listContainer.innerHTML = "";
-                };
-                listContainer.appendChild(pill);
-            });
-        })
+                });
+            }, function(error) {
+                // แจ้งเตือนถ้า iPad ปฏิเสธ GPS
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("พี่ต้องกด 'อนุญาต' (Allow) ให้เข้าถึงตำแหน่งใน Safari/Chrome ก่อนครับ");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("ไม่พบข้อมูลตำแหน่ง (ลองขยับไปใกล้หน้าต่างดูครับ)");
+                        break;
+                    case error.TIMEOUT:
+                        alert("ขอข้อมูลตำแหน่งนานเกินไป ลองกดใหม่อีกครั้งครับ");
+                        break;
+                }
+                listContainer.innerHTML = "";
+            }, { enableHighAccuracy: true, timeout: 5000 });
+        }
 
         // --- ส่วนจัดการเพลงและสถิติ ---
         function solve(id, status) {
