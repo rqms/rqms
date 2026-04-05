@@ -137,17 +137,18 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name;
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-        // ✨ แก้ไขจุดนี้: ใช้ Unavatar ดึงรูปจาก Social Link อะไรก็ได้ที่ใส่มา
-        const imgTag = document.getElementById('artist-img');
-        const socialLink = data.social_contact || ""; // ใช้คอลัมน์ที่พี่เก็บลิงก์โซเชียล
+        // ✨ แก้ไขจุดนี้: ใช้ Unavatar ดึงรูปจาก Social Link อะไรก็ได้ที่ใส่// --- ส่วนที่ต้องเปลี่ยนใน checkStatus ---
+const imgTag = document.getElementById('artist-img');
+const social = data.social_contact || ""; 
 
-        if (socialLink) {
-            // ส่งลิงก์ไปให้ Unavatar จัดการดึงรูปให้เอง บรรทัดเดียวจบ!
-            imgTag.src = `https://unavatar.io/${socialLink}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
-        } else {
-            // ถ้าไม่มีลิงก์ ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
-            imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
-        }
+if (social) {
+    // ใช้ Unavatar ดึงรูปจาก Link อะไรก็ได้ที่ใส่มา (แก้ปัญหาเครื่องหมาย [?] ทันที)
+    imgTag.src = `https://unavatar.io/${social}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+} else {
+    // ถ้าไม่มีข้อมูลโซเชียล ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
+    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+}
+
 
         if (data.promptpay) {
             currentPromptPay = data.promptpay;
