@@ -124,39 +124,41 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ ---
-        async function checkStatus() {
-            if(!artistId) return;
-            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
-            const loadingScreen = document.getElementById('loading-screen');
-            const requestForm = document.getElementById('request-form');
+        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันรองรับทุก Link) ---
+async function checkStatus() {
+    if(!artistId) return;
+    const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+    const loadingScreen = document.getElementById('loading-screen');
+    const requestForm = document.getElementById('request-form');
 
-            if (data && data.is_active) {
-                loadingScreen.classList.add('hidden');
-                requestForm.classList.remove('hidden');
-                document.getElementById('artist-display-name').innerText = data.display_name;
-                document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
-                
-                // รูป Profile (Stable Version)
-                const imgTag = document.getElementById('artist-img');
-                const social = data.social_contact || "";
-                if (social.includes('facebook.com/')) {
-                    const fbUser = social.split('facebook.com/')[1].split('/')[0].split('?')[0];
-                    imgTag.src = `https://graph.facebook.com/${fbUser}/picture?type=large`;
-                } else {
-                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
-                }
+    if (data && data.is_active) {
+        loadingScreen.classList.add('hidden');
+        requestForm.classList.remove('hidden');
+        document.getElementById('artist-display-name').innerText = data.display_name;
+        document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
+        
+        // ✨ แก้ไขจุดนี้: ใช้ Unavatar ดึงรูปจาก Social Link อะไรก็ได้ที่ใส่มา
+        const imgTag = document.getElementById('artist-img');
+        const socialLink = data.social_contact || ""; // ใช้คอลัมน์ที่พี่เก็บลิงก์โซเชียล
 
-                if (data.promptpay) {
-                    currentPromptPay = data.promptpay;
-                    document.getElementById('tip-area').classList.remove('hidden');
-                }
-                loadSmartAffiliate(""); // โหลดสินค้าเริ่มต้น
-            } else {
-                loadingScreen.classList.remove('hidden');
-                requestForm.classList.add('hidden');
-            }
+        if (socialLink) {
+            // ส่งลิงก์ไปให้ Unavatar จัดการดึงรูปให้เอง บรรทัดเดียวจบ!
+            imgTag.src = `https://unavatar.io/${socialLink}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+        } else {
+            // ถ้าไม่มีลิงก์ ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
+            imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
         }
+
+        if (data.promptpay) {
+            currentPromptPay = data.promptpay;
+            document.getElementById('tip-area').classList.remove('hidden');
+        }
+        loadSmartAffiliate(""); 
+    } else {
+        loadingScreen.classList.remove('hidden');
+        requestForm.classList.add('hidden');
+    }
+}
 
         // --- 3. ระบบ Smart Affiliate (Random ตามชื่อเพลง) ---
         function loadSmartAffiliate(songName) {
