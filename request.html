@@ -8,25 +8,27 @@
     <style>
         .glass-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .hidden { display: none !important; }
-        /* สไตล์สำหรับรายการค้นหาเพลง */
         #song-results { max-height: 200px; overflow-y: auto; z-index: 50; }
         .song-item:hover { background-color: #059669; }
+        /* สไตล์เพิ่มเติมสำหรับรายการเพลงแนะนำ */
+        .song-pill { transition: all 0.2s ease; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .song-pill:active { transform: scale(0.95); background-color: #059669; color: white; }
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen p-4 font-sans flex flex-col items-center">
 
     <div class="max-w-md w-full space-y-4">
         <div class="w-full bg-emerald-950/20 border border-emerald-500/20 rounded-2xl overflow-hidden py-3 px-4 shadow-lg">
-    <div class="flex items-center gap-3">
-        <span class="flex-shrink-0 flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded-full border border-emerald-500/30 uppercase tracking-tighter">
-            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-            Live Mode
-        </span>
-        <marquee class="text-xs font-bold text-slate-300 tracking-wide">
-            🎸 ขอเพลงได้ตลอดคืนครับ... หากเพลงไหนร้องไม่ได้ขออภัยด้วยนะค้าบ | 🙏 สนับสนุนนักดนตรี (Tip) ได้ที่ปุ่มด้านล่าง เพื่อเป็นกำลังใจและค่าอาหารให้นักดนตรีตัวน้อยๆ ครับ | 🚀 ระบบส่งเพลงรวดเร็วทันใจ ไม่ต้องเดินมาหน้าเวที
-        </marquee>
-    </div>
-</div>
+            <div class="flex items-center gap-3">
+                <span class="flex-shrink-0 flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded-full border border-emerald-500/30 uppercase tracking-tighter">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                    Live Mode
+                </span>
+                <marquee class="text-xs font-bold text-slate-300 tracking-wide">
+                    🎸 ขอเพลงได้ตลอดคืนครับ... หากเพลงไหนร้องไม่ได้ขออภัยด้วยนะค้าบ | 🙏 สนับสนุนนักดนตรี (Tip) ได้ที่ปุ่มด้านล่าง เพื่อเป็นกำลังใจและค่าอาหารให้นักดนตรีตัวน้อยๆ ครับ | 🚀 ระบบส่งเพลงรวดเร็วทันใจ ไม่ต้องเดินมาหน้าเวที
+                </marquee>
+            </div>
+        </div>
 
         <div id="loading-screen" class="text-center p-10 glass-card rounded-[2.5rem]">
             <div id="spinner" class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -40,6 +42,12 @@
                 <h2 id="artist-display-name" class="text-2xl font-black text-white leading-none">---</h2>
                 <p id="venue-display-name" class="text-emerald-400 font-bold text-[10px] uppercase tracking-widest mt-2">LIVE NOW</p>
             </div>
+
+            <div id="recommended-section" class="hidden space-y-3">
+                <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest italic px-1">✨ เพลงที่วงถนัด / แนะนำ</p>
+                <div id="recommended-list" class="flex flex-wrap gap-2">
+                    </div>
+            </div>
             
             <div class="space-y-4 relative">
                 <div class="relative">
@@ -52,13 +60,16 @@
                 <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg shadow-emerald-900/40">
                     ส่งเพลงขอ 🚀
                 </button>
+
+                <p class="text-[9px] text-slate-500 text-center italic mt-2">
+                    * ขออภัยหากไม่สะดวกรับเพลงแนว EDM หรือเพลงสากลบางประเภทครับ *
+                </p>
             </div>
 
             <div id="tip-area" class="hidden pt-6 border-t border-slate-800 text-center">
                 <p class="text-[9px] text-slate-500 mb-3 uppercase font-black italic">สนับสนุนนักดนตรี 🙏</p>
                 <div class="flex gap-2">
                     <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300">📋 คัดลอกเลขพร้อมเพย์</button> 
-
                     <button onclick="showQR()" class="bg-amber-600/20 border border-amber-500/50 p-3 rounded-xl text-xl">📸</button>
                 </div>
             </div>
@@ -92,31 +103,22 @@
         const artistId = new URLSearchParams(window.location.search).get('id');
         let currentPromptPay = "";
 
-        // --- 1. ระบบค้นหาเพลง (iTunes API) ---
         async function searchMusic(query) {
             const resultsDiv = document.getElementById('song-results');
             if (query.length < 2) { resultsDiv.classList.add('hidden'); return; }
-
             try {
                 const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&country=th`);
                 const data = await response.json();
-                
                 resultsDiv.innerHTML = '';
                 if (data.results.length > 0) {
                     data.results.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'song-item p-3 border-b border-slate-700 cursor-pointer flex items-center gap-3 transition-colors';
-                        div.innerHTML = `
-                            <img src="${item.artworkUrl30}" class="rounded">
-                            <div class="text-left">
-                                <p class="text-xs font-bold text-white">${item.trackName}</p>
-                                <p class="text-[10px] text-slate-400">${item.artistName}</p>
-                            </div>
-                        `;
+                        div.innerHTML = `<img src="${item.artworkUrl30}" class="rounded"><div class="text-left"><p class="text-xs font-bold text-white">${item.trackName}</p><p class="text-[10px] text-slate-400">${item.artistName}</p></div>`;
                         div.onclick = () => {
                             document.getElementById('song').value = `${item.trackName} - ${item.artistName}`;
                             resultsDiv.classList.add('hidden');
-                            loadSmartAffiliate(item.trackName); // สุ่มสินค้าตามชื่อเพลงที่เลือก
+                            loadSmartAffiliate(item.trackName);
                         };
                         resultsDiv.appendChild(div);
                     });
@@ -125,56 +127,57 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-                   // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (ฉบับแก้ไขให้รูปขึ้น 100%) ---
-async function checkStatus() {
-    if(!artistId) return;
-    
-    // ดึงข้อมูลจาก Supabase
-    const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
-    const loadingScreen = document.getElementById('loading-screen');
-    const requestForm = document.getElementById('request-form');
+        async function checkStatus() {
+            if(!artistId) return;
+            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+            const loadingScreen = document.getElementById('loading-screen');
+            const requestForm = document.getElementById('request-form');
 
-    if (data && data.is_active) {
-        loadingScreen.classList.add('hidden');
-        requestForm.classList.remove('hidden');
-        
-        // ใส่ชื่อศิลปินและร้าน
-        document.getElementById('artist-display-name').innerText = data.display_name || "---";
-        document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
-        
-// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันที่ง่ายที่สุดในโลก)
-        const imgTag = document.getElementById('artist-img');
-        let social = data.social_contact ? data.social_contact.trim() : "";
-        const displayName = data.display_name || "Artist";
-        const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
+            if (data && data.is_active) {
+                loadingScreen.classList.add('hidden');
+                requestForm.classList.remove('hidden');
+                document.getElementById('artist-display-name').innerText = data.display_name || "---";
+                document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
+                
+                // 📸 Artist Image
+                const imgTag = document.getElementById('artist-img');
+                let social = data.social_contact ? data.social_contact.trim() : "";
+                const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name || 'A')}&background=059669&color=fff&size=128`;
+                imgTag.src = (social && social.startsWith('http')) ? social : fallback;
+                imgTag.onerror = function() { this.src = fallback; this.onerror = null; };
 
-        if (social && social.startsWith('http')) {
-            // ✅ ไม่ว่าจะเป็นลิงก์รูปตรงๆ หรือลิงก์ที่ฝากไว้ ให้แสดงผลทันที
-            imgTag.src = social;
-        } else {
-            // ❌ ถ้าไม่มีลิงก์ ให้ขึ้นรูปตัวอักษร "NOP"
-            imgTag.src = fallback;
+                // 🎸 รายการเพลงแนะนำ (Dynamic)
+                const recSection = document.getElementById('recommended-section');
+                const recList = document.getElementById('recommended-list');
+                if (data.recommended_songs) {
+                    const songs = data.recommended_songs.split(/[\n,]+/).filter(s => s.trim() !== "");
+                    if (songs.length > 0) {
+                        recSection.classList.remove('hidden');
+                        recList.innerHTML = '';
+                        songs.forEach(songName => {
+                            const btn = document.createElement('button');
+                            btn.className = "song-pill bg-emerald-500/10 text-emerald-400 text-[11px] font-bold px-3 py-2 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20";
+                            btn.innerText = songName.trim();
+                            btn.onclick = () => {
+                                document.getElementById('song').value = songName.trim();
+                                loadSmartAffiliate(songName.trim());
+                            };
+                            recList.appendChild(btn);
+                        });
+                    } else { recSection.classList.add('hidden'); }
+                } else { recSection.classList.add('hidden'); }
+
+                if (data.promptpay) {
+                    currentPromptPay = data.promptpay.toString();
+                    document.getElementById('tip-area').classList.remove('hidden');
+                }
+                loadSmartAffiliate(""); 
+            } else {
+                loadingScreen.classList.remove('hidden');
+                requestForm.classList.add('hidden');
+            }
         }
 
-        // 🛡️ กันรูปแตก: ถ้าลิงก์เสียหรือโหลดไม่ได้ ให้เปลี่ยนเป็นตัวอักษรเขียวอัตโนมัติ
-        imgTag.onerror = function() { 
-            this.src = fallback; 
-            this.onerror = null; 
-        };
-        // จัดการเลขพร้อมเพย์
-        if (data.promptpay) {
-            currentPromptPay = data.promptpay.toString();
-            document.getElementById('tip-area').classList.remove('hidden');
-        }
-        
-        loadSmartAffiliate(""); 
-    } else {
-        // ถ้าสถานะไม่ใช่ Active ให้โชว์หน้า Loading
-        loadingScreen.classList.remove('hidden');
-        requestForm.classList.add('hidden');
-    }
-}
-        // --- 3. ระบบ Smart Affiliate (Random ตามชื่อเพลง) ---
         function loadSmartAffiliate(songName) {
             const affId = "KAEN_SHOP";
             const song = songName.toLowerCase();
@@ -182,14 +185,11 @@ async function checkStatus() {
                 { title: "สายกีตาร์ Elixir ทนทาน", img: "https://m.media-amazon.com/images/I/71P4r1T4OBL._AC_SL1500_.jpg", link: `https://shope.ee/ex1?aff_id=${affId}` },
                 { title: "พาวเวอร์แบงค์ พกกลับบ้าน", img: "https://m.media-amazon.com/images/I/61-mS5N-06L._AC_SL1500_.jpg", link: `https://shope.ee/ex2?aff_id=${affId}` }
             ];
-
-            // Logic วิเคราะห์ชื่อเพลง
             if (song.includes("เศร้า") || song.includes("เลิก") || song.includes("อกหัก")) {
-                items = [{ title: "ทิชชู่ซับน้ำตา (เกรดพรีเมียม)", img: "https://m.media-amazon.com/images/I/71X8Xh7jF7L._AC_SL1500_.jpg", link: `...` }];
+                items = [{ title: "ทิชชู่ซับน้ำตา (เกรดพรีเมียม)", img: "https://m.media-amazon.com/images/I/71X8Xh7jF7L._AC_SL1500_.jpg", link: `#` }];
             } else if (song.includes("เมา") || song.includes("เหล้า") || song.includes("เบียร์")) {
-                items = [{ title: "วิตามินแก้แฮงค์ (ตื่นมาไม่มึน)", img: "https://m.media-amazon.com/images/I/61N+V3qU7uL._AC_SL1000_.jpg", link: `...` }];
+                items = [{ title: "วิตามินแก้แฮงค์ (ตื่นมาไม่มึน)", img: "https://m.media-amazon.com/images/I/61N+V3qU7uL._AC_SL1000_.jpg", link: `#` }];
             }
-
             const pick = items[Math.floor(Math.random() * items.length)];
             document.getElementById('aff-title').innerText = pick.title;
             document.getElementById('aff-img').src = pick.img;
@@ -208,33 +208,21 @@ async function checkStatus() {
             btn.disabled = false; btn.innerText = "ส่งเพลงขอ 🚀";
         }
 
-                function showQR() {
-            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`; // <-- หาบรรทัดนี้
+        function showQR() {
+            document.getElementById('promptpay-qr').src = `https://promptpay.io/${currentPromptPay}.png`;
             document.getElementById('qr-modal').classList.remove('hidden');
         }
 
-        setInterval(checkStatus, 10000);
+        setInterval(checkStatus, 15000); // ปรับเป็น 15 วิเพื่อประหยัด Resource
         checkStatus();
-    // ฟังก์ชันคัดลอก (เวอร์ชันเน้น Alert)
-window.copyPromptPay = function() {
-    console.log("Button Clicked!"); // เช็คใน Console ว่าปุ่มทำงานไหม
-    
-    if (!currentPromptPay) {
-        alert("❌ ไม่พบเลขพร้อมเพย์ในระบบครับ");
-        return;
-    }
 
-    const cleanNumber = currentPromptPay.toString().replace(/\s+/g, '').replace(/-/g, '');
-
-    // ลองใช้คำสั่งคัดลอกแบบมาตรฐาน
-    navigator.clipboard.writeText(cleanNumber).then(function() {
-        alert("✅ คัดลอกเลข " + cleanNumber + " สำเร็จ!");
-    }).catch(function(err) {
-        // ถ้าคัดลอกผ่านระบบไม่ได้ ให้เด้งเลขขึ้นมาให้ลูกค้าเห็นเลย
-        alert("เลขพร้อมเพย์คือ: " + cleanNumber);
-    });
-};
-
+        window.copyPromptPay = function() {
+            if (!currentPromptPay) { alert("❌ ไม่พบเลขพร้อมเพย์ในระบบครับ"); return; }
+            const cleanNumber = currentPromptPay.toString().replace(/\s+/g, '').replace(/-/g, '');
+            navigator.clipboard.writeText(cleanNumber).then(function() {
+                alert("✅ คัดลอกเลข " + cleanNumber + " สำเร็จ!");
+            }).catch(function() { alert("เลขพร้อมเพย์คือ: " + cleanNumber); });
+        };
     </script>
 </body>
 </html>
