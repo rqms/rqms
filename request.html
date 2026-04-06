@@ -142,26 +142,35 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-
-    // 📸 ส่วนจัดการรูปโปรไฟล์แบบ Simple (รองรับ FB, IG, TikTok)
+// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันงัดรูปครอบจักรวาล - ง่ายและชัวร์)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
 
-        // รูปสำรอง (วงกลมเขียว) กรณีดึงรูปจริงไม่ได้
+        // 1. สร้างรูปสำรอง (Fallback) เผื่อไว้ก่อน
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
-        if (social && social.startsWith('http')) {
-            // 🚀 ท่าไม้ตาย: ส่งลิงก์ไปให้ Unavatar จัดการหาให้เอง
-            // ตัวนี้จะฉลาดพอที่จะแกะรูปจากหน้าโปรไฟล์โซเชียลต่างๆ ครับ
-            imgTag.src = `https://unavatar.io/${social}?fallback=${encodeURIComponent(fallback)}`;
+        if (social && (social.startsWith('http') || social.startsWith('www'))) {
+            // เติม https:// ให้ถ้ากรอกแค่ www
+            if (social.startsWith('www')) social = 'https://' + social;
+            
+            // ล้างลิงก์ให้สะอาด
+            let cleanLink = social.split('?')[0];
+
+            // 🚀 ใช้ Proxy ตัวกลาง (Weserv) เข้าไปงัดรูปออกมา วิธีนี้จะผ่านกำแพง Facebook ได้ดีที่สุด
+            // มันจะหลอกระบบว่าเป็นการโหลดรูปทั่วไป ไม่ใช่การดึงโปรไฟล์ครับ
+            imgTag.src = `https://images.weserv.nl/?url=${encodeURIComponent(cleanLink)}&default=${encodeURIComponent(fallback)}&errorredirect=${encodeURIComponent(fallback)}`;
+            
         } else {
-            // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
+            // ถ้าไม่ใช่ลิงก์ (เช่น เป็นเบอร์โทร) ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
 
-        // กันรูปแตก: ถ้าสุดท้ายโหลดไม่ขึ้นจริงๆ ให้กลับไปใช้รูปตัวอักษรเขียว
-        imgTag.onerror = function() { this.src = fallback; };
+        // 🛡️ ดักทางสุดท้าย: ถ้าโหลดรูปแตก ให้สลับเป็นตัวอักษรทันที
+        imgTag.onerror = function() { 
+            this.src = fallback; 
+        };
+  
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
             currentPromptPay = data.promptpay.toString();
