@@ -170,11 +170,6 @@ async function checkStatus() {
             // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
-
-        // 🛡️ ดักทางสุดท้าย: ถ้าโหลดรูปแตก ให้สลับเป็นตัวอักษรทันที
-        imgTag.onerror = function() { 
-            this.src = fallback; 
-        };
   
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
