@@ -142,35 +142,40 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันที่เคยดึงได้และเสถียรที่สุด)
+// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชัน "งัดตรง" จาก Facebook)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
 
-        // รูปสำรอง (วงกลมเขียว) กรณีดึงรูปจริงไม่ได้
+        // รูปสำรอง (วงกลมเขียว)
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
         if (social && (social.startsWith('http') || social.startsWith('www'))) {
-            // เติม https:// ถ้ากรอกแค่ www
             if (social.startsWith('www')) social = 'https://' + social;
             
-            // ล้างลิงก์ให้เหลือแค่ URL หลัก (ตัดตัวแปรตามหลังออก)
-            let cleanLink = social.split('?')[0];
-            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
-
-            // 🚀 แยกดึงตามค่าย เพื่อความแม่นยำ 100%
-            if (cleanLink.includes('facebook.com')) {
-                // สำหรับ Facebook ใช้ตัวงัดเฉพาะทาง
-                imgTag.src = `https://unavatar.io/facebook/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
+            // 🚀 ท่าดัดหลัง: ถ้าเป็น Facebook พยายามดึงผ่าน Graph ตรงๆ
+            if (social.includes('facebook.com')) {
+                // พยายามดึงรูปจาก Username หรือ ID โดยตรง
+                let parts = social.split('/');
+                let username = parts[parts.length - 1] || parts[parts.length - 2];
+                if (username.includes('?')) username = username.split('?')[0];
+                
+                // ใช้ลิงก์ดึงรูปตรงของ Facebook (ถ้าคนนั้นไม่ได้ปิด Private โหดๆ รูปจะขึ้นครับ)
+                imgTag.src = `https://graph.facebook.com/${username}/picture?type=large&redirect=true`;
             } else {
-                // สำหรับ App อื่นๆ (TikTok, IG, YouTube) ให้ Unavatar จัดการหาให้
-                imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
+                // ถ้าเป็นค่ายอื่น ใช้ Unavatar ปกติ
+                imgTag.src = `https://unavatar.io/${social.split('?')[0]}?fallback=${encodeURIComponent(fallback)}`;
             }
         } else {
-            // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
-  
+
+        // 🛡️ กันรูปแตก (อันนี้สำคัญที่สุด!)
+        // ถ้าโหลดรูปจาก FB ไม่ได้จริงๆ ให้สลับเป็น "ตัวอักษรเขียว" ทันที ห้ามโหว่ ห้ามแตก
+        imgTag.onerror = function() { 
+            this.src = fallback; 
+            this.onerror = null; // ป้องกันการวนลูปถ้า fallback เสียด้วย
+        };
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
             currentPromptPay = data.promptpay.toString();
