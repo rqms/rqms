@@ -125,7 +125,7 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-                    // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันหว่านแหเช็คชื่อคอลัมน์) ---
+                        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (ปรับปรุงการดึงรูปจาก Social Media) ---
         async function checkStatus() {
             if(!artistId) return;
             const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
@@ -138,18 +138,19 @@
                 document.getElementById('artist-display-name').innerText = data.display_name;
                 document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
                 
-                // 📸 ดึงรูปโปรไฟล์
+                // 📸 ดึงรูปโปรไฟล์แบบ Universal (รองรับทุก Social Link)
                 const imgTag = document.getElementById('artist-img');
+                
+                // ดึงค่าจากคอลัมน์ที่เป็นไปได้ใน Database
+                const socialLink = data.social_contact || data.facebook || data.social || data.link || ""; 
+                const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
 
-                // พยายามดึงจากชื่อคอลัมน์ที่พี่น่าจะตั้งไว้ (เช็คทั้ง social_contact, facebook, social, link)
-                const social = data.social_contact || data.facebook || data.social || data.link || ""; 
-
-                if (social) {
-                    // ถ้ามีค่าในฐานข้อมูล ให้ดึงรูปผ่าน Unavatar
-                    imgTag.src = `https://unavatar.io/${social}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
+                if (socialLink) {
+                    // ใช้ Unavatar แบบ Auto-detect: ใส่ URL เต็มเข้าไป ระบบจะหา Provider ให้เอง
+                    // เช่น ใส่ facebook.com/user หรือ instagram.com/user ระบบจะจัดการดึงรูปให้
+                    imgTag.src = `https://unavatar.io/${socialLink}?fallback=${encodeURIComponent(fallbackImg)}`;
                 } else {
-                    // ถ้าในฐานข้อมูลว่างเปล่า ให้โชว์รูปตัวอักษรชื่อแทน (กันรูปแตก)
-                    imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
+                    imgTag.src = fallbackImg;
                 }
 
                 if (data.promptpay) {
