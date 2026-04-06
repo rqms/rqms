@@ -143,30 +143,25 @@ async function checkStatus() {
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
 
-          // 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันงัดทุก App)
+         // 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันแก้ไขเพื่อดึงรูป Facebook ให้ติด)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
 
-        // รูปสำรอง (วงกลมเขียว)
+        // รูปสำรอง (วงกลมเขียว) กรณีดึงรูปจริงไม่ได้
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
         if (social && (social.startsWith('http') || social.startsWith('www'))) {
             if (social.startsWith('www')) social = 'https://' + social;
             
-            // ล้างลิงก์
+            // ล้างลิงก์ให้เหลือแค่ URL หลัก
             let cleanLink = social.split('?')[0];
-            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
-
-            // 🚀 ท่าไม้ตาย: ถ้าเป็น Facebook เราจะช่วยแกะให้ Unavatar ทำงานง่ายขึ้น
-            if (cleanLink.includes('facebook.com')) {
-                // ดึงรูปผ่านระบบ Proxy ของ Weserv เพื่อเลี่ยงการโดนบล็อก
-                imgTag.src = `https://images.weserv.nl/?url=${encodeURIComponent(cleanLink)}/picture?type=large&default=${encodeURIComponent(fallback)}`;
-            } else {
-                // ถ้าเป็น App อื่น (IG, TikTok, YouTube) ใช้ Unavatar ปกติ
-                imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
-            }
+            
+            // ใช้ Unavatar แบบเจาะจงดึงรูปจากโซเชียล
+            // ถ้าเป็น Facebook มันจะพยายามแกะรูปโปรไฟล์มาให้ครับ
+            imgTag.src = `https://unavatar.io/facebook/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
         } else {
+            // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
 
