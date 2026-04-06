@@ -11,6 +11,7 @@
         .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
         .big-btn:active { background-color: #000 !important; opacity: 0.7; transform: scale(0.95); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #artist-profile-img { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
@@ -38,6 +39,8 @@
                 </div>
             </div>
             <div class="border-l border-slate-800 pl-4 flex items-center gap-3">
+                <img id="artist-profile-img" src="" class="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover bg-slate-800 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                
                 <div class="text-right">
                     <p class="text-[8px] uppercase text-slate-500 font-bold">Artist</p>
                     <h2 id="display-artist-name" class="text-lg font-black text-emerald-500 leading-none">---</h2>
@@ -161,6 +164,21 @@
             location.reload();
         }
 
+        // --- ระบบแสดงรูปโปรไฟล์ ---
+        function updateProfileImage(url, name) {
+            const imgTag = document.getElementById('artist-profile-img');
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'A')}&background=059669&color=fff&size=100`;
+            if (url && url.startsWith('http')) {
+                imgTag.src = url;
+            } else {
+                imgTag.src = fallback;
+            }
+            imgTag.onerror = function() {
+                this.src = fallback;
+                this.onerror = null;
+            };
+        }
+
         // --- GPS 📍 ---
         function getLocation() {
             var listContainer = document.getElementById('venue-list');
@@ -193,6 +211,7 @@
                 isSystemOpen = resMusician.data.is_active;
                 document.getElementById('venue-input').value = resMusician.data.current_venue || "";
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name;
+                updateProfileImage(resMusician.data.social_contact, resMusician.data.display_name);
                 updateUI();
             }
             var resReq = await sb.from('requests').select('*').eq('musician_id', artistId).eq('status', 'pending');
@@ -251,7 +270,7 @@
 
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
 
-        // --- ⚙️ Settings Functions (ปรับให้เข้ากับ HTML ใหม่) ---
+        // --- ⚙️ Settings Functions ---
         async function openEditModal() {
             const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (data) {
@@ -276,6 +295,7 @@
             if (!error) {
                 alert("บันทึกสำเร็จ!");
                 document.getElementById('display-artist-name').innerText = updates.display_name;
+                updateProfileImage(updates.social_contact, updates.display_name);
                 document.getElementById('editProfileModal').classList.add('hidden');
             } else {
                 alert("บันทึกไม่สำเร็จ: " + error.message);
