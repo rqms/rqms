@@ -57,7 +57,8 @@
             <div id="tip-area" class="hidden pt-6 border-t border-slate-800 text-center">
                 <p class="text-[9px] text-slate-500 mb-3 uppercase font-black italic">สนับสนุนนักดนตรี 🙏</p>
                 <div class="flex gap-2">
-                    <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300">📋 คัดลอกเลขพร้อมเพย์</button>
+                    <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300">📋 คัดลอกเลขพร้อมเพย์</button> 
+
                     <button onclick="showQR()" class="bg-amber-600/20 border border-amber-500/50 p-3 rounded-xl text-xl">📸</button>
                 </div>
             </div>
@@ -89,7 +90,7 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
         const artistId = new URLSearchParams(window.location.search).get('id');
-        let currentPromptPay = "0873379662";
+        let currentPromptPay = "";
 
         // --- 1. ระบบค้นหาเพลง (iTunes API) ---
         async function searchMusic(query) {
@@ -202,6 +203,26 @@ if (social) {
 
         setInterval(checkStatus, 10000);
         checkStatus();
+    // ฟังก์ชันคัดลอก (เวอร์ชันเน้น Alert)
+window.copyPromptPay = function() {
+    console.log("Button Clicked!"); // เช็คใน Console ว่าปุ่มทำงานไหม
+    
+    if (!currentPromptPay) {
+        alert("❌ ไม่พบเลขพร้อมเพย์ในระบบครับ");
+        return;
+    }
+
+    const cleanNumber = currentPromptPay.toString().replace(/\s+/g, '').replace(/-/g, '');
+
+    // ลองใช้คำสั่งคัดลอกแบบมาตรฐาน
+    navigator.clipboard.writeText(cleanNumber).then(function() {
+        alert("✅ คัดลอกเลข " + cleanNumber + " สำเร็จ!");
+    }).catch(function(err) {
+        // ถ้าคัดลอกผ่านระบบไม่ได้ ให้เด้งเลขขึ้นมาให้ลูกค้าเห็นเลย
+        alert("เลขพร้อมเพย์คือ: " + cleanNumber);
+    });
+};
+
     </script>
 </body>
 </html>
