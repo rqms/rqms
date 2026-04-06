@@ -142,27 +142,32 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันงัดรูปครอบจักรวาล - ง่ายและชัวร์)
+// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันที่เคยดึงได้และเสถียรที่สุด)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
 
-        // 1. สร้างรูปสำรอง (Fallback) เผื่อไว้ก่อน
+        // รูปสำรอง (วงกลมเขียว) กรณีดึงรูปจริงไม่ได้
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
         if (social && (social.startsWith('http') || social.startsWith('www'))) {
-            // เติม https:// ให้ถ้ากรอกแค่ www
+            // เติม https:// ถ้ากรอกแค่ www
             if (social.startsWith('www')) social = 'https://' + social;
             
-            // ล้างลิงก์ให้สะอาด
+            // ล้างลิงก์ให้เหลือแค่ URL หลัก (ตัดตัวแปรตามหลังออก)
             let cleanLink = social.split('?')[0];
+            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
 
-            // 🚀 ใช้ Proxy ตัวกลาง (Weserv) เข้าไปงัดรูปออกมา วิธีนี้จะผ่านกำแพง Facebook ได้ดีที่สุด
-            // มันจะหลอกระบบว่าเป็นการโหลดรูปทั่วไป ไม่ใช่การดึงโปรไฟล์ครับ
-            imgTag.src = `https://images.weserv.nl/?url=${encodeURIComponent(cleanLink)}&default=${encodeURIComponent(fallback)}&errorredirect=${encodeURIComponent(fallback)}`;
-            
+            // 🚀 แยกดึงตามค่าย เพื่อความแม่นยำ 100%
+            if (cleanLink.includes('facebook.com')) {
+                // สำหรับ Facebook ใช้ตัวงัดเฉพาะทาง
+                imgTag.src = `https://unavatar.io/facebook/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
+            } else {
+                // สำหรับ App อื่นๆ (TikTok, IG, YouTube) ให้ Unavatar จัดการหาให้
+                imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
+            }
         } else {
-            // ถ้าไม่ใช่ลิงก์ (เช่น เป็นเบอร์โทร) ให้ขึ้นรูปตัวอักษร
+            // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
 
