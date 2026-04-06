@@ -143,25 +143,34 @@ async function checkStatus() {
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
 
-                // 📸 ส่วนดึงรูปโปรไฟล์ (เวอร์ชันตัดปัญหาทุกจุด)
+          // 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันงัดรูป Facebook DramaAdd)
         const imgTag = document.getElementById('artist-img');
+        let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
-        
-        // ดึงลิงก์จากคอลัมน์ social_contact
-        let social = data.social_contact ? data.social_contact.toString().trim() : ""; 
 
-        // สร้างรูปสำรอง (UI-Avatar) เตรียมไว้ก่อนเผื่อลิงก์พัง
-        const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
+        // สร้างรูปสำรอง (UI-Avatar) เป็นวงกลมเขียวมีตัวอักษรชื่อ เตรียมไว้ก่อน
+        const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128&rounded=true`;
 
-        if (social && social.startsWith('http')) {
-            // ล้างลิงก์ Facebook/IG ให้สะอาดที่สุด
-            let cleanLink = social.split('?')[0]; 
-            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
+        if (social) {
+            // เช็คว่ากรอกลิงก์มาหรือเปล่า
+            const isLink = social.startsWith('http') || social.startsWith('www');
             
-            // สั่งดึงรูป ถ้า 3 วินาทีแล้วรูปไม่มา ให้สลับไปใช้รูปตัวอักษรทันที (กันรูปแตก [?])
-            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallbackImg)}`;
+            if (isLink) {
+                // เติม https:// ถ้ากรอกแค่ www
+                if (social.startsWith('www')) social = 'https://' + social;
+                
+                // ล้างลิงก์ให้สะอาด (ตัด ?mibextid...)
+                let cleanLink = social.split('?')[0];
+                
+                // 🚀 ใช้ WESERV.NL (Proxy) งัดรูปโปรไฟล์จาก Facebook ชัวร์กว่า!
+                // มันจะไปดึงรูปขนาดใหญ่มาให้เลยครับ
+                imgTag.src = `https://images.weserv.nl/?url=${encodeURIComponent(cleanLink + '/picture?type=large')}&default=${encodeURIComponent(fallbackImg)}`;
+            } else {
+                // ถ้าเป็นเบอร์โทร ให้ขึ้นรูปตัวอักษรสวยๆ
+                imgTag.src = fallbackImg;
+            }
         } else {
-            // ถ้าเป็นเบอร์โทร หรือว่างเปล่า ให้ใช้รูปตัวอักษรสวยๆ เลย
+            // ถ้าว่างเปล่า ให้ขึ้นรูปตัวอักษรสำรอง
             imgTag.src = fallbackImg;
         }
 
