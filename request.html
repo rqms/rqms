@@ -142,7 +142,7 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชัน "งัดตรง" จาก Facebook)
+// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันอึดพิเศษ - ลองทุกทาง)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
@@ -153,29 +153,31 @@ async function checkStatus() {
         if (social && (social.startsWith('http') || social.startsWith('www'))) {
             if (social.startsWith('www')) social = 'https://' + social;
             
-            // 🚀 ท่าดัดหลัง: ถ้าเป็น Facebook พยายามดึงผ่าน Graph ตรงๆ
-            if (social.includes('facebook.com')) {
-                // พยายามดึงรูปจาก Username หรือ ID โดยตรง
-                let parts = social.split('/');
-                let username = parts[parts.length - 1] || parts[parts.length - 2];
-                if (username.includes('?')) username = username.split('?')[0];
+            // ล้างลิงก์ให้สะอาด (ตัด ?mibextid... ออก)
+            let cleanLink = social.split('?')[0];
+            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
+
+            // 🚀 STEP 1: ลองดึงผ่าน Unavatar ก่อน (เพราะมันรวมหลายวิธีไว้ข้างใน)
+            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
+
+            // 🚀 STEP 2: ถ้า STEP 1 พัง (รูปแตก) ให้ลองท่าดัดหลัง FB อีกรอบ
+            imgTag.onerror = function() {
+                if (cleanLink.includes('facebook.com')) {
+                    let parts = cleanLink.split('/');
+                    let username = parts[parts.length - 1];
+                    // ลองใช้ Graph API แบบดื้อๆ
+                    this.src = `https://graph.facebook.com/${username}/picture?type=large`;
+                }
                 
-                // ใช้ลิงก์ดึงรูปตรงของ Facebook (ถ้าคนนั้นไม่ได้ปิด Private โหดๆ รูปจะขึ้นครับ)
-                imgTag.src = `https://graph.facebook.com/${username}/picture?type=large&redirect=true`;
-            } else {
-                // ถ้าเป็นค่ายอื่น ใช้ Unavatar ปกติ
-                imgTag.src = `https://unavatar.io/${social.split('?')[0]}?fallback=${encodeURIComponent(fallback)}`;
-            }
+                // 🚀 STEP 3: ถ้ายังพังอีก (ห่วยสุดๆ) ค่อยกลับไปเป็นตัวอักษร "เป"
+                this.onerror = function() {
+                    this.src = fallback;
+                    this.onerror = null;
+                };
+            };
         } else {
             imgTag.src = fallback;
         }
-
-        // 🛡️ กันรูปแตก (อันนี้สำคัญที่สุด!)
-        // ถ้าโหลดรูปจาก FB ไม่ได้จริงๆ ให้สลับเป็น "ตัวอักษรเขียว" ทันที ห้ามโหว่ ห้ามแตก
-        imgTag.onerror = function() { 
-            this.src = fallback; 
-            this.onerror = null; // ป้องกันการวนลูปถ้า fallback เสียด้วย
-        };
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
             currentPromptPay = data.promptpay.toString();
