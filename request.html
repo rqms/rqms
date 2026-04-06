@@ -125,7 +125,7 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-                // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันแก้ไขใหม่) ---
+                    // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันหว่านแหเช็คชื่อคอลัมน์) ---
         async function checkStatus() {
             if(!artistId) return;
             const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
@@ -138,16 +138,18 @@
                 document.getElementById('artist-display-name').innerText = data.display_name;
                 document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
                 
-                // 📸 ดึงรูปโปรไฟล์ (รองรับทุกลิงก์ Social)
+                // 📸 ดึงรูปโปรไฟล์
                 const imgTag = document.getElementById('artist-img');
-                const social = data.social_contact || ""; 
+
+                // พยายามดึงจากชื่อคอลัมน์ที่พี่น่าจะตั้งไว้ (เช็คทั้ง social_contact, facebook, social, link)
+                const social = data.social_contact || data.facebook || data.social || data.link || ""; 
 
                 if (social) {
-                    // ใช้ Unavatar ดึงรูปจาก Link อะไรก็ได้ที่ใส่มา
-                    imgTag.src = `https://unavatar.io/${social}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+                    // ถ้ามีค่าในฐานข้อมูล ให้ดึงรูปผ่าน Unavatar
+                    imgTag.src = `https://unavatar.io/${social}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
                 } else {
-                    // ถ้าไม่มีข้อมูล ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
-                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+                    // ถ้าในฐานข้อมูลว่างเปล่า ให้โชว์รูปตัวอักษรชื่อแทน (กันรูปแตก)
+                    imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
                 }
 
                 if (data.promptpay) {
