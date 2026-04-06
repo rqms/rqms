@@ -125,42 +125,53 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-                        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (ปรับปรุงการดึงรูปจาก Social Media) ---
-        async function checkStatus() {
-            if(!artistId) return;
-            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
-            const loadingScreen = document.getElementById('loading-screen');
-            const requestForm = document.getElementById('request-form');
+                   // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (ฉบับแก้ไขให้รูปขึ้น 100%) ---
+async function checkStatus() {
+    if(!artistId) return;
+    
+    // ดึงข้อมูลจาก Supabase
+    const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+    const loadingScreen = document.getElementById('loading-screen');
+    const requestForm = document.getElementById('request-form');
 
-            if (data && data.is_active) {
-                loadingScreen.classList.add('hidden');
-                requestForm.classList.remove('hidden');
-                document.getElementById('artist-display-name').innerText = data.display_name;
-                document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
-                const imgTag = document.getElementById('artist-img');
-                let social = data.social_contact || ""; 
+    if (data && data.is_active) {
+        loadingScreen.classList.add('hidden');
+        requestForm.classList.remove('hidden');
+        
+        // ใส่ชื่อศิลปินและร้าน
+        document.getElementById('artist-display-name').innerText = data.display_name || "---";
+        document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
+        
+        // 📸 จัดการรูปโปรไฟล์
+        const imgTag = document.getElementById('artist-img');
+        // ดึงลิงก์จากคอลัมน์ social_contact (ตามรูปที่พี่ส่งมา)
+        let social = data.social_contact || ""; 
 
-                if (social && social.includes('http')) {
-                    // ล้างลิงก์ขยะพวก ?mibextid หรือ /share/ ออกให้สะอาด
-                    let cleanLink = social.split('?')[0];
-                    if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
-                    
-                    // ส่งไปดึงรูป ถ้าดึงไม่ได้จะขึ้นรูปตัวอักษร (Fallback) สวยๆ แทนเครื่องหมาย [?]
-                    imgTag.src = `https://unavatar.io/${cleanLink}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
-                } else {
-                    // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษรชื่อนักดนตรี
-                    imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
-                }                if (data.promptpay) {
-                    currentPromptPay = data.promptpay;
-                    document.getElementById('tip-area').classList.remove('hidden');
-                }
-                loadSmartAffiliate(""); 
-            } else {
-                loadingScreen.classList.remove('hidden');
-                requestForm.classList.add('hidden');
-            }
+        if (social && social.includes('http')) {
+            // ล้างลิงก์ให้สะอาด (ตัด ?mibextid... ออก)
+            let cleanLink = social.split('?')[0];
+            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
+            
+            // ส่งไปดึงรูป ถ้าดึงจากแอปไม่ได้ จะขึ้นรูปตัวอักษร "ชื่อพี่" สวยๆ แทนเครื่องหมาย [?]
+            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
+        } else {
+            // กรณีเป็นเบอร์โทร หรือว่างเปล่า ให้ขึ้นรูปตัวอักษรชื่อแทน
+            imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
         }
 
+        // จัดการเลขพร้อมเพย์
+        if (data.promptpay) {
+            currentPromptPay = data.promptpay.toString();
+            document.getElementById('tip-area').classList.remove('hidden');
+        }
+        
+        loadSmartAffiliate(""); 
+    } else {
+        // ถ้าสถานะไม่ใช่ Active ให้โชว์หน้า Loading
+        loadingScreen.classList.remove('hidden');
+        requestForm.classList.add('hidden');
+    }
+}
         // --- 3. ระบบ Smart Affiliate (Random ตามชื่อเพลง) ---
         function loadSmartAffiliate(songName) {
             const affId = "KAEN_SHOP";
