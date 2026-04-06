@@ -24,7 +24,7 @@
             <button onclick="checkPin()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">
                 ยืนยันรหัสผ่าน
             </button>
-            <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้องครับ ถ้าจำไม่ได้ ใช้ QR code เปิดสำหรับหลังบ้าน</p>
+            <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้องครับ</p>
         </div>
     </div>
 
@@ -83,21 +83,22 @@
                     <label class="text-[10px] text-emerald-500 font-bold mb-1 block">💸 PromptPay รับทิป</label>
                     <input type="text" id="edit_promptpay" placeholder="เบอร์โทร / เลขบัตร" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold text-lg">
                 </div>
+                
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">แนวเพลง</label>
-                    <input type="text" id="edit_genres" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🖼️ ใส่ link รูปวง (.jpg, .png)</label>
+                    <input type="text" id="edit_social" placeholder="แปะที่อยู่รูปภาพตรงนี้" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
                 </div>
+
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ใส่ link รูปวง</label>
-                    <input type="text" id="edit_social" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🎸 แนวเพลง / ข้อมูลวง / ช่องทางติดต่อ</label>
+                    <textarea id="edit_songs" rows="5" placeholder="พิมพ์รวมได้เลย เช่น: แนววาไรตี้ / ติดต่องาน 08x-xxx-xxxx" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500"></textarea>
                 </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ข้อมูลนักดนตรี/ช่องทางติดต่อ</label>
-                    <textarea id="edit_songs" rows="3" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500"></textarea>
-                </div>
+
+                <input type="hidden" id="edit_genres">
             </div>
+
             <div class="grid grid-cols-2 gap-3 mt-8">
-                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase">บันทึก</button>
+                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)]">บันทึก</button>
                 <button onclick="document.getElementById('editProfileModal').classList.add('hidden')" class="bg-slate-800 text-slate-400 py-4 rounded-2xl font-black uppercase">ยกเลิก</button>
             </div>
         </div>
@@ -116,25 +117,12 @@
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }, 1000);
 
-        // --- ระบบความปลอดภัย (ปรับปรุงใหม่เพื่อรองรับ Admin QR) ---
+        // --- ระบบความปลอดภัย ---
         async function initAuth() {
             if (!artistId) return alert("ไม่พบ ID ศิลปิน");
-            
-            // ดักจับรหัสลับจาก URL (กรณีสแกนจาก QR Admin)
-            const urlParams = new URLSearchParams(window.location.search);
-            const autoAuth = urlParams.get('auth');
-
             const { data } = await sb.from('musicians').select('pin').eq('id', artistId).single();
             if (data) {
                 masterPin = data.pin;
-                
-                // ถ้ามีรหัสลับมากับ URL และตรงกับรหัสจริง ให้ปล่อยผ่านและจำเครื่องไว้
-                if (autoAuth && atob(autoAuth) === masterPin) {
-                    localStorage.setItem('access_' + artistId, 'true');
-                    // ล้างรหัสลับออกจาก URL เพื่อความปลอดภัย
-                    window.history.replaceState({}, document.title, window.location.pathname + "?id=" + artistId);
-                }
-
                 if (localStorage.getItem('access_' + artistId) === 'true') {
                     document.getElementById('lock-screen').classList.add('hidden');
                     load();
@@ -156,89 +144,59 @@
             }
         }
 
-        // --- ฟังก์ชัน Logout แบบถามก่อน (Smart Logout) ---
-async function logout() {
-    // 1. เช็คว่าถ้าระบบ "เปิดใช้งาน (Online)" อยู่
-    if (isSystemOpen) {
-        const confirmClose = confirm("🎸 พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบขอเพลง + Logout (จบโชว์)\nกด [ยกเลิก] = Logout อย่างเดียว (ระบบยังรันต่อ)");
-        
-        if (confirmClose) {
-            // กรณีเลือกปิดระบบด้วย (Update DB ก่อนออก)
-            await sb.from('musicians').update({ is_active: false }).eq('id', artistId);
-            executeLogout();
-            return;
+        async function logout() {
+            if (isSystemOpen) {
+                const confirmClose = confirm("พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบ + Logout\nกด [ยกเลิก] = Logout อย่างเดียว");
+                if (confirmClose) {
+                    await sb.from('musicians').update({ is_active: false }).eq('id', artistId);
+                    executeLogout();
+                    return;
+                }
+            }
+            if (confirm("ยืนยันการออกจากระบบใช่ไหมครับ?")) { executeLogout(); }
         }
-    }
-    
-    // 2. ถ้าระบบปิดอยู่แล้ว หรือเลือกแค่ Logout อย่างเดียว
-    if (confirm("ยืนยันการออกจากระบบ (Logout) ใช่ไหมครับ?")) {
-        executeLogout();
-    }
-}
 
-// ฟังก์ชันล้างค่าในเครื่องและ Reload
-function executeLogout() {
-    localStorage.removeItem('access_' + artistId);
-    location.reload();
-}
+        function executeLogout() {
+            localStorage.removeItem('access_' + artistId);
+            location.reload();
+        }
 
-        // --- 📍 ฟังก์ชัน GPS (ของเดิมที่พี่เน้นย้ำ) ---
+        // --- GPS 📍 ---
         function getLocation() {
             var listContainer = document.getElementById('venue-list');
             listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
-
-            if (!navigator.geolocation) {
-                alert("iPad ไม่รองรับ GPS ครับ");
-                return;
-            }
-
+            if (!navigator.geolocation) { alert("iPad ไม่รองรับ GPS ครับ"); return; }
             navigator.geolocation.getCurrentPosition(function(pos) {
                 var lat = pos.coords.latitude;
                 var lon = pos.coords.longitude;
                 var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
-                
-                fetch(url)
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
+                fetch(url).then(res => res.json()).then(data => {
                     var addr = data.address;
                     var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
                     listContainer.innerHTML = "";
-                    if (names.length === 0) {
-                        listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้าน ลองพิมพ์เองนะครับ</p>";
-                        return;
-                    }
-                    names.forEach(function(name) {
+                    if (names.length === 0) { listContainer.innerHTML = "<p class='text-[10px] text-slate-500'>ไม่พบชื่อร้าน ลองพิมพ์เองนะครับ</p>"; return; }
+                    names.forEach(name => {
                         var pill = document.createElement('button');
                         pill.className = "bg-slate-800 text-[10px] px-3 py-2 rounded-full border border-slate-700 text-emerald-400 font-bold";
                         pill.innerText = name;
-                        pill.onclick = function() {
-                            document.getElementById('venue-input').value = name;
-                            listContainer.innerHTML = "";
-                        };
+                        pill.onclick = () => { document.getElementById('venue-input').value = name; listContainer.innerHTML = ""; };
                         listContainer.appendChild(pill);
                     });
-                })
-                .catch(function(err) {
-                    alert("ดึงข้อมูลแผนที่ไม่ได้: " + err);
-                    listContainer.innerHTML = "";
-                });
-            }, function(error) {
-                alert("กรุณาเปิด GPS และกดยอมรับการเข้าถึงตำแหน่งครับ");
-                listContainer.innerHTML = "";
-            }, { enableHighAccuracy: true, timeout: 5000 });
+                }).catch(() => { listContainer.innerHTML = ""; });
+            }, () => { alert("กรุณาเปิด GPS ครับ"); listContainer.innerHTML = ""; }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
-        // --- ระบบจัดการคิวและสถานะ (คงเดิม) ---
+        // --- ระบบจัดการคิว ---
         async function load() {
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (resMusician.data) {
                 isSystemOpen = resMusician.data.is_active;
                 document.getElementById('venue-input').value = resMusician.data.current_venue || "";
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name;
-                updateUI(resMusician.data.current_venue);
+                updateUI();
             }
             var resReq = await sb.from('requests').select('*').eq('musician_id', artistId).eq('status', 'pending');
-            if (resReq.data) { resReq.data.forEach(function(r) { draw(r); }); }
+            if (resReq.data) { resReq.data.forEach(r => draw(r)); }
         }
 
         async function toggleSystem() {
@@ -246,10 +204,10 @@ function executeLogout() {
             var next = !isSystemOpen;
             if(!next) { document.getElementById('queue-container').innerHTML = ""; document.getElementById('history-container').innerHTML = ""; }
             await sb.from('musicians').update({ is_active: next, current_venue: v }).eq('id', artistId);
-            isSystemOpen = next; updateUI(v);
+            isSystemOpen = next; updateUI();
         }
 
-        function updateUI(v) {
+        function updateUI() {
             var b = document.getElementById('system-btn');
             var d = document.getElementById('status-dot');
             var s = document.getElementById('status-text');
@@ -287,18 +245,18 @@ function executeLogout() {
                 card.appendChild(label);
                 card.classList.add('is-history');
                 document.getElementById('history-container').prepend(card);
-                sb.from('requests').update({ status: (status === 'ok' ? 'played' : 'declined') }).eq('id', id).then(function(){});
+                sb.from('requests').update({ status: (status === 'ok' ? 'played' : 'declined') }).eq('id', id).then(() => {});
             }
         }
 
-        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, 
-            function(p) { draw(p.new); }).subscribe();
+        sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
 
+        // --- ⚙️ Settings Functions (ปรับให้เข้ากับ HTML ใหม่) ---
         async function openEditModal() {
             const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (data) {
                 document.getElementById('edit_display_name').value = data.display_name || "";
-                document.getElementById('edit_genres').value = data.genres || "";
+                document.getElementById('edit_genres').value = data.genres || ""; 
                 document.getElementById('edit_social').value = data.social_contact || "";
                 document.getElementById('edit_promptpay').value = data.promptpay || "";
                 document.getElementById('edit_songs').value = data.recommended_songs || "";
@@ -319,6 +277,8 @@ function executeLogout() {
                 alert("บันทึกสำเร็จ!");
                 document.getElementById('display-artist-name').innerText = updates.display_name;
                 document.getElementById('editProfileModal').classList.add('hidden');
+            } else {
+                alert("บันทึกไม่สำเร็จ: " + error.message);
             }
         }
 
