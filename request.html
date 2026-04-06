@@ -143,7 +143,7 @@ async function checkStatus() {
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
 
-         // 📸 ส่วนจัดการรูปโปรไฟล์แบบง่าย (รองรับ FB, IG, TikTok, YT)
+    // 📸 ส่วนจัดการรูปโปรไฟล์แบบ Simple (รองรับ FB, IG, TikTok)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
@@ -152,15 +152,15 @@ async function checkStatus() {
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
         if (social && social.startsWith('http')) {
-            // 🚀 ท่าไม้ตาย: ส่งลิงก์ไปให้ Unavatar จัดการหาให้เองทุกลิงก์
-            // ระบบนี้จะไปงัดรูปจากหน้าเว็บโซเชียลมาให้โดยอัตโนมัติ
+            // 🚀 ท่าไม้ตาย: ส่งลิงก์ไปให้ Unavatar จัดการหาให้เอง
+            // ตัวนี้จะฉลาดพอที่จะแกะรูปจากหน้าโปรไฟล์โซเชียลต่างๆ ครับ
             imgTag.src = `https://unavatar.io/${social}?fallback=${encodeURIComponent(fallback)}`;
         } else {
             // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
 
-        // กันรูปแตกซ้ำซ้อน
+        // กันรูปแตก: ถ้าสุดท้ายโหลดไม่ขึ้นจริงๆ ให้กลับไปใช้รูปตัวอักษรเขียว
         imgTag.onerror = function() { this.src = fallback; };
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
