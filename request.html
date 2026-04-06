@@ -137,23 +137,20 @@
                 requestForm.classList.remove('hidden');
                 document.getElementById('artist-display-name').innerText = data.display_name;
                 document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
-                
-                // 📸 ดึงรูปโปรไฟล์แบบ Universal (รองรับทุก Social Link)
                 const imgTag = document.getElementById('artist-img');
-                
-                // ดึงค่าจากคอลัมน์ที่เป็นไปได้ใน Database
-                const socialLink = data.social_contact || data.facebook || data.social || data.link || ""; 
-                const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff`;
+                let social = data.social_contact || ""; 
 
-                if (socialLink) {
-                    // ใช้ Unavatar แบบ Auto-detect: ใส่ URL เต็มเข้าไป ระบบจะหา Provider ให้เอง
-                    // เช่น ใส่ facebook.com/user หรือ instagram.com/user ระบบจะจัดการดึงรูปให้
-                    imgTag.src = `https://unavatar.io/${socialLink}?fallback=${encodeURIComponent(fallbackImg)}`;
+                if (social && social.includes('http')) {
+                    // ล้างลิงก์ขยะพวก ?mibextid หรือ /share/ ออกให้สะอาด
+                    let cleanLink = social.split('?')[0];
+                    if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
+                    
+                    // ส่งไปดึงรูป ถ้าดึงไม่ได้จะขึ้นรูปตัวอักษร (Fallback) สวยๆ แทนเครื่องหมาย [?]
+                    imgTag.src = `https://unavatar.io/${cleanLink}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
                 } else {
-                    imgTag.src = fallbackImg;
-                }
-
-                if (data.promptpay) {
+                    // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษรชื่อนักดนตรี
+                    imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
+                }                if (data.promptpay) {
                     currentPromptPay = data.promptpay;
                     document.getElementById('tip-area').classList.remove('hidden');
                 }
