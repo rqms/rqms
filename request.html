@@ -143,36 +143,25 @@ async function checkStatus() {
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
 
-         // 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันงัดรูป Facebook 2026)
+         // 📸 ส่วนจัดการรูปโปรไฟล์แบบง่าย (รองรับ FB, IG, TikTok, YT)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
 
-        // รูปสำรอง (วงกลมเขียว) กรณีทุกอย่างพัง
+        // รูปสำรอง (วงกลมเขียว) กรณีดึงรูปจริงไม่ได้
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
-        if (social && (social.startsWith('http') || social.startsWith('www'))) {
-            if (social.startsWith('www')) social = 'https://' + social;
-            
-            let cleanLink = social.split('?')[0];
-            if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
-
-            if (cleanLink.includes('facebook.com')) {
-                // 🚀 ท่าแก้รูปแตก: ดึงผ่าน Redirector ของ Unavatar แบบเจาะจง Facebook
-                // วิธีนี้จะช่วยเลี่ยงการโดนบล็อกได้ดีที่สุด
-                imgTag.src = `https://unavatar.io/facebook/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
-            } else {
-                // สำหรับ App อื่นๆ (TikTok, IG)
-                imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
-            }
+        if (social && social.startsWith('http')) {
+            // 🚀 ท่าไม้ตาย: ส่งลิงก์ไปให้ Unavatar จัดการหาให้เองทุกลิงก์
+            // ระบบนี้จะไปงัดรูปจากหน้าเว็บโซเชียลมาให้โดยอัตโนมัติ
+            imgTag.src = `https://unavatar.io/${social}?fallback=${encodeURIComponent(fallback)}`;
         } else {
+            // ถ้าเป็นเบอร์โทรหรือค่าว่าง ให้ขึ้นรูปตัวอักษร
             imgTag.src = fallback;
         }
 
-        // กันรูปแตกซ้ำซ้อน: ถ้าโหลดรูปที่ตั้งไว้ไม่ได้ ให้สลับไปใช้รูปตัวอักษรทันที
-        imgTag.onerror = function() {
-            this.src = fallback;
-        };
+        // กันรูปแตกซ้ำซ้อน
+        imgTag.onerror = function() { this.src = fallback; };
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
             currentPromptPay = data.promptpay.toString();
