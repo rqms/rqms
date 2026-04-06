@@ -142,42 +142,42 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันแกะรอยโซเชียลรายค่าย)
+// 📸 ส่วนจัดการรูปโปรไฟล์ (เวอร์ชันอึดพิเศษ - ลองทุกทาง)
         const imgTag = document.getElementById('artist-img');
         let social = data.social_contact ? data.social_contact.trim() : "";
         const displayName = data.display_name || "Artist";
+
+        // รูปสำรอง (วงกลมเขียว)
         const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
 
         if (social && (social.startsWith('http') || social.startsWith('www'))) {
             if (social.startsWith('www')) social = 'https://' + social;
             
-            // 1. ล้างลิงก์ให้เหลือแค่ชื่อ Username (สำคัญมากสำหรับ FB ส่วนตัว และ TikTok)
+            // ล้างลิงก์ให้สะอาด (ตัด ?mibextid... ออก)
             let cleanLink = social.split('?')[0];
             if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
 
-            // 2. แยกค่ายเพื่อเรียกใช้ Engine ที่ถูกต้อง
-            if (cleanLink.includes('facebook.com')) {
-                // บังคับดึงผ่าน facebook engine
-                imgTag.src = `https://unavatar.io/facebook/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
-            } else if (cleanLink.includes('instagram.com')) {
-                // บังคับดึงผ่าน instagram engine
-                imgTag.src = `https://unavatar.io/instagram/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
-            } else if (cleanLink.includes('tiktok.com')) {
-                // บังคับดึงผ่าน tiktok engine
-                imgTag.src = `https://unavatar.io/tiktok/${encodeURIComponent(cleanLink)}?fallback=${encodeURIComponent(fallback)}`;
-            } else {
-                // ค่ายอื่นๆ (YouTube, Twitter, etc.)
-                imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
-            }
+            // 🚀 STEP 1: ลองดึงผ่าน Unavatar ก่อน (เพราะมันรวมหลายวิธีไว้ข้างใน)
+            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallback)}`;
+
+            // 🚀 STEP 2: ถ้า STEP 1 พัง (รูปแตก) ให้ลองท่าดัดหลัง FB อีกรอบ
+            imgTag.onerror = function() {
+                if (cleanLink.includes('facebook.com')) {
+                    let parts = cleanLink.split('/');
+                    let username = parts[parts.length - 1];
+                    // ลองใช้ Graph API แบบดื้อๆ
+                    this.src = `https://graph.facebook.com/${username}/picture?type=large`;
+                }
+                
+                // 🚀 STEP 3: ถ้ายังพังอีก (ห่วยสุดๆ) ค่อยกลับไปเป็นตัวอักษร "เป"
+                this.onerror = function() {
+                    this.src = fallback;
+                    this.onerror = null;
+                };
+            };
         } else {
             imgTag.src = fallback;
         }
-
-        // 🛡️ ถ้าดึงไม่ได้จริงๆ (พังทุกทาง) ให้ขึ้นรูปตัวอักษร "เป" ทันที ห้ามโชว์รูปแตก
-        imgTag.onerror = function() { 
-            this.src = fallback; 
-            this.onerror = null;
-        };
         // จัดการเลขพร้อมเพย์
         if (data.promptpay) {
             currentPromptPay = data.promptpay.toString();
