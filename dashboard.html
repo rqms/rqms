@@ -12,6 +12,9 @@
         .big-btn:active { background-color: #000 !important; opacity: 0.7; transform: scale(0.95); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         #artist-profile-img { transition: all 0.3s ease; }
+        /* สไตล์สำหรับผลการค้นหาเพลงแนะนำ */
+        .search-result-item { transition: all 0.2s; cursor: pointer; }
+        .search-result-item:hover { background-color: #1e293b; }
     </style>
 </head>
 <body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
@@ -44,9 +47,9 @@
                     <p class="text-[8px] uppercase text-slate-500 font-bold">Artist</p>
                     <h2 id="display-artist-name" class="text-lg font-black text-emerald-500 leading-none">---</h2>
                 </div>
-                <button onclick="openEditModal()" class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-sm hover:bg-slate-700">⚙️</button>
+                <button onclick="openEditModal()" class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-sm hover:bg-slate-700">⚙️ Settings</button>
             </div>
-            <div class="text-right ml-auto">
+            <div class="text-right ml-auto hidden md:block">
                 <h2 id="display-time" class="text-2xl font-mono font-black text-emerald-500 leading-none">00:00:00</h2>
             </div>
         </div>
@@ -73,39 +76,50 @@
         <button onclick="logout()" class="text-slate-600 text-[10px] uppercase font-bold w-full py-8 hover:text-red-400">🚪 ออกจากระบบ (Logout)</button>
     </div>
 
-    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 font-sans">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-xl font-black text-white uppercase mb-6 border-b border-slate-800 pb-2">ตั้งค่าโปรไฟล์วง</h2>
+    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 font-sans overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl my-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-white uppercase">ตั้งค่าระบบขอเพลง</h2>
+                <button onclick="document.getElementById('editProfileModal').classList.add('hidden')" class="text-slate-500 text-2xl">&times;</button>
+            </div>
+            
             <div class="space-y-4 text-left">
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ชื่อวง</label>
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ชื่อวง / ชื่อศิลปิน</label>
                     <input type="text" id="edit_display_name" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
                 </div>
-                <div>
-                    <label class="text-[10px] text-emerald-500 font-bold mb-1 block">💸 PromptPay รับทิป</label>
-                    <input type="text" id="edit_promptpay" placeholder="เบอร์โทร / เลขบัตร" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold text-lg">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] text-slate-500 font-bold mb-1 block">แนวเพลง</label>
+                        <input type="text" id="edit_genres" placeholder="เช่น วาไรตี้, โฟล์คซอง" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-emerald-500 font-bold mb-1 block">PromptPay รับทิป</label>
+                        <input type="text" id="edit_promptpay" placeholder="เบอร์โทร / เลขบัตร" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold">
+                    </div>
                 </div>
+
                 <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🎵 แนวเพลง</label>
-                    <input type="text" id="edit_genres" placeholder="เช่น วาไรตี้, สตริง, เพื่อชีวิต" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🖼️ รูปโปรไฟล์วง (ลิงก์รูปภาพ .jpg / .png)</label>
+                    <input type="text" id="edit_social_contact" placeholder="วางลิงก์รูปภาพที่นี่" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-[12px] text-slate-300 outline-none focus:border-emerald-500">
                 </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🖼️ ใส่ link รูปวง (.jpg, .png)</label>
-                    <input type="text" id="edit_social" placeholder="แปะที่อยู่รูปภาพตรงนี้" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">📱 โซเชียลติดต่อ (Link FB / Line ID)</label>
-                    <input type="text" id="edit_contact" placeholder="เช่น https://www.facebook.com/..." class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="text-[10px] text-emerald-400 font-bold mb-1 block">⭐️ เพลงแนะนำ (1 เพลงต่อ 1 บรรทัด)</label>
-                    <textarea id="edit_songs" rows="5" placeholder="พิมพ์ชื่อเพลงที่นี่..." class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500"></textarea>
-                    <p class="text-[9px] text-slate-500 mt-1">* ระบบจะนำชื่อเพลงไปสร้างเป็นปุ่มให้ลูกค้ากดขอได้ทันที</p>
+
+                <div class="border-t border-slate-800 pt-4">
+                    <label class="text-[10px] text-emerald-400 font-bold mb-1 block uppercase">จัดการเพลงแนะนำ (Playlist)</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="song-search-input" placeholder="ค้นหาชื่อเพลง/ศิลปินทั่วโลก..." class="flex-1 bg-slate-950 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
+                        <button onclick="searchSongs()" class="bg-slate-800 px-4 rounded-xl border border-slate-700">🔍</button>
+                    </div>
+                    <div id="search-results" class="max-h-[150px] overflow-y-auto hidden bg-black rounded-xl border border-slate-800 mb-3 p-1"></div>
+                    
+                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">รายการเพลงที่แนะนำ (พิมพ์เพิ่มเองหรือเลือกจากข้างบน)</label>
+                    <textarea id="edit_recommended_songs" rows="4" placeholder="ชื่อเพลง - ศิลปิน (1 เพลงต่อ 1 บรรทัด)" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500 text-sm"></textarea>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3 mt-8">
-                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)]">บันทึก</button>
+                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase shadow-lg">บันทึก</button>
                 <button onclick="document.getElementById('editProfileModal').classList.add('hidden')" class="bg-slate-800 text-slate-400 py-4 rounded-2xl font-black uppercase">ยกเลิก</button>
             </div>
         </div>
@@ -119,10 +133,12 @@
         var isSystemOpen = false;
         var masterPin = "";
 
-        setInterval(function() {
+        // --- ระบบเวลา ---
+        setInterval(() => {
             document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
         }, 1000);
 
+        // --- ระบบความปลอดภัย (เดิม) ---
         async function initAuth() {
             if (!artistId) return alert("ไม่พบ ID ศิลปิน");
             const { data } = await sb.from('musicians').select('pin').eq('id', artistId).single();
@@ -149,45 +165,92 @@
             }
         }
 
-        function executeLogout() {
-            localStorage.removeItem('access_' + artistId);
-            location.reload();
-        }
-
-        async function logout() {
-            if (isSystemOpen) {
-                const confirmClose = confirm("พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบ + Logout\nกด [ยกเลิก] = Logout อย่างเดียว");
-                if (confirmClose) {
-                    await sb.from('musicians').update({ is_active: false }).eq('id', artistId);
-                    executeLogout();
-                    return;
-                }
-            }
-            if (confirm("ยืนยันการออกจากระบบใช่ไหมครับ?")) { executeLogout(); }
-        }
-
+        // --- ระบบจัดการ Profile (ปรับปรุงแยกช่อง) ---
         function updateProfileImage(url, name) {
             const imgTag = document.getElementById('artist-profile-img');
             const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'A')}&background=059669&color=fff&size=100`;
-            if (url && url.startsWith('http')) {
-                imgTag.src = url;
-            } else {
-                imgTag.src = fallback;
-            }
-            imgTag.onerror = function() {
-                this.src = fallback;
-                this.onerror = null;
-            };
+            imgTag.src = (url && url.startsWith('http')) ? url : fallback;
+            imgTag.onerror = function() { this.src = fallback; this.onerror = null; };
         }
 
+        async function openEditModal() {
+            const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
+            if (data) {
+                document.getElementById('edit_display_name').value = data.display_name || "";
+                document.getElementById('edit_genres').value = data.genres || ""; 
+                document.getElementById('edit_social_contact').value = data.social_contact || "";
+                document.getElementById('edit_promptpay').value = data.promptpay || "";
+                document.getElementById('edit_recommended_songs').value = data.recommended_songs || "";
+                document.getElementById('editProfileModal').classList.remove('hidden');
+                document.getElementById('search-results').innerHTML = "";
+                document.getElementById('search-results').classList.add('hidden');
+            }
+        }
+
+        // --- ค้นหาเพลงจาก Apple Music (เหมือนหน้าขอเพลง) ---
+        async function searchSongs() {
+            const term = document.getElementById('song-search-input').value;
+            if (!term) return;
+            const resBox = document.getElementById('search-results');
+            resBox.innerHTML = "<p class='text-center p-4 text-xs text-emerald-500 animate-pulse'>กำลังค้นหา...</p>";
+            resBox.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=10&country=th`);
+                const data = await response.json();
+                resBox.innerHTML = "";
+                if (data.results.length === 0) {
+                    resBox.innerHTML = "<p class='p-3 text-xs text-slate-500'>ไม่พบเพลงที่ค้นหา</p>";
+                    return;
+                }
+                data.results.forEach(song => {
+                    const div = document.createElement('div');
+                    div.className = "search-result-item flex items-center gap-3 p-2 border-b border-white/5";
+                    div.innerHTML = `
+                        <img src="${song.artworkUrl60}" class="w-8 h-8 rounded">
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-white text-[12px] font-bold truncate">${song.trackName}</p>
+                            <p class="text-slate-500 text-[10px] truncate">${song.artistName}</p>
+                        </div>
+                    `;
+                    div.onclick = () => {
+                        const textarea = document.getElementById('edit_recommended_songs');
+                        const songStr = `${song.trackName} - ${song.artistName}`;
+                        textarea.value += (textarea.value ? "\n" : "") + songStr;
+                        resBox.classList.add('hidden');
+                        document.getElementById('song-search-input').value = "";
+                    };
+                    resBox.appendChild(div);
+                });
+            } catch (e) { resBox.innerHTML = "<p class='p-3 text-red-500'>เกิดข้อผิดพลาด</p>"; }
+        }
+
+        async function saveProfile() {
+            const updates = {
+                display_name: document.getElementById('edit_display_name').value,
+                genres: document.getElementById('edit_genres').value,
+                social_contact: document.getElementById('edit_social_contact').value,
+                promptpay: document.getElementById('edit_promptpay').value,
+                recommended_songs: document.getElementById('edit_recommended_songs').value
+            };
+            const { error } = await sb.from('musicians').update(updates).eq('id', artistId);
+            if (!error) {
+                alert("บันทึกเรียบร้อยครับพี่!");
+                document.getElementById('display-artist-name').innerText = updates.display_name;
+                updateProfileImage(updates.social_contact, updates.display_name);
+                document.getElementById('editProfileModal').classList.add('hidden');
+            } else { alert("Error: " + error.message); }
+        }
+
+        // --- ระบบ GPS (เดิม) ---
         function getLocation() {
             var listContainer = document.getElementById('venue-list');
             listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
-            if (!navigator.geolocation) { alert("iPad ไม่รองรับ GPS ครับ"); return; }
+            if (!navigator.geolocation) { alert("ไม่รองรับ GPS"); return; }
             navigator.geolocation.getCurrentPosition(function(pos) {
                 var lat = pos.coords.latitude;
                 var lon = pos.coords.longitude;
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
                 fetch(url).then(res => res.json()).then(data => {
                     var addr = data.address;
                     var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
@@ -204,6 +267,7 @@
             }, () => { alert("กรุณาเปิด GPS ครับ"); listContainer.innerHTML = ""; }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
+        // --- โหลดข้อมูลเริ่มต้นและ Real-time ---
         async function load() {
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (resMusician.data) {
@@ -231,12 +295,10 @@
             var s = document.getElementById('status-text');
             if (isSystemOpen) {
                 b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
-                d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
-                s.innerText = "Online";
+                d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"; s.innerText = "Online";
             } else {
                 b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
-                d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]";
-                s.innerText = "Offline";
+                d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"; s.innerText = "Offline";
             }
         }
 
@@ -246,62 +308,38 @@
             var div = document.createElement('div');
             div.id = 'card-' + req.id;
             div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
-            div.innerHTML = '<div><p class="text-[9px] text-slate-500 font-bold mb-1">จาก: ' + (req.customer_name || "ไม่ระบุ") + '</p><h3 class="text-lg font-black text-white leading-tight">' + req.song_name + '</h3></div>' +
-                '<div class="btn-area flex gap-2"><button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">เล่นได้</button>' +
-                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">ไม่ได้</button></div>';
+            div.innerHTML = `<div><p class="text-[9px] text-slate-500 font-bold mb-1">จาก: ${req.customer_name || "ไม่ระบุ"}</p><h3 class="text-lg font-black text-white leading-tight">${req.song_name}</h3></div>
+                <div class="btn-area flex gap-2"><button onclick="solve('${req.id}', 'ok')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">เล่นได้</button>
+                <button onclick="solve('${req.id}', 'no')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">ไม่ได้</button></div>`;
             container.prepend(div);
         }
 
         function solve(id, status) {
             var card = document.getElementById('card-' + id);
             if (card) {
-                var btnArea = card.querySelector('.btn-area');
-                if(btnArea) btnArea.remove();
+                var btnArea = card.querySelector('.btn-area'); if(btnArea) btnArea.remove();
                 var label = document.createElement('div');
                 label.className = (status === 'ok' ? "text-emerald-500" : "text-red-500") + " font-black text-[10px] mt-1";
                 label.innerText = (status === 'ok' ? "PLAYED ✅" : "DECLINED ❌");
-                card.appendChild(label);
-                card.classList.add('is-history');
+                card.appendChild(label); card.classList.add('is-history');
                 document.getElementById('history-container').prepend(card);
                 sb.from('requests').update({ status: (status === 'ok' ? 'played' : 'declined') }).eq('id', id).then(() => {});
             }
         }
 
+        function logout() {
+            if (isSystemOpen) {
+                if (confirm("พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบ + Logout\nกด [ยกเลิก] = Logout อย่างเดียว")) {
+                    sb.from('musicians').update({ is_active: false }).eq('id', artistId).then(() => executeLogout());
+                    return;
+                }
+            }
+            if (confirm("ยืนยันการออกจากระบบใช่ไหมครับ?")) executeLogout();
+        }
+
+        function executeLogout() { localStorage.removeItem('access_' + artistId); location.reload(); }
+
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
-
-        // --- ⚙️ Settings Functions (ฉบับแก้ไข) ---
-        async function openEditModal() {
-            const { data } = await sb.from('musicians').select('*').eq('id', artistId).single();
-            if (data) {
-                document.getElementById('edit_display_name').value = data.display_name || "";
-                document.getElementById('edit_genres').value = data.genres || ""; 
-                document.getElementById('edit_social').value = data.social_contact || ""; // ลิงก์รูปวง
-                document.getElementById('edit_promptpay').value = data.promptpay || "";
-                document.getElementById('edit_songs').value = data.recommended_songs || ""; // รายชื่อเพลง
-                document.getElementById('edit_contact').value = data.social_links || ""; // ลิงก์โซเชียลติดต่อ
-                document.getElementById('editProfileModal').classList.remove('hidden');
-            }
-        }
-
-        async function saveProfile() {
-            const updates = {
-                display_name: document.getElementById('edit_display_name').value,
-                genres: document.getElementById('edit_genres').value,
-                social_contact: document.getElementById('edit_social').value,
-                promptpay: document.getElementById('edit_promptpay').value,
-                recommended_songs: document.getElementById('edit_songs').value,
-                social_links: document.getElementById('edit_contact').value
-            };
-            const { error } = await sb.from('musicians').update(updates).eq('id', artistId);
-            if (!error) {
-                alert("บันทึกสำเร็จ!");
-                document.getElementById('display-artist-name').innerText = updates.display_name;
-                updateProfileImage(updates.social_contact, updates.display_name);
-                document.getElementById('editProfileModal').classList.add('hidden');
-            } else {
-                alert("บันทึกไม่สำเร็จ: " + error.message);
-            }
-        }
 
         initAuth();
     </script>
