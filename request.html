@@ -125,42 +125,41 @@
             } catch (e) { console.error("Search error", e); }
         }
 
-        // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันรองรับทุก Link) ---
-async function checkStatus() {
-    if(!artistId) return;
-    const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
-    const loadingScreen = document.getElementById('loading-screen');
-    const requestForm = document.getElementById('request-form');
+                // --- 2. ระบบเช็คสถานะและรูปโปรไฟล์ (เวอร์ชันแก้ไขใหม่) ---
+        async function checkStatus() {
+            if(!artistId) return;
+            const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
+            const loadingScreen = document.getElementById('loading-screen');
+            const requestForm = document.getElementById('request-form');
 
-    if (data && data.is_active) {
-        loadingScreen.classList.add('hidden');
-        requestForm.classList.remove('hidden');
-        document.getElementById('artist-display-name').innerText = data.display_name;
-        document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
-        
-        // ✨ แก้ไขจุดนี้: ใช้ Unavatar ดึงรูปจาก Social Link อะไรก็ได้ที่ใส่// --- ส่วนที่ต้องเปลี่ยนใน checkStatus ---
-const imgTag = document.getElementById('artist-img');
-const social = data.social_contact || ""; 
+            if (data && data.is_active) {
+                loadingScreen.classList.add('hidden');
+                requestForm.classList.remove('hidden');
+                document.getElementById('artist-display-name').innerText = data.display_name;
+                document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
+                
+                // 📸 ดึงรูปโปรไฟล์ (รองรับทุกลิงก์ Social)
+                const imgTag = document.getElementById('artist-img');
+                const social = data.social_contact || ""; 
 
-if (social) {
-    // ใช้ Unavatar ดึงรูปจาก Link อะไรก็ได้ที่ใส่มา (แก้ปัญหาเครื่องหมาย [?] ทันที)
-    imgTag.src = `https://unavatar.io/${social}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
-} else {
-    // ถ้าไม่มีข้อมูลโซเชียล ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
-    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
-}
+                if (social) {
+                    // ใช้ Unavatar ดึงรูปจาก Link อะไรก็ได้ที่ใส่มา
+                    imgTag.src = `https://unavatar.io/${social}?fallback=https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+                } else {
+                    // ถ้าไม่มีข้อมูล ให้ใช้รูปการ์ตูนสุ่มจากชื่อ
+                    imgTag.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.display_name)}`;
+                }
 
-
-        if (data.promptpay) {
-            currentPromptPay = data.promptpay;
-            document.getElementById('tip-area').classList.remove('hidden');
+                if (data.promptpay) {
+                    currentPromptPay = data.promptpay;
+                    document.getElementById('tip-area').classList.remove('hidden');
+                }
+                loadSmartAffiliate(""); 
+            } else {
+                loadingScreen.classList.remove('hidden');
+                requestForm.classList.add('hidden');
+            }
         }
-        loadSmartAffiliate(""); 
-    } else {
-        loadingScreen.classList.remove('hidden');
-        requestForm.classList.add('hidden');
-    }
-}
 
         // --- 3. ระบบ Smart Affiliate (Random ตามชื่อเพลง) ---
         function loadSmartAffiliate(songName) {
