@@ -89,7 +89,7 @@
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
         const artistId = new URLSearchParams(window.location.search).get('id');
-        let currentPromptPay = "";
+        let currentPromptPay = "0873379662";
 
         // --- 1. ระบบค้นหาเพลง (iTunes API) ---
         async function searchMusic(query) {
