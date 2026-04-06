@@ -142,21 +142,27 @@ async function checkStatus() {
         document.getElementById('artist-display-name').innerText = data.display_name || "---";
         document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
         
-        // 📸 จัดการรูปโปรไฟล์
-        const imgTag = document.getElementById('artist-img');
-        // ดึงลิงก์จากคอลัมน์ social_contact (ตามรูปที่พี่ส่งมา)
-        let social = data.social_contact || ""; 
 
-        if (social && social.includes('http')) {
-            // ล้างลิงก์ให้สะอาด (ตัด ?mibextid... ออก)
-            let cleanLink = social.split('?')[0];
+                // 📸 ส่วนดึงรูปโปรไฟล์ (เวอร์ชันตัดปัญหาทุกจุด)
+        const imgTag = document.getElementById('artist-img');
+        const displayName = data.display_name || "Artist";
+        
+        // ดึงลิงก์จากคอลัมน์ social_contact
+        let social = data.social_contact ? data.social_contact.toString().trim() : ""; 
+
+        // สร้างรูปสำรอง (UI-Avatar) เตรียมไว้ก่อนเผื่อลิงก์พัง
+        const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=059669&color=fff&size=128`;
+
+        if (social && social.startsWith('http')) {
+            // ล้างลิงก์ Facebook/IG ให้สะอาดที่สุด
+            let cleanLink = social.split('?')[0]; 
             if (cleanLink.endsWith('/')) cleanLink = cleanLink.slice(0, -1);
             
-            // ส่งไปดึงรูป ถ้าดึงจากแอปไม่ได้ จะขึ้นรูปตัวอักษร "ชื่อพี่" สวยๆ แทนเครื่องหมาย [?]
-            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
+            // สั่งดึงรูป ถ้า 3 วินาทีแล้วรูปไม่มา ให้สลับไปใช้รูปตัวอักษรทันที (กันรูปแตก [?])
+            imgTag.src = `https://unavatar.io/${cleanLink}?fallback=${encodeURIComponent(fallbackImg)}`;
         } else {
-            // กรณีเป็นเบอร์โทร หรือว่างเปล่า ให้ขึ้นรูปตัวอักษรชื่อแทน
-            imgTag.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name)}&background=059669&color=fff&size=128`;
+            // ถ้าเป็นเบอร์โทร หรือว่างเปล่า ให้ใช้รูปตัวอักษรสวยๆ เลย
+            imgTag.src = fallbackImg;
         }
 
         // จัดการเลขพร้อมเพย์
