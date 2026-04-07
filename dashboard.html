@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Style เดิมของพี่ */
         .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; pointer-events: none; }
         .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
         .big-btn:active { background-color: #000 !important; opacity: 0.7; transform: scale(0.95); }
@@ -17,7 +16,6 @@
         .search-result-item:hover { background-color: #1e293b; }
         .song-tag { display: inline-flex; align-items: center; gap: 4px; background: #10b98120; border: 1px solid #10b98140; color: #10b981; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: bold; margin: 2px; }
         
-        /* Style ใหม่ที่เพิ่มมา (ไม่กระทบของเดิม) */
         body, html { height: 100%; overflow: hidden; background: #020617; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
@@ -82,20 +80,27 @@
         </div>
 
         <div id="chord-viewer-panel" class="hidden lg:flex flex-1 flex-col bg-[#010409] relative">
-            
-            <div class="p-3 bg-slate-900 border-b border-slate-800 flex flex-wrap gap-3 justify-between items-center shadow-lg">
-                <div class="flex items-center gap-3">
-                    <span id="playing-song-label" class="text-emerald-500 font-black text-xs uppercase italic tracking-wider">Now Playing: ---</span>
+            <div class="p-3 bg-slate-900 border-b border-slate-800 flex flex-wrap gap-2 justify-between items-center shadow-lg">
+                <div class="flex items-center gap-2">
+                    <span id="playing-song-label" class="text-emerald-500 font-black text-[10px] uppercase italic tracking-wider">Now Playing: ---</span>
                 </div>
                 
-                <div class="flex gap-2">
-                    <input type="text" id="drive-folder-input" placeholder="วางลิงก์ Folder Google Drive..." 
+                <div class="flex gap-2 items-center">
+                    <input type="text" id="drive-folder-input" placeholder="วางลิงก์ Google Drive..." 
                            class="bg-slate-950 border border-slate-700 px-3 py-2 rounded-xl text-[10px] text-white outline-none w-44 focus:border-blue-500">
-                    <button onclick="openDriveFolder()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-bold active:scale-95">📂 เปิดโฟลเดอร์</button>
                     
+                    <select id="drive-sort-order" onchange="openDriveFolder()" class="bg-slate-800 text-white px-2 py-2 rounded-xl text-[10px] outline-none border border-slate-700">
+                        <option value="name">เรียง: ชื่อ (ก-ฮ)</option>
+                        <option value="modified">เรียง: ล่าสุด</option>
+                    </select>
+
+                    <button onclick="saveAndOpenDrive()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-black active:scale-95">💾 บันทึก & เปิด</button>
+                    
+                    <div class="h-6 w-[1px] bg-slate-700 mx-1"></div>
+
                     <input type="file" id="chord-file-input" accept="image/*" class="hidden" onchange="loadLocalChord(event)">
-                    <label for="chord-file-input" class="bg-slate-800 text-white px-3 py-2 rounded-xl text-[10px] font-bold cursor-pointer active:scale-95">📁 ไฟล์ในเครื่อง</label>
-                    <button onclick="autoSearchChord()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-[10px] font-bold active:scale-95">🔍 Google</button>
+                    <label for="chord-file-input" class="bg-slate-800 text-slate-400 p-2 rounded-xl text-[10px] cursor-pointer">📁</label>
+                    <button onclick="autoSearchChord()" class="bg-slate-800 text-emerald-500 p-2 rounded-xl text-[10px] font-bold">🔍</button>
                     <button onclick="resetViewer()" class="bg-slate-700 text-slate-400 px-2 py-2 rounded-xl text-[10px]">✕</button>
                 </div>
             </div>
@@ -146,7 +151,6 @@
     </div>
 
     <script>
-        /* --- SUPABASE & DATA เดิม (ห้ามแก้) --- */
         var SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         var sb = supabase.createClient(SB_URL, SB_KEY);
@@ -241,6 +245,12 @@
                 document.getElementById('venue-input').value = resMusician.data.current_venue || "";
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name;
                 updateProfileImage(resMusician.data.social_contact, resMusician.data.display_name);
+                
+                if (resMusician.data.genres && resMusician.data.genres.includes('drive.google.com')) {
+                    const driveMatch = resMusician.data.genres.match(/(https?:\/\/drive\.google\.com[^\s]+)/);
+                    if(driveMatch) document.getElementById('drive-folder-input').value = driveMatch[0];
+                }
+
                 updateUI();
             }
             var resReq = await sb.from('requests').select('*').eq('musician_id', artistId).eq('status', 'pending');
@@ -282,11 +292,9 @@
             container.prepend(div);
         }
 
-        /* --- 🌟 ฟังก์ชันจัดการคอร์ดที่เพิ่ม/ปรับปรุงใหม่ --- */
-        
         let scrollTimer;
         let isScrolling = false;
-        let scrollSpeed = 100; // ความเร็วเริ่มต้น (ช้าลงกว่าเดิม)
+        let scrollSpeed = 100;
 
         function solve(id, status, songName) {
             var card = document.getElementById('card-' + id);
@@ -311,20 +319,20 @@
             resetViewerDisplay();
         }
 
-        // ฟังชันเปิด Folder Google Drive (ใหม่)
+        async function saveAndOpenDrive() {
+            const folderUrl = document.getElementById('drive-folder-input').value.trim();
+            if (!folderUrl) return alert("กรุณาวางลิงก์ก่อนครับ");
+            await sb.from('musicians').update({ genres: folderUrl }).eq('id', artistId);
+            openDriveFolder();
+        }
+
         function openDriveFolder() {
             const input = document.getElementById('drive-folder-input').value.trim();
-            if (!input) return alert("กรุณาวางลิงก์โฟลเดอร์ Google Drive ก่อนครับ");
-
+            if (!input) return;
             let folderId = "";
             if (input.includes('/folders/')) {
                 folderId = input.split('/folders/')[1].split('?')[0].split('/')[0];
-            } else if (input.length > 20) {
-                folderId = input;
-            } else {
-                return alert("ลิงก์ไม่ถูกต้องครับ");
-            }
-
+            } else { folderId = input; }
             resetViewerDisplay();
             const web = document.getElementById('main-chord-web');
             web.src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
@@ -357,22 +365,14 @@
             document.getElementById('scroll-controls').classList.remove('hidden');
         }
 
-        // ฟังก์ชันปรับความเร็ว (ใหม่)
         function adjustSpeed(delta) {
             scrollSpeed += delta;
             if (scrollSpeed < 20) scrollSpeed = 20; 
             if (scrollSpeed > 400) scrollSpeed = 400; 
-            
-            if (isScrolling) {
-                stopAutoScroll();
-                startAutoScroll();
-            }
+            if (isScrolling) { stopAutoScroll(); startAutoScroll(); }
         }
 
-        function toggleAutoScroll() {
-            if (isScrolling) { stopAutoScroll(); } else { startAutoScroll(); }
-        }
-
+        function toggleAutoScroll() { if (isScrolling) { stopAutoScroll(); } else { startAutoScroll(); } }
         function startAutoScroll() {
             isScrolling = true;
             document.getElementById('v-scroll-btn').innerText = "⏸ หยุดเลื่อน";
@@ -380,7 +380,6 @@
             const area = document.getElementById('chord-display-area');
             scrollTimer = setInterval(() => { area.scrollTop += 1; }, scrollSpeed);
         }
-
         function stopAutoScroll() {
             isScrolling = false;
             document.getElementById('v-scroll-btn').innerText = "📜 เลื่อนหน้า";
@@ -403,7 +402,6 @@
             activeSongName = "";
         }
 
-        /* --- ฟีเจอร์ Search เพลงแนะนำ (เหมือนเดิม) --- */
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
 
         const searchInput = document.getElementById('song-search-input');
