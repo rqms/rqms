@@ -19,9 +19,6 @@
         body, html { height: 100%; overflow: hidden; background: #020617; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        
-        /* ปรับแต่ง iframe ให้ดูเนียนกับระบบ */
-        #main-chord-web { background-color: #000; }
     </style>
 </head>
 <body class="text-slate-200 font-sans">
@@ -83,7 +80,6 @@
         </div>
 
         <div id="chord-viewer-panel" class="hidden lg:flex flex-1 flex-col bg-[#010409] relative">
-            
             <div class="p-3 bg-slate-900 border-b border-slate-800 flex flex-wrap gap-2 justify-between items-center shadow-lg">
                 <div class="flex items-center gap-2">
                     <span id="playing-song-label" class="text-emerald-500 font-black text-[10px] uppercase italic tracking-wider">Now Playing: ---</span>
@@ -109,7 +105,7 @@
                     <img id="main-chord-img" class="w-full h-auto mx-auto shadow-2xl">
                 </div>
 
-                <iframe id="main-chord-web" class="hidden w-full h-full bg-white border-none" src=""></iframe>
+                <iframe id="main-chord-web" class="hidden w-full h-full bg-white border-none" src="" allow="autoplay"></iframe>
 
                 <div id="chord-empty-msg" class="h-full flex flex-col items-center justify-center text-slate-800 text-center">
                     <p class="text-6xl mb-4 opacity-20">🎸</p>
@@ -153,7 +149,6 @@
     </div>
 
     <script>
-        /* --- SUPABASE & AUTH --- */
         var SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         var sb = supabase.createClient(SB_URL, SB_KEY);
@@ -241,7 +236,6 @@
             }, () => { alert("กรุณาเปิด GPS ครับ"); listContainer.innerHTML = ""; }, { enableHighAccuracy: true });
         }
 
-        /* --- LOAD DATA & SYNC --- */
         async function load() {
             var resMusician = await sb.from('musicians').select('*').eq('id', artistId).single();
             if (resMusician.data) {
@@ -250,7 +244,6 @@
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name;
                 updateProfileImage(resMusician.data.social_contact, resMusician.data.display_name);
                 
-                // ดึงลิงก์ Google Drive ที่จดจำไว้
                 if (resMusician.data.genres && resMusician.data.genres.includes('drive.google.com')) {
                     const driveMatch = resMusician.data.genres.match(/(https?:\/\/drive\.google\.com[^\s]+)/);
                     if(driveMatch) document.getElementById('drive-folder-input').value = driveMatch[0];
@@ -296,7 +289,6 @@
             container.prepend(div);
         }
 
-        /* --- 🌟 ฟังก์ชันจัดการคอร์ด (GOOGLE DRIVE GRID) 🌟 --- */
         let scrollTimer;
         let isScrolling = false;
         let scrollSpeed = 100;
@@ -326,7 +318,6 @@
         async function saveAndOpenDrive() {
             const folderUrl = document.getElementById('drive-folder-input').value.trim();
             if (!folderUrl) return alert("กรุณาวางลิงก์ก่อนครับ");
-            // บันทึกทับช่อง genres เพื่อซิงค์ข้ามเครื่อง
             await sb.from('musicians').update({ genres: folderUrl }).eq('id', artistId);
             openDriveFolder();
         }
@@ -336,15 +327,14 @@
             if (!input) return;
             
             let folderId = "";
-            // ดึง ID จากลิงก์ปกติ
             if (input.includes('/folders/')) {
                 folderId = input.split('/folders/')[1].split('?')[0].split('/')[0];
             } else { folderId = input; }
 
             resetViewerDisplay();
             const web = document.getElementById('main-chord-web');
-            // บังคับ Layout เป็น Grid และใช้ embeddedfolderview เพื่อให้อยู่ในหน้าเดิม
-            web.src = `https://drive.google.com/embeddedfolderview?id=${folderId}&layout=grid`;
+            // แก้ไข: ใช้ Preview Mode เพื่อให้อยู่ในหน้าเดิม และแสดงผลสีตัวหนังสือปกติ
+            web.src = `https://drive.google.com/drive/u/0/folders/${folderId}?preview=${folderId}`;
             web.classList.remove('hidden');
         }
 
@@ -372,7 +362,6 @@
             web.classList.remove('hidden');
         }
 
-        /* --- LOGIC ควบคุมการแสดงผล --- */
         function adjustSpeed(delta) {
             scrollSpeed += delta;
             if (scrollSpeed < 20) scrollSpeed = 20; 
@@ -410,7 +399,6 @@
             activeSongName = "";
         }
 
-        /* --- EDIT PROFILE & REALTIME --- */
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
 
         const searchInput = document.getElementById('song-search-input');
