@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RQMS Dashboard - Secured & GPS Active</title>
+    <title>RQMS Dashboard - Universal Chord Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Style เดิมของพี่ */
         .is-history { opacity: 0.4 !important; filter: grayscale(1); transform: scale(0.9); border-left-color: #475569 !important; pointer-events: none; }
         .request-card { transition: all 0.2s ease; margin-bottom: 12px; }
         .big-btn:active { background-color: #000 !important; opacity: 0.7; transform: scale(0.95); }
@@ -15,9 +16,14 @@
         .search-result-item { transition: all 0.2; cursor: pointer; }
         .search-result-item:hover { background-color: #1e293b; }
         .song-tag { display: inline-flex; align-items: center; gap: 4px; background: #10b98120; border: 1px solid #10b98140; color: #10b981; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: bold; margin: 2px; }
+        
+        /* Style ใหม่ที่เพิ่มมา (ไม่กระทบของเดิม) */
+        body, html { height: 100%; overflow: hidden; background: #020617; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-[#020617] text-slate-200 min-h-screen p-4 font-sans">
+<body class="text-slate-200 font-sans">
 
     <div id="lock-screen" class="fixed inset-0 z-[200] bg-[#020617] flex items-center justify-center p-6 hidden">
         <div class="max-w-sm w-full text-center space-y-8">
@@ -25,102 +31,114 @@
             <p class="text-slate-400 text-sm">กรอก PIN 6 หลักเพื่อเข้าควบคุมระบบ</p>
             <input type="password" id="pin-input" maxlength="6" inputmode="numeric" 
                    class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl text-center text-3xl tracking-[0.5em] text-white outline-none focus:border-emerald-500">
-            <button onclick="checkPin()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">
-                ยืนยันรหัสผ่าน
-            </button>
+            <button onclick="checkPin()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all">ยืนยันรหัสผ่าน</button>
             <p id="pin-error" class="text-red-500 text-sm hidden font-bold">❌ รหัสผ่านไม่ถูกต้องครับ</p>
         </div>
     </div>
 
-    <div id="main-content">
-        <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
-            <div class="flex items-center gap-4">
-                <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
-                <div>
-                    <p class="text-[8px] uppercase text-slate-500 font-bold">Status</p>
-                    <h2 id="status-text" class="text-lg font-black text-white uppercase leading-none">Offline</h2>
+    <div class="flex h-screen w-full overflow-hidden">
+        
+        <div id="main-content" class="w-full lg:w-[450px] border-r border-slate-800 flex flex-col p-4 overflow-y-auto custom-scrollbar bg-slate-950">
+            
+            <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
+                <div class="flex items-center gap-3">
+                    <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
+                    <div>
+                        <p class="text-[8px] uppercase text-slate-500 font-bold leading-none mb-1">Status</p>
+                        <h2 id="status-text" class="text-sm font-black text-white uppercase leading-none">Offline</h2>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <img id="artist-profile-img" src="" class="w-8 h-8 rounded-full border border-emerald-500 object-cover bg-slate-800">
+                    <div class="text-right">
+                        <h2 id="display-artist-name" class="text-sm font-black text-emerald-500 leading-none">---</h2>
+                    </div>
+                    <button onclick="openEditModal()" class="bg-slate-800 p-1.5 rounded-lg border border-slate-700 text-xs">⚙️</button>
+                </div>
+                <div class="text-right ml-2 border-l border-slate-800 pl-2">
+                    <h2 id="display-time" class="text-lg font-mono font-black text-emerald-500 leading-none">00:00</h2>
                 </div>
             </div>
-            <div class="border-l border-slate-800 pl-4 flex items-center gap-3">
-                <img id="artist-profile-img" src="" class="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover bg-slate-800 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                <div class="text-right">
-                    <p class="text-[8px] uppercase text-slate-500 font-bold">Artist</p>
-                    <h2 id="display-artist-name" class="text-lg font-black text-emerald-500 leading-none">---</h2>
+
+            <div class="grid grid-cols-1 gap-2 mb-6">
+                <div class="flex gap-2">
+                    <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-3 rounded-xl flex-1 text-white font-bold text-sm outline-none focus:border-emerald-500">
+                    <button onclick="getLocation()" class="bg-slate-800 px-4 rounded-xl border border-slate-600 big-btn">📍</button>
                 </div>
-                <button onclick="openEditModal()" class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-sm hover:bg-slate-700">⚙️</button>
+                <div id="venue-list" class="flex flex-wrap gap-2 min-h-[5px]"></div>
+                <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white py-3 rounded-xl font-black uppercase shadow-lg big-btn text-lg">เปิดระบบ</button>
             </div>
-            <div class="text-right ml-auto">
-                <h2 id="display-time" class="text-2xl font-mono font-black text-emerald-500 leading-none">00:00:00</h2>
+
+            <div class="mb-8">
+                <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em] uppercase">🔥 Live Requests</h3>
+                <div id="queue-container"></div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 gap-2 mb-8">
-            <div class="flex gap-2">
-                <input type="text" id="venue-input" placeholder="พิมพ์ชื่อร้าน..." class="bg-slate-900 border border-slate-700 p-4 rounded-xl flex-1 text-white font-bold text-lg outline-none focus:border-emerald-500">
-                <button onclick="getLocation()" class="bg-slate-800 px-6 rounded-xl border border-slate-600 text-2xl big-btn">📍</button>
+            <div class="border-t border-slate-900 pt-6">
+                <h3 class="text-slate-600 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em] uppercase">💾 History</h3>
+                <div id="history-container"></div>
             </div>
-            <div id="venue-list" class="flex flex-wrap gap-2 min-h-[10px]"></div>
-            <button id="system-btn" onclick="toggleSystem()" class="bg-emerald-600 text-white py-4 rounded-xl font-black uppercase shadow-lg big-btn text-xl">เปิดระบบ</button>
+
+            <button onclick="logout()" class="text-slate-700 text-[10px] uppercase font-bold w-full py-8 hover:text-red-500">🚪 ออกจากระบบ</button>
         </div>
 
-        <div class="mb-10">
-            <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em]">🔥 LIVE REQUESTS</h3>
-            <div id="queue-container"></div>
-        </div>
+        <div id="chord-viewer-panel" class="hidden lg:flex flex-1 flex-col bg-[#010409] relative">
+            
+            <div class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-3">
+                    <span id="playing-song-label" class="text-emerald-500 font-black text-xs uppercase italic tracking-wider">Now Playing: ---</span>
+                </div>
+                
+                <div class="flex gap-2">
+                    <input type="file" id="chord-file-input" accept="image/*" class="hidden" onchange="loadLocalChord(event)">
+                    <label for="chord-file-input" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer active:scale-95">📁 เปิดไฟล์คอร์ด</label>
+                    <button onclick="autoSearchChord()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold active:scale-95">🔍 หาคอร์ดสด</button>
+                    <button onclick="resetViewer()" class="bg-slate-700 text-slate-400 px-3 py-2 rounded-xl text-xs">✕</button>
+                </div>
+            </div>
 
-        <div class="border-t border-slate-800 pt-10 pb-20">
-            <h3 class="text-slate-500 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em]">💾 HISTORY (STATS)</h3>
-            <div id="history-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
+            <div id="chord-display-area" class="flex-1 overflow-auto scroll-smooth relative p-0 bg-black">
+                <img id="main-chord-img" class="hidden w-full h-auto mx-auto shadow-2xl">
+                
+                <iframe id="main-chord-web" class="hidden w-full h-full bg-white border-none" src=""></iframe>
 
-        <button onclick="logout()" class="text-slate-600 text-[10px] uppercase font-bold w-full py-8 hover:text-red-400">🚪 ออกจากระบบ (Logout)</button>
+                <div id="chord-empty-msg" class="h-full flex flex-col items-center justify-center text-slate-800 text-center">
+                    <p class="text-6xl mb-4 opacity-20">🎸</p>
+                    <p class="font-bold text-xs uppercase tracking-[0.2em] opacity-40">เตรียมพร้อมเล่นดนตรี</p>
+                </div>
+            </div>
+
+            <button id="v-scroll-btn" onclick="toggleAutoScroll()" class="hidden absolute bottom-8 right-8 bg-amber-600 hover:bg-amber-500 text-white px-8 py-5 rounded-full font-black uppercase shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50 text-xl active:scale-90 transition-all">
+                📜 เลื่อนหน้า
+            </button>
+        </div>
     </div>
 
-    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 font-sans overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl my-auto">
+    <div id="editProfileModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl">
             <h2 class="text-xl font-black text-white uppercase mb-6">Settings</h2>
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">ชื่อวง</label>
-                    <input type="text" id="edit_display_name" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
-                </div>
-
-                <div>
-                    <label class="text-[10px] text-emerald-500 font-bold mb-1 block">💸 PromptPay รับทิป</label>
-                    <input type="text" id="edit_promptpay" placeholder="เบอร์โทร / เลขบัตร" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none focus:border-emerald-500 font-bold text-lg">
-                </div>
-
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">🖼️ ใส่ link รูปวง (.jpg, .png)</label>
-                    <input type="text" id="edit_social" placeholder="แปะ URL รูปภาพเพื่อโชว์โปรไฟล์" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500">
-                </div>
-
+            <div class="space-y-4">
+                <div><label class="text-[10px] text-slate-500 font-bold mb-1 block uppercase">ชื่อวง</label><input type="text" id="edit_display_name" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none"></div>
+                <div><label class="text-[10px] text-emerald-500 font-bold mb-1 block uppercase">💸 PromptPay</label><input type="text" id="edit_promptpay" class="w-full bg-slate-950 border border-emerald-900 p-3 rounded-xl text-white outline-none font-bold"></div>
+                <div><label class="text-[10px] text-slate-500 font-bold mb-1 block uppercase">🖼️ Link รูปโปรไฟล์</label><input type="text" id="edit_social" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none"></div>
                 <div class="relative">
-                    <label class="text-[10px] text-emerald-400 font-bold mb-1 block">🎸 จัดการเพลงแนะนำ (Search & Add)</label>
-                    <div class="flex gap-2 mb-2">
-                        <input type="text" id="song-search-input" placeholder="ค้นชื่อเพลงที่จะแนะนำ..." 
-                               class="flex-1 bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500 text-sm">
-                    </div>
-                    <div id="search-results" class="absolute z-[110] left-0 right-0 bg-slate-800 border border-slate-700 rounded-xl mt-1 hidden max-h-40 overflow-y-auto shadow-2xl"></div>
-                    <div id="selected-songs-list" class="min-h-[40px] p-2 bg-slate-950 border border-dashed border-slate-800 rounded-xl flex flex-wrap gap-1"></div>
+                    <label class="text-[10px] text-emerald-400 font-bold mb-1 block uppercase">🎸 จัดการเพลงแนะนำ</label>
+                    <input type="text" id="song-search-input" placeholder="ค้นหาชื่อเพลง..." class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white text-sm outline-none">
+                    <div id="search-results" class="absolute z-[110] left-0 right-0 bg-slate-800 border border-slate-700 rounded-xl mt-1 hidden max-h-40 overflow-y-auto"></div>
+                    <div id="selected-songs-list" class="min-h-[40px] mt-2 p-2 bg-slate-950 border border-dashed border-slate-800 rounded-xl flex flex-wrap gap-1"></div>
                     <input type="hidden" id="edit_songs">
                 </div>
-
-                <div>
-                    <label class="text-[10px] text-slate-500 font-bold mb-1 block">📱 ข้อมูลวง / ช่องทางติดต่อ</label>
-                    <textarea id="edit_genres" rows="3" placeholder="เช่น ติดต่องาน 08x-xxx-xxxx / Facebook: xxx" 
-                              class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white outline-none focus:border-emerald-500 text-sm"></textarea>
-                </div>
+                <div><label class="text-[10px] text-slate-500 font-bold mb-1 block uppercase">📱 ติดต่อ/ข้อมูลวง</label><textarea id="edit_genres" rows="3" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-white text-sm outline-none"></textarea></div>
             </div>
-
             <div class="grid grid-cols-2 gap-3 mt-8">
-                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)]">บันทึก</button>
+                <button onclick="saveProfile()" class="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase shadow-lg">บันทึก</button>
                 <button onclick="document.getElementById('editProfileModal').classList.add('hidden')" class="bg-slate-800 text-slate-400 py-4 rounded-2xl font-black uppercase">ยกเลิก</button>
             </div>
         </div>
     </div>
 
     <script>
+        /* --- SUPABASE & DATA เดิมของพี่ (ห้ามแก้) --- */
         var SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co"; 
         var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
         var sb = supabase.createClient(SB_URL, SB_KEY);
@@ -128,9 +146,10 @@
         var isSystemOpen = false;
         var masterPin = "";
         var currentSelectedSongs = [];
+        var activeSongName = ""; // เก็บชื่อเพลงที่กำลังเล่น
 
         setInterval(function() {
-            document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
+            document.getElementById('display-time').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false, hour: '2-digit', minute: '2-digit' });
         }, 1000);
 
         async function initAuth() {
@@ -166,7 +185,7 @@
 
         async function logout() {
             if (isSystemOpen) {
-                const confirmClose = confirm("พี่เปิดระบบค้างไว้อยู่ครับ...\n\nกด [ตกลง] = ปิดระบบ + Logout\nกด [ยกเลิก] = Logout อย่างเดียว");
+                const confirmClose = confirm("ระบบยังเปิดอยู่ครับ...\n\nกด [ตกลง] = ปิดระบบ + Logout\nกด [ยกเลิก] = Logout อย่างเดียว");
                 if (confirmClose) {
                     await sb.from('musicians').update({ is_active: false }).eq('id', artistId);
                     executeLogout();
@@ -179,22 +198,18 @@
         function updateProfileImage(url, name) {
             const imgTag = document.getElementById('artist-profile-img');
             const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'A')}&background=059669&color=fff&size=100`;
-            if (url && url.startsWith('http')) {
-                imgTag.src = url;
-            } else {
-                imgTag.src = fallback;
-            }
+            imgTag.src = (url && url.startsWith('http')) ? url : fallback;
             imgTag.onerror = function() { this.src = fallback; this.onerror = null; };
         }
 
         function getLocation() {
             var listContainer = document.getElementById('venue-list');
             listContainer.innerHTML = "<p class='text-[10px] text-emerald-500 animate-pulse'>กำลังหาตำแหน่งร้าน...</p>";
-            if (!navigator.geolocation) { alert("iPad ไม่รองรับ GPS ครับ"); return; }
+            if (!navigator.geolocation) { alert("อุปกรณ์ไม่รองรับ GPS"); return; }
             navigator.geolocation.getCurrentPosition(function(pos) {
                 var lat = pos.coords.latitude;
                 var lon = pos.coords.longitude;
-                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18&addressdetails=1';
+                var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lon + '&zoom=18';
                 fetch(url).then(res => res.json()).then(data => {
                     var addr = data.address;
                     var names = [addr.amenity, addr.building, addr.shop, addr.tourism, addr.leisure, addr.restaurant, addr.bar, addr.cafe].filter(Boolean);
@@ -208,7 +223,7 @@
                         listContainer.appendChild(pill);
                     });
                 }).catch(() => { listContainer.innerHTML = ""; });
-            }, () => { alert("กรุณาเปิด GPS ครับ"); listContainer.innerHTML = ""; }, { enableHighAccuracy: true, timeout: 5000 });
+            }, () => { alert("กรุณาเปิด GPS ครับ"); listContainer.innerHTML = ""; }, { enableHighAccuracy: true });
         }
 
         async function load() {
@@ -237,11 +252,11 @@
             var d = document.getElementById('status-dot');
             var s = document.getElementById('status-text');
             if (isSystemOpen) {
-                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
+                b.innerText = "ปิดระบบ"; b.className = "bg-red-600 text-white py-3 rounded-xl font-black w-full shadow-lg big-btn text-lg uppercase";
                 d.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
                 s.innerText = "Online";
             } else {
-                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white py-4 rounded-xl font-black w-full shadow-lg big-btn text-xl";
+                b.innerText = "เปิดระบบ"; b.className = "bg-emerald-600 text-white py-3 rounded-xl font-black w-full shadow-lg big-btn text-lg uppercase";
                 d.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]";
                 s.innerText = "Offline";
             }
@@ -252,14 +267,16 @@
             var container = document.getElementById('queue-container');
             var div = document.createElement('div');
             div.id = 'card-' + req.id;
-            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-5 rounded-xl flex justify-between items-center shadow-lg";
-            div.innerHTML = '<div><p class="text-[9px] text-slate-500 font-bold mb-1">จาก: ' + (req.customer_name || "ไม่ระบุ") + '</p><h3 class="text-lg font-black text-white leading-tight">' + req.song_name + '</h3></div>' +
-                '<div class="btn-area flex gap-2"><button onclick="solve(\'' + req.id + '\', \'ok\')" class="bg-emerald-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">เล่นได้</button>' +
-                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-5 py-3 rounded-xl font-black text-xs big-btn">ไม่ได้</button></div>';
+            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-4 rounded-xl flex justify-between items-center shadow-lg";
+            div.innerHTML = '<div><p class="text-[9px] text-slate-500 font-bold mb-1 uppercase tracking-tighter">Request: ' + (req.customer_name || "Guest") + '</p><h3 class="text-base font-black text-white leading-tight">' + req.song_name + '</h3></div>' +
+                '<div class="btn-area flex gap-2"><button onclick="solve(\'' + req.id + '\', \'ok\', \'' + req.song_name.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">เล่นได้</button>' +
+                '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">ไม่ได้</button></div>';
             container.prepend(div);
         }
 
-        function solve(id, status) {
+        /* --- 🌟 ฟังก์ชันจัดการคอร์ดที่เพิ่มใหม่ (Universal Viewer) --- */
+        
+        function solve(id, status, songName) {
             var card = document.getElementById('card-' + id);
             if (card) {
                 var btnArea = card.querySelector('.btn-area');
@@ -271,12 +288,94 @@
                 card.classList.add('is-history');
                 document.getElementById('history-container').prepend(card);
                 sb.from('requests').update({ status: (status === 'ok' ? 'played' : 'declined') }).eq('id', id).then(() => {});
+                
+                // ถ้า "เล่นได้" ให้ส่งชื่อเพลงไปเตรียมหาคอร์ด
+                if(status === 'ok') {
+                    prepareChord(songName);
+                }
             }
         }
 
+        function prepareChord(name) {
+            activeSongName = name;
+            document.getElementById('playing-song-label').innerText = "Now Playing: " + name;
+            document.getElementById('chord-viewer-panel').classList.remove('hidden');
+            resetViewerDisplay();
+            // autoSearchChord(); // เปิดบรรทัดนี้ถ้าต้องการให้หา Google ทันทีที่กดรับเพลง
+        }
+
+        function loadLocalChord(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resetViewerDisplay();
+                    const img = document.getElementById('main-chord-img');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('chord-display-area').scrollTop = 0;
+                    document.getElementById('v-scroll-btn').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function autoSearchChord() {
+            if (!activeSongName) return alert("กรุณาเลือกเพลงจากคิวก่อนครับ");
+            resetViewerDisplay();
+            const web = document.getElementById('main-chord-web');
+            web.src = `https://www.google.com/search?q=${encodeURIComponent(activeSongName)}+คอร์ด+เนื้อเพลง&igu=1`;
+            web.classList.remove('hidden');
+            document.getElementById('v-scroll-btn').classList.remove('hidden');
+        }
+
+        function resetViewerDisplay() {
+            document.getElementById('main-chord-img').classList.add('hidden');
+            document.getElementById('main-chord-web').classList.add('hidden');
+            document.getElementById('chord-empty-msg').classList.add('hidden');
+            stopAutoScroll();
+        }
+
+        function resetViewer() {
+            resetViewerDisplay();
+            document.getElementById('chord-empty-msg').classList.remove('hidden');
+            document.getElementById('v-scroll-btn').classList.add('hidden');
+            document.getElementById('playing-song-label').innerText = "Now Playing: ---";
+            activeSongName = "";
+        }
+
+        /* --- 📜 ระบบ Auto-Scroll --- */
+        let scrollTimer;
+        let isScrolling = false;
+
+        function toggleAutoScroll() {
+            if (isScrolling) {
+                stopAutoScroll();
+            } else {
+                startAutoScroll();
+            }
+        }
+
+        function startAutoScroll() {
+            isScrolling = true;
+            document.getElementById('v-scroll-btn').innerText = "⏸ หยุดเลื่อน";
+            document.getElementById('v-scroll-btn').classList.replace('bg-amber-600', 'bg-red-600');
+            const area = document.getElementById('chord-display-area');
+            scrollTimer = setInterval(() => {
+                area.scrollTop += 1;
+            }, 60); // ความเร็ว 60ms ต่อ 1px (ปรับเลขนี้เพื่อเปลี่ยนความเร็ว)
+        }
+
+        function stopAutoScroll() {
+            isScrolling = false;
+            document.getElementById('v-scroll-btn').innerText = "📜 เลื่อนหน้า";
+            document.getElementById('v-scroll-btn').classList.replace('bg-red-600', 'bg-amber-600');
+            clearInterval(scrollTimer);
+        }
+
+        /* --- ฟีเจอร์ Search เพลงแนะนำ (ของเดิม) --- */
         sb.channel('db').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'requests', filter: 'musician_id=eq.'+artistId }, p => draw(p.new)).subscribe();
 
-        // --- ระบบ Search & Add Song ---
         const searchInput = document.getElementById('song-search-input');
         const resultsBox = document.getElementById('search-results');
 
