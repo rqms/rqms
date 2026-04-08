@@ -308,15 +308,13 @@
             }
         }
 
-        // ฟังก์ชันใหม่: ดูดไฟล์จาก Google Drive มาเก็บไว้ในระบบ (Memory)
+        // ฟังก์ชันแก้ไขใหม่: ใช้แท็ก img โหลดโดยตรงเพื่อเลี่ยงปัญหา CORS/403
         async function fetchAndStoreImage(url, songName) {
             const label = document.getElementById('playing-song-label');
-            const originalText = label.innerText;
-            label.innerText = "⏳ กำลังดึงข้อมูลไฟล์...";
+            label.innerText = "⏳ กำลังโหลดคอร์ด...";
 
             try {
                 let fileId = "";
-                // ดึง ID จาก Link Google Drive (ทั้งแบบ /file/d/... และ ?id=...)
                 if (url.includes('id=')) {
                     fileId = url.split('id=')[1].split('&')[0];
                 } else if (url.includes('/d/')) {
@@ -324,33 +322,34 @@
                 }
 
                 if (fileId) {
-                    // ใช้ URL สำหรับ Direct Download
-                    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    // ใช้ export=view เพื่อแสดงภาพดิบ
+                    const directImageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
                     
-                    const response = await fetch(downloadUrl);
-                    if (!response.ok) throw new Error("Fetch failed");
-                    
-                    const blob = await response.blob();
-                    const internalUrl = URL.createObjectURL(blob);
-                    
-                    // แสดงผลใน Image Viewer
                     resetViewerDisplay();
                     const img = document.getElementById('main-chord-img');
-                    img.src = internalUrl;
-                    document.getElementById('img-container').classList.remove('hidden');
-                    document.getElementById('img-container').scrollTop = 0;
-                    document.getElementById('scroll-controls').classList.remove('hidden');
                     
-                    label.innerText = "Now Playing: " + songName;
+                    // โหลดรูปเข้าแท็ก img โดยตรง
+                    img.src = directImageUrl;
+                    
+                    img.onload = function() {
+                        document.getElementById('img-container').classList.remove('hidden');
+                        document.getElementById('img-container').scrollTop = 0;
+                        document.getElementById('scroll-controls').classList.remove('hidden');
+                        label.innerText = "Now Playing: " + songName;
+                    };
+
+                    img.onerror = function() {
+                        console.error("Image load failed");
+                        autoSearchChord(); 
+                        label.innerText = "Now Playing: " + songName + " (Load Failed)";
+                    };
                 } else {
-                    // หากไม่ใช่ลิงก์ Drive ให้ลองเปิดผ่าน iframe ปกติ
                     autoSearchChord(); 
                 }
             } catch (error) {
-                console.error("Download Error:", error);
-                // ถ้าโหลดไม่สำเร็จ ให้ใช้ iframe ค้นหา Google แทนเป็นทางเลือกสำรอง
+                console.error("System Error:", error);
                 autoSearchChord();
-                label.innerText = "Now Playing: " + songName + " (Load Failed)";
+                label.innerText = "Now Playing: " + songName + " (System Error)";
             }
         }
 
@@ -359,9 +358,12 @@
             document.getElementById('playing-song-label').innerText = "Now Playing: " + name;
             document.getElementById('chord-viewer-panel').classList.remove('hidden');
             
-            // หากชื่อเพลงเป็น URL ของ Google Drive ให้ใช้การ Fetch ทันที
+            // ตรวจสอบว่าเป็นลิงก์ Drive หรือไม่
             if (name.includes('drive.google.com')) {
-                fetchAndStoreImage(name, "File from Drive");
+                fetchAndStoreImage(name, name.split('/').pop() || "File from Drive");
+            } else {
+                // ถ้าไม่ใช่ลิงก์ ให้ลองใช้ Search อัตโนมัติ
+                autoSearchChord();
             }
         }
 
