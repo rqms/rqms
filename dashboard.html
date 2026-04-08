@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RQMS Dashboard - Stable Edition</title>
+    <title>RQMS Dashboard - Local Storage Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -89,7 +89,7 @@
                     <input type="text" id="drive-folder-input" placeholder="วางลิงก์ Google Drive..." 
                            class="bg-slate-950 border border-slate-700 px-3 py-2 rounded-xl text-[10px] text-white outline-none w-44 focus:border-blue-500">
                     
-                    <button onclick="saveAndOpenDrive()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-black active:scale-95 shadow-lg">💾 บันทึกโฟลเดอร์</button>
+                    <button onclick="saveAndOpenDrive()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-[10px] font-black active:scale-95 shadow-lg">💾 บันทึกคอร์ด (เครื่องนี้)</button>
                     
                     <div class="h-6 w-[1px] bg-slate-700 mx-1"></div>
 
@@ -308,33 +308,60 @@
             }
         }
 
-        // ฟังก์ชันใหม่: ใช้ Iframe โหลดภาพจาก Preview ของ Drive เพื่อเลี่ยง CORS
+        // ฟังก์ชันใหม่: ดูดไฟล์จาก Google Drive มาเก็บไว้ในระบบ (Memory)
+        async function fetchAndStoreImage(url, songName) {
+            const label = document.getElementById('playing-song-label');
+            const originalText = label.innerText;
+            label.innerText = "⏳ กำลังดึงข้อมูลไฟล์...";
+
+            try {
+                let fileId = "";
+                // ดึง ID จาก Link Google Drive (ทั้งแบบ /file/d/... และ ?id=...)
+                if (url.includes('id=')) {
+                    fileId = url.split('id=')[1].split('&')[0];
+                } else if (url.includes('/d/')) {
+                    fileId = url.split('/d/')[1].split('/')[0].split('?')[0];
+                }
+
+                if (fileId) {
+                    // ใช้ URL สำหรับ Direct Download
+                    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    
+                    const response = await fetch(downloadUrl);
+                    if (!response.ok) throw new Error("Fetch failed");
+                    
+                    const blob = await response.blob();
+                    const internalUrl = URL.createObjectURL(blob);
+                    
+                    // แสดงผลใน Image Viewer
+                    resetViewerDisplay();
+                    const img = document.getElementById('main-chord-img');
+                    img.src = internalUrl;
+                    document.getElementById('img-container').classList.remove('hidden');
+                    document.getElementById('img-container').scrollTop = 0;
+                    document.getElementById('scroll-controls').classList.remove('hidden');
+                    
+                    label.innerText = "Now Playing: " + songName;
+                } else {
+                    // หากไม่ใช่ลิงก์ Drive ให้ลองเปิดผ่าน iframe ปกติ
+                    autoSearchChord(); 
+                }
+            } catch (error) {
+                console.error("Download Error:", error);
+                // ถ้าโหลดไม่สำเร็จ ให้ใช้ iframe ค้นหา Google แทนเป็นทางเลือกสำรอง
+                autoSearchChord();
+                label.innerText = "Now Playing: " + songName + " (Load Failed)";
+            }
+        }
+
         function prepareChord(name) {
             activeSongName = name;
             document.getElementById('playing-song-label').innerText = "Now Playing: " + name;
             document.getElementById('chord-viewer-panel').classList.remove('hidden');
             
+            // หากชื่อเพลงเป็น URL ของ Google Drive ให้ใช้การ Fetch ทันที
             if (name.includes('drive.google.com')) {
-                let fileId = "";
-                if (name.includes('id=')) {
-                    fileId = name.split('id=')[1].split('&')[0];
-                } else if (name.includes('/d/')) {
-                    fileId = name.split('/d/')[1].split('/')[0].split('?')[0];
-                }
-                
-                if (fileId) {
-                    resetViewerDisplay();
-                    const web = document.getElementById('main-chord-web');
-                    // ใช้ preview เพื่อให้ Google จัดการเรื่องสิทธิ์และการแสดงผลภาพให้
-                    web.src = `https://drive.google.com/file/d/${fileId}/preview`;
-                    web.classList.remove('hidden');
-                    // เนื่องจากเป็น iframe จากภายนอก จะเลื่อนอัตโนมัติ (Auto-scroll) ไม่ได้
-                    document.getElementById('scroll-controls').classList.add('hidden');
-                } else {
-                    autoSearchChord();
-                }
-            } else {
-                autoSearchChord();
+                fetchAndStoreImage(name, "File from Drive");
             }
         }
 
@@ -384,8 +411,7 @@
             if (!activeSongName) return alert("กรุณาเลือกเพลงจากคิวก่อนครับ");
             resetViewerDisplay();
             const web = document.getElementById('main-chord-web');
-            // ค้นหาคอร์ดโดยระบุชื่อเพลงให้ชัดเจน
-            web.src = `https://www.google.com/search?q=${encodeURIComponent(activeSongName)}+คอร์ด+กีตาร์&igu=1`;
+            web.src = `https://www.google.com/search?q=${encodeURIComponent(activeSongName)}+คอร์ด+เนื้อเพลง&igu=1`;
             web.classList.remove('hidden');
         }
 
