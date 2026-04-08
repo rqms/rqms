@@ -242,7 +242,6 @@
                 document.getElementById('display-artist-name').innerText = resMusician.data.display_name;
                 updateProfileImage(resMusician.data.social_contact, resMusician.data.display_name);
                 
-                // แก้ไข: ดึงค่าจากความจำเครื่อง (LocalStorage) แทนตาราง Supabase
                 const savedDriveLink = localStorage.getItem('local_drive_link_' + artistId);
                 if (savedDriveLink) {
                     document.getElementById('drive-folder-input').value = savedDriveLink;
@@ -315,17 +314,14 @@
             document.getElementById('chord-viewer-panel').classList.remove('hidden');
         }
 
-        // แก้ไข: เปลี่ยนมาใช้ LocalStorage แทนการ Update ตาราง
         function saveAndOpenDrive() {
             const folderUrl = document.getElementById('drive-folder-input').value.trim();
             if (!folderUrl) return alert("กรุณาวางลิงก์ก่อนครับ");
-            
-            // บันทึกลงความจำเครื่องเบราว์เซอร์
             localStorage.setItem('local_drive_link_' + artistId, folderUrl);
-            
             openDriveFolder();
         }
 
+        // แก้ไขฟังก์ชันเปิด Google Drive ให้เสถียรขึ้น
         function openDriveFolder() {
             const input = document.getElementById('drive-folder-input').value.trim();
             if (!input) return;
@@ -333,11 +329,16 @@
             let folderId = "";
             if (input.includes('/folders/')) {
                 folderId = input.split('/folders/')[1].split('?')[0].split('/')[0];
-            } else { folderId = input; }
+            } else if (input.includes('id=')) {
+                folderId = input.split('id=')[1].split('&')[0];
+            } else { 
+                folderId = input; 
+            }
 
             resetViewerDisplay();
             const web = document.getElementById('main-chord-web');
-            web.src = `https://drive.google.com/drive/u/0/folders/${folderId}?preview=${folderId}`;
+            // ใช้ embeddedfolderview ซึ่งถูกออกแบบมาให้แสดงผลในเว็บอื่นได้ดีกว่าหน้าปกติ
+            web.src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
             web.classList.remove('hidden');
         }
 
