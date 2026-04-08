@@ -286,6 +286,8 @@
                 '<div class="btn-area flex gap-2"><button onclick="solve(\'' + req.id + '\', \'ok\', \'' + req.song_name.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">เล่นได้</button>' +
                 '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">ไม่ได้</button></div>';
             container.prepend(div);
+            document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' });
+
         }
 
         let scrollTimer;
