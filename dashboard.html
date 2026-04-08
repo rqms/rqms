@@ -308,10 +308,61 @@
             }
         }
 
+        // ฟังก์ชันใหม่: ดูดไฟล์จาก Google Drive มาเก็บไว้ในระบบ (Memory)
+        async function fetchAndStoreImage(url, songName) {
+            const label = document.getElementById('playing-song-label');
+            const originalText = label.innerText;
+            label.innerText = "⏳ กำลังดึงข้อมูลไฟล์...";
+
+            try {
+                let fileId = "";
+                // ดึง ID จาก Link Google Drive (ทั้งแบบ /file/d/... และ ?id=...)
+                if (url.includes('id=')) {
+                    fileId = url.split('id=')[1].split('&')[0];
+                } else if (url.includes('/d/')) {
+                    fileId = url.split('/d/')[1].split('/')[0].split('?')[0];
+                }
+
+                if (fileId) {
+                    // ใช้ URL สำหรับ Direct Download
+                    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    
+                    const response = await fetch(downloadUrl);
+                    if (!response.ok) throw new Error("Fetch failed");
+                    
+                    const blob = await response.blob();
+                    const internalUrl = URL.createObjectURL(blob);
+                    
+                    // แสดงผลใน Image Viewer
+                    resetViewerDisplay();
+                    const img = document.getElementById('main-chord-img');
+                    img.src = internalUrl;
+                    document.getElementById('img-container').classList.remove('hidden');
+                    document.getElementById('img-container').scrollTop = 0;
+                    document.getElementById('scroll-controls').classList.remove('hidden');
+                    
+                    label.innerText = "Now Playing: " + songName;
+                } else {
+                    // หากไม่ใช่ลิงก์ Drive ให้ลองเปิดผ่าน iframe ปกติ
+                    autoSearchChord(); 
+                }
+            } catch (error) {
+                console.error("Download Error:", error);
+                // ถ้าโหลดไม่สำเร็จ ให้ใช้ iframe ค้นหา Google แทนเป็นทางเลือกสำรอง
+                autoSearchChord();
+                label.innerText = "Now Playing: " + songName + " (Load Failed)";
+            }
+        }
+
         function prepareChord(name) {
             activeSongName = name;
             document.getElementById('playing-song-label').innerText = "Now Playing: " + name;
             document.getElementById('chord-viewer-panel').classList.remove('hidden');
+            
+            // หากชื่อเพลงเป็น URL ของ Google Drive ให้ใช้การ Fetch ทันที
+            if (name.includes('drive.google.com')) {
+                fetchAndStoreImage(name, "File from Drive");
+            }
         }
 
         function saveAndOpenDrive() {
@@ -321,7 +372,6 @@
             openDriveFolder();
         }
 
-        // แก้ไขฟังก์ชันเปิด Google Drive ให้เสถียรขึ้น
         function openDriveFolder() {
             const input = document.getElementById('drive-folder-input').value.trim();
             if (!input) return;
@@ -337,7 +387,6 @@
 
             resetViewerDisplay();
             const web = document.getElementById('main-chord-web');
-            // ใช้ embeddedfolderview ซึ่งถูกออกแบบมาให้แสดงผลในเว็บอื่นได้ดีกว่าหน้าปกติ
             web.src = `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`;
             web.classList.remove('hidden');
         }
