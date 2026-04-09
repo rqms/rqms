@@ -36,7 +36,8 @@
 
    <div class="flex h-screen w-full overflow-hidden flex-col lg:flex-row">
         
-       <div id="main-content" class="h-[20%] lg:h-full w-full lg:w-[400px] border-b-4 border-emerald-600 lg:border-b-0 lg:border-r border-slate-800 flex flex-col p-4 overflow-y-auto bg-slate-950 order-1">           <div class="mb-6 p-4 rounded-2xl bg-slate-900 border border-slate-800 flex justify-between items-center shadow-2xl">
+      <div id="main-content" class="h-[20%] lg:h-full w-full lg:w-[400px] border-b-2 border-emerald-500 lg:border-b-0 lg:border-r border-slate-800 flex flex-col items-center justify-center p-2 bg-slate-950 order-1 overflow-hidden">
+    <div id="queue-container" class="w-full"></div>
                 <div class="flex items-center gap-3">
                     <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
                     <div>
@@ -280,13 +281,14 @@
             var container = document.getElementById('queue-container');
             var div = document.createElement('div');
             div.id = 'card-' + req.id;
-            div.className = "request-card bg-slate-900 border-l-4 border-emerald-500 p-4 rounded-xl flex justify-between items-center shadow-lg";
+            // ในฟังก์ชัน draw ตรงส่วนที่สร้าง div
+div.className = "w-full max-w-sm mx-auto p-3 rounded-xl bg-slate-900 border border-slate-800 shadow-lg";
             div.innerHTML = '<div><p class="text-[9px] text-slate-500 font-bold mb-1 uppercase tracking-tighter">Request: ' + (req.customer_name || "Guest") + '</p><h3 class="text-base font-black text-white leading-tight">' + req.song_name + '</h3></div>' +
                 '<div class="btn-area flex gap-2"><button onclick="solve(\'' + req.id + '\', \'ok\', \'' + req.song_name.replace(/'/g, "\\'") + '\')" class="bg-emerald-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">เล่นได้</button>' +
                 '<button onclick="solve(\'' + req.id + '\', \'no\')" class="bg-red-600 text-white px-4 py-3 rounded-xl font-black text-xs big-btn uppercase">ไม่ได้</button></div>';
             container.prepend(div);
-            const dash = document.getElementById('main-content');
-    dash.scrollTop = dash.scrollHeight;
+            container.innerHTML = ''; 
+    container.appendChild(div);
         }
 
         let scrollTimer;
