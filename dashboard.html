@@ -70,6 +70,22 @@
                 <h3 class="text-emerald-400 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em] uppercase">🔥 Live Requests</h3>
                 <div id="queue-container"></div>
             </div>
+           <div id="admin-affiliate-box" class="max-w-md mx-auto mt-6 p-4 rounded-2xl border-2 border-dashed border-emerald-500/30 bg-emerald-500/5">
+    <p class="text-[10px] text-emerald-400 font-bold mb-3 uppercase tracking-widest text-center">Support Platform Developer ☕</p>
+    <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-white rounded-xl flex-shrink-0 overflow-hidden border border-slate-700">
+            <img id="dash-aff-img" src="https://via.placeholder.com/150" class="w-full h-full object-cover">
+        </div>
+        <div class="flex-1 min-w-0">
+            <h4 id="dash-aff-title" class="text-xs font-bold text-white truncate italic">กำลังโหลดดีลเด็ด...</h4>
+            <p class="text-[9px] text-slate-400 mb-2">สนับสนุนระบบด้วยการเลือกซื้อสินค้า</p>
+            <div class="flex gap-2">
+                <a id="dash-aff-btn" href="#" target="_blank" class="flex-1 bg-orange-600 py-2 rounded-lg text-[10px] font-black text-center uppercase shadow-lg">ซื้อเลย</a>
+                <button onclick="refreshAffiliate()" class="bg-slate-800 px-3 py-2 rounded-lg text-[10px] hover:bg-slate-700">🔄</button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <div class="border-t border-slate-900 pt-6">
                 <h3 class="text-slate-600 font-bold text-[10px] mb-4 italic px-2 tracking-[0.3em] uppercase">💾 History</h3>
@@ -539,5 +555,47 @@
 
         initAuth();
     </script>
+    <script>
+    // --- ID ของคุณ (เจ้าของแพลตฟอร์ม) ---
+    const ADMIN_SHOPEE_ID = "15301320155";
+    const ADMIN_LAZADA_ID = "307781178";
+
+    // คลังสินค้าแนะนำสำหรับนักดนตรี (เพิ่ม/ลด ได้ตามใจชอบ)
+    const myDeals = [
+        { title: "สายกีตาร์ Elixir เบอร์ 10", kw: "elixir guitar strings", img: "https://www.musicarms.net/wp-content/uploads/2017/05/Elixir-12052.jpg" },
+        { title: "หูฟัง KZ In-Ear Monitor", kw: "KZ ZSN Pro", img: "https://m.media-amazon.com/images/I/611ZzXpS7tL._AC_SL1200_.jpg" },
+        { title: "ถ่านชาร์จ Eneloop Pro", kw: "eneloop pro", img: "https://m.media-amazon.com/images/I/61O2h8OAL6L._AC_SL1000_.jpg" },
+        { title: "คาโป้กีตาร์อย่างดี", kw: "guitar capo metal", img: "https://images.unsplash.com/photo-1519832584003-88ec0c53846c?q=80&w=200&auto=format&fit=crop" },
+        { title: "ยาอมแก้เจ็บคอ (สำหรับนักร้อง)", kw: "ยาอมแก้เจ็บคอ", img: "https://images.unsplash.com/photo-1584017945366-b97b0e491f07?q=80&w=200&auto=format&fit=crop" }
+    ];
+
+    function refreshAffiliate() {
+        const item = myDeals[Math.floor(Math.random() * myDeals.length)];
+        const platform = Math.random() > 0.5 ? 'SHOPEE' : 'LAZADA';
+        
+        let link = "";
+        if(platform === 'SHOPEE') {
+            link = `https://shopee.co.th/search?keyword=${encodeURIComponent(item.kw)}&utm_content=${ADMIN_SHOPEE_ID}`;
+        } else {
+            link = `https://www.lazada.co.th/catalog/?q=${encodeURIComponent(item.kw)}&aff_id=${ADMIN_LAZADA_ID}`;
+        }
+
+        // อัปเดตข้อมูลลงหน้าเว็บ
+        document.getElementById('dash-aff-img').src = item.img;
+        document.getElementById('dash-aff-title').innerText = item.title;
+        const btn = document.getElementById('dash-aff-btn');
+        btn.href = link;
+        btn.innerText = `ช้อปที่ ${platform}`;
+        
+        // เปลี่ยนสีปุ่มตามแพลตฟอร์ม
+        btn.style.backgroundColor = (platform === 'SHOPEE') ? "#ea580c" : "#1e40af";
+    }
+
+    // สั่งให้ทำงานทันทีเมื่อเปิดหน้าจอ
+    document.addEventListener('DOMContentLoaded', refreshAffiliate);
+    
+    // สุ่มใหม่ทุกๆ 10 นาที (เผื่อนั่งคุมคิวนานๆ จะได้ไม่เบื่อสินค้าเดิม)
+    setInterval(refreshAffiliate, 600000);
+</script>
 </body>
 </html>
