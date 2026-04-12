@@ -35,21 +35,19 @@
             <p id="status-desc" class="text-slate-400 text-sm italic">กำลังรอสัญญาณจากเวที...</p>
         </div>
 
-        <div id="request-form" class="hidden glass-card rounded-[2.5rem] p-8 shadow-2xl space-y-6 relative">
+        <div id="request-form" class="hidden glass-card rounded-[2.5rem] p-8 shadow-2xl space-y-6 relative border border-white/5">
             <div class="text-center space-y-3">
                 <img id="artist-img" src="" class="w-20 h-20 rounded-full mx-auto border-2 border-emerald-500 p-1 object-cover bg-slate-800">
                 <h2 id="artist-display-name" class="text-2xl font-black text-white leading-none">---</h2>
                 <p id="venue-display-name" class="text-emerald-400 font-bold text-[10px] uppercase tracking-widest mt-2">LIVE NOW</p>
             </div>
 
-            <div id="status-display" class="space-y-2 mt-4"></div>
-
             <div id="recommended-section" class="hidden space-y-3">
                 <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest italic px-1">✨ เพลงแนะนำ</p>
                 <div id="recommended-list" class="flex flex-wrap gap-2"></div>
             </div>
             
-            <div class="space-y-4 relative">
+            <div class="space-y-4 relative border-b border-slate-800 pb-6">
                 <div class="relative">
                     <input type="text" id="song" oninput="searchMusic(this.value)" placeholder="🔍 พิมพ์ชื่อเพลงหรือศิลปิน..." autocomplete="off" class="w-full p-4 bg-slate-900/50 rounded-2xl border border-slate-700 outline-none focus:border-emerald-500 text-white font-bold">
                     <div id="song-results" class="hidden absolute left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50"></div>
@@ -58,22 +56,27 @@
                 <button onclick="sendSong()" id="send-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black text-lg active:scale-95 transition-all shadow-lg">ส่งเพลงขอ 🚀</button>
             </div>
 
-            <div id="tip-area" class="hidden pt-6 border-t border-slate-800 text-center">
+            <div id="tip-area" class="hidden text-center pb-2">
                 <div class="flex gap-2">
                     <button onclick="copyPromptPay()" class="flex-1 bg-slate-800 p-3 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300 italic">📋 คัดลอกพร้อมเพย์</button> 
                     <button onclick="showQR()" class="bg-amber-600/20 border border-amber-500/50 p-3 rounded-xl text-xl">📸</button>
                 </div>
             </div>
+
+            <div id="status-container" class="hidden pt-4 border-t border-slate-800 space-y-2">
+                <p class="text-[9px] text-emerald-500 font-black uppercase tracking-widest italic px-1 text-center">คิวเพลงล่าสุด</p>
+                <div id="status-display" class="space-y-2"></div>
+            </div>
         </div>
 
-        <div id="affiliate-card" class="glass-card rounded-3xl p-4 flex items-center gap-4 border-dashed border-slate-700">
+        <div id="affiliate-card" class="glass-card rounded-3xl p-4 flex items-center gap-4 border-dashed border-slate-700 shadow-xl">
             <div class="w-14 h-14 bg-white rounded-xl flex-shrink-0 flex items-center justify-center p-1">
                 <img id="aff-img" src="" class="object-contain w-full h-full">
             </div>
             <div class="flex-1 min-w-0">
-                <p id="aff-platform-label" class="text-[9px] text-orange-400 font-bold uppercase">Item Recommended</p>
+                <p id="aff-platform-label" class="text-[9px] text-orange-400 font-bold uppercase">Recommended Item</p>
                 <h4 id="aff-title" class="text-xs font-bold text-white truncate italic">---</h4>
-                <a id="aff-link" href="#" target="_blank" class="text-[9px] text-slate-500 underline">เช็คราคาที่ Shopee/Lazada</a>
+                <a id="aff-link" href="#" target="_blank" class="text-[9px] text-slate-500 underline">เช็คราคาที่ร้านค้า</a>
             </div>
             <a id="aff-buy-btn" href="#" target="_blank" class="bg-orange-600 px-3 py-2 rounded-lg text-[10px] font-black uppercase">ซื้อ</a>
         </div>
@@ -87,9 +90,9 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURATION (ใส่ ID ของคุณที่นี่) ---
-        const MY_SHOPEE_ID = "15301320155"; // เปลี่ยนเป็น ID ของคุณ
-        const MY_LAZADA_ID = "307781178";   // เปลี่ยนเป็น ID ของคุณ
+        // --- 1. CONFIGURATION (ปรับตามรูปที่ส่งมา) ---
+        const MY_SHOPEE_ID = "15301320155"; 
+        const MY_LAZADA_ID = "307781178"; 
 
         const SB_URL = "https://uswpewtkfccqncjlmeus.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzd3Bld3RrZmNjcW5jamxtZXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjE1MzQsImV4cCI6MjA5MDQzNzUzNH0.qQPQMzI2J_87Pu6M9FRHEeLL2hk9rabpUK4yiYOrKBc";
@@ -97,12 +100,13 @@
         const artistId = new URLSearchParams(window.location.search).get('id');
         let currentPromptPay = "";
 
-        // --- 2. CORE FUNCTIONS (ห้ามลบ/แก้ส่วนนี้ เพื่อให้เปิด-ปิดระบบทำงานได้) ---
+        // --- 2. CORE FUNCTIONS (จัดการเปิด-ปิดระบบ) ---
         async function checkStatus() {
             if(!artistId) return;
             const { data } = await sbClient.from('musicians').select('*').eq('id', artistId).single();
             const loadingScreen = document.getElementById('loading-screen');
             const requestForm = document.getElementById('request-form');
+            const statusContainer = document.getElementById('status-container');
 
             if (data && data.is_active) {
                 loadingScreen.classList.add('hidden');
@@ -111,67 +115,67 @@
                 document.getElementById('venue-display-name').innerText = data.current_venue || "LIVE NOW";
                 
                 const imgTag = document.getElementById('artist-img');
-                let social = data.social_contact ? data.social_contact.trim() : "";
                 const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.display_name || 'A')}&background=059669&color=fff&size=128`;
-                imgTag.src = (social && social.startsWith('http')) ? social : fallback;
-                imgTag.onerror = function() { this.src = fallback; this.onerror = null; };
+                imgTag.src = (data.social_contact && data.social_contact.startsWith('http')) ? data.social_contact : fallback;
 
-                const recSection = document.getElementById('recommended-section');
-                const recList = document.getElementById('recommended-list');
                 if (data.recommended_songs) {
                     const songs = data.recommended_songs.split(/[\n,]+/).filter(s => s.trim() !== "");
-                    if (songs.length > 0) {
-                        recSection.classList.remove('hidden');
-                        recList.innerHTML = songs.map(s => `<button onclick="selectSong('${s.trim()}')" class="song-pill bg-emerald-500/10 text-emerald-400 text-[11px] font-bold px-3 py-2 rounded-xl border border-emerald-500/20">${s.trim()}</button>`).join('');
-                    } else { recSection.classList.add('hidden'); }
+                    document.getElementById('recommended-section').classList.toggle('hidden', songs.length === 0);
+                    document.getElementById('recommended-list').innerHTML = songs.map(s => `<button onclick="selectSong('${s.trim()}')" class="song-pill bg-emerald-500/10 text-emerald-400 text-[11px] font-bold px-3 py-2 rounded-xl border border-emerald-500/20">${s.trim()}</button>`).join('');
                 }
 
                 if (data.promptpay) {
                     currentPromptPay = data.promptpay.toString();
                     document.getElementById('tip-area').classList.remove('hidden');
                 }
+                syncSongStatus(); // ดึงคิวเพลงเมื่อระบบเปิด
             } else {
                 loadingScreen.classList.remove('hidden');
                 requestForm.classList.add('hidden');
+                statusContainer.classList.add('hidden'); // ลบคิวเพลงออกเมื่อปิดระบบ
             }
         }
 
-        // --- 3. LIVE STATUS (รายการเพลงล่าสุด) ---
+        // --- 3. LIVE QUEUE (แสดงสถานะเพลง) ---
         async function syncSongStatus() {
             if(!artistId || document.getElementById('request-form').classList.contains('hidden')) return;
             const { data } = await sbClient.from('requests').select('song_name, status').eq('musician_id', artistId).order('created_at', { ascending: false }).limit(3);
-            if (data) {
-                const container = document.getElementById('status-display');
-                container.innerHTML = data.map(item => {
+            const container = document.getElementById('status-container');
+            const display = document.getElementById('status-display');
+            
+            if (data && data.length > 0) {
+                container.classList.remove('hidden');
+                display.innerHTML = data.map(item => {
                     let color = "text-slate-400", text = "รอคิว...";
                     if(item.status === 'played') { color = "text-emerald-400"; text = "เล่นแล้ว ✅"; }
-                    if(item.status === 'declined') { color = "text-red-400"; text = "ข้ามเพลงนี้ ❌"; }
-                    return `<div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-[10px]">
-                        <span class="text-white truncate flex-1 mr-2">${item.song_name}</span>
+                    if(item.status === 'declined') { color = "text-red-400"; text = "ข้าม ❌"; }
+                    return `<div class="bg-slate-900/30 p-2.5 rounded-xl border border-slate-800/50 flex justify-between items-center text-[10px]">
+                        <span class="text-slate-300 truncate flex-1 mr-2">${item.song_name}</span>
                         <span class="font-bold ${color}">${text}</span>
                     </div>`;
                 }).join('');
+            } else {
+                container.classList.add('hidden');
             }
         }
 
-        // --- 4. SMART AFFILIATE (แก้ไขให้สมบูรณ์ขึ้น) ---
+        // --- 4. SMART AFFILIATE (ใช้ลิงก์ค้นหาชัวร์ที่สุด) ---
         function loadSmartAffiliate(songName = "") {
             const song = songName.toLowerCase();
-            const hour = new Date().getHours();
             let platform = Math.random() > 0.5 ? 'SHOPEE' : 'LAZADA';
-            let item = { title: "สายกีตาร์ Elixir", kw: "guitar strings elixir", img: "https://m.media-amazon.com/images/I/71P4r1T4OBL._AC_SL1500_.jpg" };
+            let item = { title: "สายกีตาร์ Elixir", kw: "สายกีตาร์ elixir", img: "https://m.media-amazon.com/images/I/71P4r1T4OBL._AC_SL1500_.jpg" };
 
             if (song.includes("เศร้า") || song.includes("เลิก") || song.includes("อกหัก")) {
-                item = { title: "ทิชชู่ซับน้ำตาเกรดพรีเมียม", kw: "facial tissue", img: "https://m.media-amazon.com/images/I/71X8Xh7jF7L._AC_SL1500_.jpg" };
+                item = { title: "ทิชชู่ซับน้ำตาเกรดพรีเมียม", kw: "ทิชชู่เช็ดหน้า", img: "https://m.media-amazon.com/images/I/71X8Xh7jF7L._AC_SL1500_.jpg" };
                 platform = 'SHOPEE';
-            } else if (song.includes("เมา") || song.includes("เหล้า") || song.includes("เบียร์") || hour >= 22 || hour <= 2) {
-                item = { title: "วิตามินแก้แฮงค์", kw: "hangover cure", img: "https://m.media-amazon.com/images/I/61N+V3qU7uL._AC_SL1000_.jpg" };
+            } else if (song.includes("เมา") || song.includes("เหล้า") || song.includes("เบียร์")) {
+                item = { title: "วิตามินแก้แฮงค์", kw: "แก้แฮงค์", img: "https://m.media-amazon.com/images/I/61N+V3qU7uL._AC_SL1000_.jpg" };
                 platform = 'LAZADA';
             }
 
             const affLink = platform === 'SHOPEE' 
                 ? `https://shopee.co.th/search?keyword=${encodeURIComponent(item.kw)}&utm_content=${MY_SHOPEE_ID}`
-                : `https://s.lazada.co.th/s.xxxx?q=${encodeURIComponent(item.kw)}&p_id=${MY_LAZADA_ID}`;
+                : `https://www.lazada.co.th/catalog/?q=${encodeURIComponent(item.kw)}&aff_id=${MY_LAZADA_ID}`;
 
             document.getElementById('aff-title').innerText = item.title;
             document.getElementById('aff-img').src = item.img;
@@ -183,7 +187,7 @@
             document.getElementById('aff-platform-label').innerText = platform + " RECOMMENDED";
         }
 
-        // --- 5. OTHERS (คงเดิมไว้ทั้งหมด) ---
+        // --- 5. OTHERS ---
         window.selectSong = (val) => {
             document.getElementById('song').value = val;
             document.getElementById('song-results').classList.add('hidden');
@@ -230,11 +234,10 @@
             navigator.clipboard.writeText(currentPromptPay.replace(/\D/g, '')).then(() => alert("คัดลอกแล้ว!"));
         };
 
-        // ลำดับการรันฟังก์ชัน
         checkStatus();
         loadSmartAffiliate("");
-        setInterval(checkStatus, 15000); // เช็คสถานะเปิด-ปิด ทุก 15 วิ
-        setInterval(syncSongStatus, 10000); // เช็คคิวเพลง ทุก 10 วิ
+        setInterval(checkStatus, 15000); 
+        setInterval(syncSongStatus, 10000);
     </script>
 </body>
 </html>
