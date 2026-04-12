@@ -223,6 +223,41 @@
                 alert("✅ คัดลอกเลข " + cleanNumber + " สำเร็จ!");
             }).catch(function() { alert("เลขพร้อมเพย์คือ: " + cleanNumber); });
         };
-    </script>
+    </script>  
+    <div class="w-full space-y-2 mt-4 px-2">
+    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">สถานะเพลงล่าสุด</p>
+    <div id="status-display" class="space-y-2"></div>
+</div>
+
+<script>
+// 2. ฟังก์ชันดึงข้อมูล (ก๊อปไปวางใน <script> เดิมที่มีอยู่)
+async function syncSongStatus() {
+    const { data } = await sbClient
+        .from('requests')
+        .select('song_name, status')
+        .eq('musician_id', artistId)
+        .order('created_at', { ascending: false })
+        .limit(3); // โชว์แค่ 3 เพลงล่าสุดพอครับ ไม่รก
+
+    if (data) {
+        const container = document.getElementById('status-display');
+        container.innerHTML = data.map(item => {
+            let color = "text-slate-400";
+            let text = "รอคิว...";
+            if(item.status === 'played') { color = "text-emerald-400"; text = "กำลังเล่น/จบแล้ว ✅"; }
+            if(item.status === 'declined') { color = "text-red-400"; text = "ร้องไม่ได้ครับ ❌"; }
+            
+            return `<div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-[11px]">
+                <span class="text-white truncate flex-1 mr-2">${item.song_name}</span>
+                <span class="font-bold ${color}">${text}</span>
+            </div>`;
+        }).join('');
+    }
+}
+
+// ให้ทำงานทุกๆ 10 วินาที
+setInterval(syncSongStatus, 10000);
+syncSongStatus(); 
+</script>
 </body>
 </html>
